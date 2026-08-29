@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 1: Fundamentos de Prevención de Riesgos</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #2c3e50;
+        background: #f5f7fa;
+    }
+    
+    .top-nav {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+        color: white;
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .back-button {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .back-button:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateX(-3px);
+    }
+    
+    .module-info h1 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+    
+    .module-info span {
+        font-size: 13px;
+        opacity: 0.9;
+    }
+    
+    .progress-bar {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 5px;
+        width: 200px;
+    }
+    
+    .progress-fill {
+        background: #f39c12;
+        height: 8px;
+        border-radius: 6px;
+        width: 0%;
+        transition: width 0.3s;
+    }
+    
+    .main-wrapper {
+        display: flex;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .sidebar {
+        width: 350px;
+        background: white;
+        height: calc(100vh - 70px);
+        position: sticky;
+        top: 70px;
+        overflow-y: auto;
+        border-right: 1px solid #e2e8f0;
+        padding: 30px;
+    }
+    
+    .sidebar h3 {
+        color: #1e3a5f;
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f39c12;
+    }
+    
+    .sidebar-nav {
+        list-style: none;
+    }
+    
+    .sidebar-nav li {
+        margin-bottom: 5px;
+    }
+    
+    .sidebar-nav a {
+        display: block;
+        padding: 12px 15px;
+        color: #4a5568;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.3s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .sidebar-nav a:hover {
+        background: #f39c12;
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .sidebar-nav a.active {
+        background: #1e3a5f;
+        color: white;
+    }
+    
+    .sidebar-nav a::before {
+        content: "📌";
+        font-size: 12px;
+    }
+    
+    .content {
+        flex: 1;
+        padding: 40px;
+        max-width: 900px;
+    }
+    
+    .content-header {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .content-header h2 {
+        color: #1e3a5f;
+        font-size: 36px;
+        margin-bottom: 15px;
+    }
+    
+    .content-header p {
+        color: #718096;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    .banner-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .section {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        scroll-margin-top: 100px;
+    }
+    
+    .section h3 {
+        color: #1e3a5f;
+        font-size: 28px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f39c12;
+    }
+    
+    .section h4 {
+        color: #2c5282;
+        font-size: 20px;
+        margin: 25px 0 15px 0;
+    }
+    
+    .section p {
+        margin-bottom: 15px;
+        text-align: justify;
+        font-size: 15px;
+        line-height: 1.8;
+        color: #4a5568;
+    }
+    
+    .section ul {
+        margin: 15px 0 15px 25px;
+    }
+    
+    .section ul li {
+        margin-bottom: 10px;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .destacado {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        border-left: 5px solid #f39c12;
+        padding: 20px 25px;
+        margin: 25px 0;
+        border-radius: 8px;
+        font-style: italic;
+    }
+    
+    .importante {
+        background: linear-gradient(135deg, #e8f4f8, #d1e8f2);
+        border-left: 5px solid #2c5282;
+        padding: 20px 25px;
+        margin: 25px 0;
+        border-radius: 8px;
+    }
+    
+    .importante strong {
+        color: #1e3a5f;
+    }
+    
+    .comparacion {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin: 25px 0;
+    }
+    
+    .caja {
+        padding: 25px;
+        border-radius: 10px;
+        background: #f8f9fa;
+    }
+    
+    .caja.peligro {
+        border-top: 5px solid #e74c3c;
+    }
+    
+    .caja.riesgo {
+        border-top: 5px solid #f39c12;
+    }
+    
+    .caja h5 {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+    
+    .caja.peligro h5 { color: #c0392b; }
+    .caja.riesgo h5 { color: #d68910; }
+    
+    .lista-pasos {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 10px;
+        margin: 25px 0;
+    }
+    
+    .lista-pasos ol {
+        margin-left: 25px;
+    }
+    
+    .lista-pasos ol li {
+        margin-bottom: 15px;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .lista-pasos ol li strong {
+        color: #1e3a5f;
+    }
+    
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border-radius: 10px;
+        margin: 25px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+    }
+    
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin: 25px 0;
+    }
+    
+    .image-gallery img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .cierre {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+        color: white;
+        padding: 60px 40px;
+        text-align: center;
+        border-radius: 15px;
+        margin-top: 40px;
+    }
+    
+    .cierre h3 {
+        font-size: 32px;
+        margin-bottom: 20px;
+        border: none;
+        color: white;
+    }
+    
+    .cierre p {
+        font-size: 18px;
+        max-width: 800px;
+        margin: 0 auto 15px auto;
+        line-height: 1.8;
+        color: rgba(255,255,255,0.9);
+    }
+    
+    .cierre .frase-final {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 30px;
+        color: #f39c12;
+    }
+    
+    .next-module {
+        display: inline-block;
+        margin-top: 30px;
+        background: #f39c12;
+        color: white;
+        padding: 15px 40px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .next-module:hover {
+        background: #e67e22;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4);
+    }
+    
+    .scroll-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #f39c12;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 999;
+    }
+    
+    .scroll-top.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .scroll-top:hover {
+        background: #e67e22;
+        transform: translateY(-5px);
+    }
+    
+    .tts-controls {
+        display: inline-flex;
+        gap: 5px;
+        margin-bottom: 15px;
+        background: #f7fafc;
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .tts-btn {
+        background: white;
+        border: 1px solid #cbd5e0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 14px;
+    }
+    
+    .tts-btn:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .tts-btn.active {
+        background: #f39c12;
+        color: white;
+        border-color: #f39c12;
+    }
+    
+    .section.reading {
+        background: #fffef5;
+        border-left: 4px solid #f39c12;
+    }
+    
+    @media (max-width: 1024px) {
+        .sidebar {
+            display: none;
+        }
+        
+        .comparacion {
+            grid-template-columns: 1fr;
+        }
+        
+        .image-gallery {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .nav-container {
+            padding: 0 20px;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            padding: 25px;
+        }
+        
+        .content-header h2 {
+            font-size: 28px;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">
+                    ← Menú Principal
+                </a>
+                <div class="module-info">
+                    <h1>Módulo 1: Fundamentos de Prevención</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#prevencion">1. Qué es Prevención de Riesgos</a></li>
+                <li><a href="#peligro-riesgo">2. Peligro vs. Riesgo</a></li>
+                <li><a href="#accidente-trabajo">3. Accidente del Trabajo</a></li>
+                <li><a href="#accidente-trayecto">4. Accidente de Trayecto</a></li>
+                <li><a href="#enfermedad-profesional">5. Enfermedad Profesional</a></li>
+                <li><a href="#derechos-obligaciones">6. Derechos y Obligaciones</a></li>
+                <li><a href="#responsabilidad-empleador">7. Responsabilidad del Empleador</a></li>
+                <li><a href="#reporte-accidentes">8. Reporte de Accidentes</a></li>
+                <li><a href="#incidentes">9. Incidentes</a></li>
+                <li><a href="#cultura-seguridad">10. Cultura de Seguridad</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Fundamentos de Prevención de Riesgos</h2>
+                <p>Conceptos básicos, marco legal y cultura preventiva para un entorno laboral seguro en operaciones de bodega</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1553413077-190dd342872f?w=1200" alt="Bodega industrial" class="banner-image">
+
+            <section class="section" id="prevencion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Qué es Prevención de Riesgos</h3>
+                <p>La <strong>prevención de riesgos</strong> es el conjunto de acciones y medidas destinadas a anticiparse a los accidentes antes de que ocurran. No se trata de reaccionar cuando algo malo ya pasó, sino de identificar las situaciones que podrían causar daño y actuar sobre ellas a tiempo.</p>
+                
+                <p>En una bodega, esto significa entender que no basta con trabajar rápido o eficiente: hay que trabajar de manera segura. Cada caja que movemos, cada pallet que desplazamos, cada pasillo que recorremos, implica decisiones que pueden prevenir o provocar un accidente.</p>
+                
+                <div class="importante">
+                    <strong>Prevenir es actuar antes.</strong> No esperamos a que alguien tropiece con una caja atravesada en el pasillo para recién retirarla. La vemos, la identificamos como un problema potencial, y la removemos antes de que cause daño.
+                </div>
+                
+                <p>La prevención no es una tarea opcional ni un trámite burocrático. Es la base de todo trabajo bien hecho, porque ningún producto vale más que la integridad de una persona.</p>
+
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video Introducción Prevención" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </section>
+
+            <section class="section" id="peligro-riesgo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Peligro vs. Riesgo</h3>
+                <p>Estos dos conceptos suelen confundirse, pero son distintos y entender su diferencia es fundamental para trabajar con seguridad.</p>
+                
+                <div class="comparacion">
+                    <div class="caja peligro">
+                        <h5>PELIGRO</h5>
+                        <p>Es la <strong>fuente, situación o acto</strong> con capacidad de causar daño por sí mismo.</p>
+                        <p><em>Ejemplo:</em> Una carga pesada almacenada en altura.</p>
+                    </div>
+                    <div class="caja riesgo">
+                        <h5>RIESGO</h5>
+                        <p>Es la <strong>probabilidad</strong> de que ese peligro cause un daño, junto con la <strong>gravedad</strong> de sus consecuencias.</p>
+                        <p><em>Ejemplo:</em> Que esa carga caiga sobre un trabajador que pasa por debajo.</p>
+                    </div>
+                </div>
+                
+                <p>El peligro existe objetivamente: la carga está ahí, en altura. El riesgo depende de las condiciones: si la carga está bien asegurada y nadie pasa por debajo, el riesgo es bajo. Si está mal distribuida y hay tránsito constante, el riesgo es alto.</p>
+                
+                <div class="destacado">
+                    Aprender a distinguir peligro de riesgo nos permite priorizar: no todos los peligros tienen el mismo nivel de riesgo, y debemos enfocar nuestros esfuerzos donde el riesgo es mayor.
+                </div>
+
+                <div class="image-gallery">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600" alt="Peligro en bodega">
+                    <img src="https://images.unsplash.com/photo-1601584115197-02c4c40f2b61?w=600" alt="Gestión de riesgos">
+                </div>
+            </section>
+
+            <section class="section" id="accidente-trabajo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Accidente del Trabajo</h3>
+                <p>En Chile, la <strong>Ley 16.744</strong> establece el seguro social contra accidentes del trabajo y enfermedades profesionales. Según esta normativa, un accidente del trabajo es <strong>toda lesión que una persona sufra a causa o con ocasión del trabajo</strong>, y que le produzca incapacidad o muerte.</p>
+                
+                <h4>Características clave:</h4>
+                <ul>
+                    <li><strong>Ocurre a causa del trabajo:</strong> directamente relacionado con la tarea que se estaba realizando.</li>
+                    <li><strong>Ocurre con ocasión del trabajo:</strong> en el contexto laboral, aunque no sea la tarea específica.</li>
+                    <li><strong>Produce una lesión:</strong> debe haber un daño físico o psicológico verificable.</li>
+                </ul>
+                
+                <h4>Ejemplos comunes en bodega:</h4>
+                <ul>
+                    <li>Caída de una caja sobre el pie durante la manipulación.</li>
+                    <li>Resbalón en un piso mojado.</li>
+                    <li>Atrapamiento con una máquina o equipo.</li>
+                    <li>Lesión lumbar al levantar una carga pesada.</li>
+                    <li>Caída desde una escalera o plataforma.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Un accidente no es solo "cuando alguien se mete la mano en una máquina".</strong> Puede ocurrir en cualquier momento y en cualquier actividad. Por eso la prevención debe estar presente en todo lo que hacemos.
+                </div>
+            </section>
+
+            <section class="section" id="accidente-trayecto">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Accidente de Trayecto</h3>
+                <p>Un <strong>accidente de trayecto</strong> es aquel que ocurre en el recorrido directo y habitual entre el hogar del trabajador y su lugar de trabajo (o viceversa), cumpliendo con los requisitos que establece la legislación.</p>
+                
+                <h4>Condiciones para que sea considerado accidente de trayecto:</h4>
+                <ul>
+                    <li>El trayecto debe ser <strong>directo y habitual</strong>.</li>
+                    <li>Debe existir una <strong>relación de causalidad</strong> entre el recorrido y el accidente.</li>
+                    <li>No deben haber existido <strong>interrupciones o desvíos</strong> por motivos ajenos al trabajo (salvo excepciones legales).</li>
+                </ul>
+                
+                <div class="destacado">
+                    Muchas personas creen que la protección laboral comienza recién al cruzar la puerta de la empresa. Esto no es así: la ley nos ampara también en el camino, siempre que cumplamos con las condiciones establecidas.
+                </div>
+                
+                <p>Conocer este concepto es importante porque nos permite entender nuestros derechos y saber cómo actuar si sufrimos un accidente camino al trabajo o de regreso a casa.</p>
+            </section>
+
+            <section class="section" id="enfermedad-profesional">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Enfermedad Profesional</h3>
+                <p>A diferencia del accidente, que es un evento súbito y puntual, la <strong>enfermedad profesional</strong> se desarrolla de manera progresiva, como consecuencia de las condiciones en las que se desarrolla el trabajo.</p>
+                
+                <p>Es aquella patología causada directamente por el trabajo o por la exposición a agentes presentes en el ambiente laboral, y que está reconocida en el listado oficial de enfermedades profesionales.</p>
+                
+                <h4>Ejemplos frecuentes en bodega:</h4>
+                <ul>
+                    <li><strong>Lesiones musculoesqueléticas:</strong> por manipulación repetitiva de cargas, posturas forzadas o movimientos repetitivos.</li>
+                    <li><strong>Problemas auditivos:</strong> por exposición prolongada a ruido elevado.</li>
+                    <li><strong>Afecciones respiratorias:</strong> por exposición a polvo, productos químicos o sustancias irritantes.</li>
+                    <li><strong>Trastornos por estrés:</strong> relacionados con la carga laboral o condiciones organizacionales.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La prevención no es solo evitar accidentes.</strong> También es cuidar nuestra salud a largo plazo, adoptando buenas prácticas ergonómicas, usando los equipos de protección adecuados y reportando síntomas tempranos antes de que se conviertan en enfermedades crónicas.
+                </div>
+            </section>
+
+            <section class="section" id="derechos-obligaciones">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Derechos y Obligaciones del Trabajador</h3>
+                
+                <h4>Derechos del trabajador:</h4>
+                <ul>
+                    <li><strong>Trabajar en condiciones seguras:</strong> el empleador debe garantizar un entorno que no ponga en riesgo la salud.</li>
+                    <li><strong>Recibir información y capacitación:</strong> sobre los riesgos de su trabajo y las medidas preventivas.</li>
+                    <li><strong>Contar con equipos de protección adecuados:</strong> entregados por el empleador, en buen estado y sin costo.</li>
+                    <li><strong>Paralizar faenas en caso de riesgo grave:</strong> cuando exista peligro inminente para la vida o salud (derecho a negarse a trabajar en condiciones inseguras).</li>
+                    <li><strong>Ser atendido en caso de accidente:</strong> con cobertura del seguro de la Ley 16.744.</li>
+                    <li><strong>Participar en comités de seguridad:</strong> a través de representantes elegidos.</li>
+                </ul>
+                
+                <h4>Obligaciones del trabajador:</h4>
+                <ul>
+                    <li><strong>Cumplir las medidas de prevención:</strong> respetar los procedimientos y protocolos establecidos.</li>
+                    <li><strong>Usar correctamente los EPP:</strong> elementos de protección personal proporcionados por la empresa.</li>
+                    <li><strong>Informar sobre condiciones inseguras:</strong> reportar peligros, riesgos o situaciones anómalas detectadas.</li>
+                    <li><strong>Reportar accidentes e incidentes:</strong> incluso aquellos que no hayan causado lesiones.</li>
+                    <li><strong>Cuidar los equipos y herramientas:</strong> utilizarlos de manera responsable y reportar fallas.</li>
+                    <li><strong>No operar equipos sin autorización:</strong> ni sin la capacitación correspondiente.</li>
+                    <li><strong>Cooperar con los organismos preventivos:</strong> seguir las instrucciones de los supervisores y prevencionistas.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La seguridad es una responsabilidad compartida. El empleador pone las condiciones, pero el trabajador es quien ejecuta las tareas día a día. Ambos deben cumplir su parte para que el sistema funcione.
+                </div>
+            </section>
+
+            <section class="section" id="responsabilidad-empleador">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Responsabilidad del Empleador</h3>
+                <p>El empleador tiene la <strong>obligación legal</strong> de proteger eficazmente a todos sus trabajadores frente a los riesgos profesionales. Esta responsabilidad es indelegable y se extiende a todas las áreas de la empresa.</p>
+                
+                <h4>Principales obligaciones del empleador:</h4>
+                <ul>
+                    <li><strong>Garantizar condiciones de trabajo seguras:</strong> instalaciones, equipos y procesos que no representen riesgos innecesarios.</li>
+                    <li><strong>Implementar medidas de prevención:</strong> identificar peligros, evaluar riesgos y aplicar controles.</li>
+                    <li><strong>Capacitar a los trabajadores:</strong> entregar formación continua en prevención de riesgos.</li>
+                    <li><strong>Proporcionar EPP adecuados:</strong> en buen estado, sin costo para el trabajador y con instrucción de uso.</li>
+                    <li><strong>Organizar los servicios de prevención:</strong> contar con personal calificado o contratar organismos externos autorizados.</li>
+                    <li><strong>Investigar accidentes e incidentes:</strong> para determinar causas y evitar recurrencias.</li>
+                    <li><strong>Mantener registros actualizados:</strong> de accidentes, enfermedades profesionales, capacitaciones y mediciones ambientales.</li>
+                    <li><strong>Cumplir la normativa legal:</strong> respetar todas las disposiciones de la Ley 16.744 y sus reglamentos.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La responsabilidad del empleador no se limita a "entregar un casco".</strong> Implica crear un sistema integral de prevención que incluya evaluación de riesgos, capacitación, supervisión, investigación de incidentes y mejora continua.
+                </div>
+            </section>
+
+            <section class="section" id="reporte-accidentes">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Reporte de Accidentes e Incidentes</h3>
+                <p>Cuando ocurre un accidente o incidente, existe un <strong>protocolo claro</strong> que debe seguirse de manera inmediata y rigurosa.</p>
+                
+                <h4>Pasos a seguir ante un accidente:</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Proteger:</strong> asegurar la zona para evitar un segundo accidente o que la situación empeore.</li>
+                        <li><strong>Informar:</strong> comunicar inmediatamente al supervisor directo y/o al encargado de prevención, según el procedimiento de la empresa.</li>
+                        <li><strong>Atender:</strong> brindar primeros auxilios si es necesario y solicitar atención médica profesional.</li>
+                        <li><strong>Registrar:</strong> completar el formulario de denuncia de accidente (DIAT) y dejar constancia en los registros internos de la empresa.</li>
+                        <li><strong>Investigar:</strong> participar en el análisis de causas para evitar que el accidente se repita.</li>
+                    </ol>
+                </div>
+                
+                <h4>Errores comunes que debemos evitar:</h4>
+                <ul>
+                    <li><strong>Ocultar el accidente:</strong> pensar "no fue nada" o "no quiero hacer problema" es un error grave. Una lesión menor puede agravarse con el tiempo.</li>
+                    <li><strong>No reportar incidentes:</strong> los "casi accidentes" son oportunidades valiosas para prevenir futuros siniestros.</li>
+                    <li><strong>Demorar el reporte:</strong> la denuncia debe hacerse de inmediato, no días después.</li>
+                    <li><strong>Falsificar información:</strong> alterar los hechos compromete la investigación y puede tener consecuencias legales.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Reportar un accidente no es "hacer problema". Es un acto de responsabilidad que protege al trabajador afectado y a todos sus compañeros. Sin reporte, no hay investigación; sin investigación, no hay prevención.
+                </div>
+            </section>
+
+            <section class="section" id="incidentes">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Incidentes</h3>
+                <p>Un <strong>incidente</strong> es un acontecimiento relacionado con el trabajo que <strong>tuvo la capacidad de causar daño</strong>, pero que finalmente no produjo lesiones ni daños a la propiedad. Es lo que comúnmente llamamos "casi accidente" o "casi lo logra".</p>
+                
+                <h4>Ejemplos de incidentes en bodega:</h4>
+                <ul>
+                    <li>Una caja cae desde una estantería, pero no hay nadie debajo.</li>
+                    <li>Un pallet se desliza del montacargas, pero no golpea a nadie.</li>
+                    <li>Un trabajador resbala en un piso mojado, pero logra afirmarse.</li>
+                    <li>Una herramienta cae desde una altura, pero no impacta a ninguna persona.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Los incidentes son avisos.</strong> Nos están diciendo que algo está mal, que existe un peligro que no hemos controlado, y que la próxima vez la suerte podría no estar de nuestro lado.
+                </div>
+                
+                <h4>¿Por qué son tan importantes?</h4>
+                <ul>
+                    <li><strong>Permiten prevenir accidentes futuros:</strong> si investigamos un incidente, podemos corregir la causa antes de que alguien resulte herido.</li>
+                    <li><strong>Revelan debilidades del sistema:</strong> muestran dónde fallan los controles o los procedimientos.</li>
+                    <li><strong>Son más frecuentes que los accidentes:</strong> por cada accidente grave, hay decenas de incidentes que no se reportan.</li>
+                </ul>
+                
+                <div class="destacado">
+                    <strong>La prevención no puede depender de la suerte.</strong> Si una carga estuvo a punto de caer y no cayó, tuvimos suerte. Pero una operación profesional no se basa en tener suerte todos los días, sino en controlar las condiciones para que el accidente no ocurra.
+                </div>
+                
+                <p>Por eso, los incidentes deben reportarse e investigarse con la misma seriedad que los accidentes. Cada "casi" es una oportunidad de mejorar.</p>
+            </section>
+
+            <section class="section" id="cultura-seguridad">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Cultura de Seguridad</h3>
+                <p>La <strong>cultura de seguridad</strong> es el conjunto de valores, actitudes, percepciones y comportamientos compartidos por todos los miembros de una organización en relación con la prevención de riesgos. Es, en definitiva, <strong>cómo pensamos y actuamos frente a la seguridad en el día a día</strong>.</p>
+                
+                <h4>¿Cómo se ve una mala cultura de seguridad?</h4>
+                <ul>
+                    <li>"No pasó nada, así que está bien hacerlo así."</li>
+                    <li>"Siempre lo hemos hecho de esta manera y nunca ha pasado nada."</li>
+                    <li>"Ponte el casco rápido, que viene el supervisor."</li>
+                    <li>"No reportes ese incidente, total no pasó nada."</li>
+                    <li>"La seguridad es cosa del prevencionista, no mía."</li>
+                </ul>
+                
+                <h4>¿Cómo se ve una buena cultura de seguridad?</h4>
+                <ul>
+                    <li>"No pasó nada esta vez, pero ¿qué podría pasar la próxima?"</li>
+                    <li>"Si veo una condición insegura, la corrijo o la reporto."</li>
+                    <li>"Los incidentes se reportan siempre, aunque no haya heridos."</li>
+                    <li>"La seguridad es responsabilidad de todos, no de uno solo."</li>
+                    <li>"Trabajar seguro es trabajar bien."</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La cultura de seguridad se construye con acciones diarias.</strong> No basta con tener procedimientos escritos o hacer capacitaciones una vez al año. Se trata de vivir la prevención en cada decisión, en cada movimiento, en cada turno.
+                </div>
+                
+                <p>Una buena cultura de seguridad se refleja cuando:</p>
+                <ul>
+                    <li>Los trabajadores reportan incidentes sin miedo a represalias.</li>
+                    <li>Los líderes modelan con el ejemplo y cumplen las normas.</li>
+                    <li>Se investiga para aprender, no para castigar.</li>
+                    <li>La seguridad se prioriza sobre la productividad cuando hay conflicto.</li>
+                    <li>Todos se sienten responsables y empoderados para actuar.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La cultura de seguridad es quizás el activo más valioso de una organización. Los equipos se pueden comprar, los procedimientos se pueden escribir, pero la cultura se construye con el compromiso genuino de cada persona, día tras día.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>La prevención de riesgos no es un conjunto de reglas impuestas desde arriba. Es una forma de trabajar, de pensar y de cuidar lo más importante: <strong>la vida y la salud de cada uno de nosotros y de nuestros compañeros</strong>.</p>
+                <p>Cada vez que identificamos un peligro, cada vez que reportamos un incidente, cada vez que elegimos hacer las cosas de manera segura aunque tome más tiempo, estamos construyendo una bodega mejor, un equipo más fuerte y un futuro más seguro para todos.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"La prevención no depende de la suerte.<br>Depende de nosotros."</p>
+                
+                <a href="parte2.html" class="next-module">Siguiente Módulo: EPP →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        ↑
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // TTS MEJORADO - BUSCA LA MEJOR VOZ DISPONIBLE
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        // Función para encontrar la mejor voz en español
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            
+            // Prioridad 1: Voces de Google en español
+            const googleSpanish = voices.find(v => 
+                v.name.includes('Google') && 
+                (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX') || v.lang.startsWith('es-US'))
+            );
+            
+            if (googleSpanish) return googleSpanish;
+            
+            // Prioridad 2: Voces de Microsoft en español
+            const microsoftSpanish = voices.find(v => 
+                v.name.includes('Microsoft') && 
+                (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX'))
+            );
+            
+            if (microsoftSpanish) return microsoftSpanish;
+            
+            // Prioridad 3: Cualquier voz en español
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            
+            if (anySpanish) return anySpanish;
+            
+            // Si no hay voces en español, devolver la primera disponible
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            
+            if (isPlaying && currentSection === section) {
+                pauseTTS();
+                return;
+            }
+            
+            stopTTS();
+            
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            
+            // Usar la mejor voz disponible
+            if (!bestVoice) {
+                bestVoice = findBestSpanishVoice();
+            }
+            
+            if (bestVoice) {
+                currentUtterance.voice = bestVoice;
+            }
+            
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            
+            currentUtterance.onend = () => {
+                resetSection(section);
+            };
+            
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+                isPlaying = false;
+            } else if (synth.paused) {
+                synth.resume();
+                isPlaying = true;
+            }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) {
+                synth.cancel();
+            }
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        // Cargar voces cuando estén disponibles
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    bestVoice = findBestSpanishVoice();
+                };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>
