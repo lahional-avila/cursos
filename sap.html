@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Simulador Educativo de Bodega</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { font-family: Arial, 'Segoe UI', Tahoma, sans-serif; font-size: 12px; color: #1a1a1a; background: #d6d3cb; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* BARRA DE TÍTULO */
+    .titlebar { background: linear-gradient(180deg, #5a7bb0, #33507e); color: white; display: flex; align-items: center; gap: 10px; padding: 5px 10px; }
+    .saplogo { background: white; color: #0a6ed1; font-weight: bold; font-size: 14px; padding: 2px 8px; border-radius: 2px; letter-spacing: 1px; }
+    .titletext { flex: 1; font-size: 12px; }
+    .winbtns { display: flex; gap: 4px; }
+    .winbtns span { background: rgba(255,255,255,0.15); padding: 1px 7px; border-radius: 2px; cursor: default; }
+
+    /* BARRA DE MENÚ */
+    .menubar { background: #f0efe9; border-bottom: 1px solid #b9b6ae; padding: 3px 8px; display: flex; gap: 2px; }
+    .menubar span { padding: 3px 10px; cursor: default; }
+    .menubar span:hover { background: #dce6f5; }
+
+    /* BARRA ESTÁNDAR */
+    .stdbar { background: #e3e1da; border-bottom: 1px solid #a9a499; padding: 4px 8px; display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+    .icobtn { min-width: 26px; height: 24px; border: 1px solid #8c8c8c; background: linear-gradient(#fdfdfd, #e1e1e1); border-radius: 2px; cursor: pointer; font-size: 13px; text-align: center; padding: 0 5px; }
+    .icobtn:hover { background: #dce6f5; border-color: #346187; }
+    .icobtn.ok { color: #1b7a1b; font-weight: bold; }
+    .icobtn.back { color: #c78a00; font-weight: bold; }
+    .icobtn.cancel { color: #c22; font-weight: bold; }
+    .sep { width: 1px; height: 20px; background: #a9a499; margin: 0 5px; }
+    .txinput { width: 130px; height: 24px; border: 1px solid #7f9db9; padding: 0 6px; font-size: 12px; background: white; text-transform: uppercase; }
+
+    /* ÁREA PRINCIPAL */
+    .mainarea { flex: 1; overflow: auto; background: #eceae4; padding: 12px; }
+    .screen-title { font-size: 14px; font-weight: bold; color: #1a3a6b; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid #b9c6dc; }
+    fieldset { border: 1px solid #b9b6ae; background: #e7e4dd; padding: 12px; margin-bottom: 12px; border-radius: 2px; }
+    legend { color: #1a3a6b; font-weight: bold; padding: 0 6px; font-size: 12px; }
+    .frow { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin-bottom: 8px; }
+    .frow label { width: 150px; text-align: right; color: #333; }
+    .frow input, .frow select { width: 200px; height: 24px; border: 1px solid #94a3b4; background: white; padding: 0 5px; font-size: 12px; }
+    .frow input:focus, .frow select:focus { outline: 2px solid #7aa9d8; }
+    .appbar { margin: 10px 0; display: flex; gap: 6px; }
+    .sbtn { border: 1px solid #8c8c8c; background: linear-gradient(#fdfdfd, #e1e1e1); border-radius: 2px; padding: 5px 14px; cursor: pointer; font-size: 12px; }
+    .sbtn:hover { background: #dce6f5; border-color: #346187; }
+
+    /* TABLAS TIPO ALV */
+    .alv { width: 100%; border-collapse: collapse; background: white; border: 1px solid #9db6d9; margin-top: 8px; }
+    .alv th { background: #dce6f5; border: 1px solid #b0c4de; padding: 5px 8px; text-align: left; color: #1a3a6b; font-size: 11px; }
+    .alv td { border: 1px solid #d7e2f0; padding: 5px 8px; font-size: 11px; }
+    .alv tr:nth-child(even) td { background: #f2f7fd; }
+    .alv tr:hover td { background: #cfe8ff; }
+
+    /* ÁRBOL EASY ACCESS */
+    .easy { display: flex; gap: 15px; flex-wrap: wrap; }
+    .tree { background: white; border: 1px solid #94a3b4; padding: 12px; min-width: 320px; flex: 1; }
+    .tree div { padding: 3px 6px; cursor: pointer; white-space: nowrap; }
+    .tree div:hover { background: #dce6f5; }
+    .tree .n1 { margin-left: 0; font-weight: bold; }
+    .tree .n2 { margin-left: 18px; }
+    .tree .n3 { margin-left: 36px; }
+    .info-panel { background: #fffbe6; border: 1px solid #d9c36a; padding: 12px; max-width: 420px; font-size: 12px; line-height: 1.7; }
+    .info-panel b { color: #1a3a6b; }
+
+    /* BARRA DE ESTATUS */
+    .statusbar { background: #d6d3cb; border-top: 1px solid #a9a499; display: flex; align-items: center; gap: 8px; padding: 3px 8px; height: 28px; }
+    .sticon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 2px; color: white; font-size: 12px; }
+    .sticon.S { background: #2e7d32; }
+    .sticon.E { background: #c62828; }
+    .sticon.W { background: #ef6c00; }
+    .sticon.I { background: #1565c0; }
+    #stText { flex: 1; }
+    .stright { color: #555; font-size: 11px; }
+    .watermark { position: fixed; bottom: 34px; right: 10px; color: rgba(0,0,0,0.25); font-size: 10px; font-weight: bold; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+    <div class="saplogo">SAP</div>
+    <div class="titletext">Simulador Educativo de Bodega — ZBODEGA · SAP Easy Access</div>
+    <div class="winbtns"><span>—</span><span>□</span><span>✕</span></div>
+</div>
+
+<div class="menubar">
+    <span>Menú</span><span>Edición</span><span>Favoritos</span><span>Extras</span><span>Sistema</span><span>Ayuda</span>
+</div>
+
+<div class="stdbar">
+    <button class="icobtn ok" title="Validar (Enter)" onclick="primaryAction()">✓</button>
+    <button class="icobtn back" title="Volver (F3)" onclick="goEasy()">←</button>
+    <button class="icobtn cancel" title="Anular (F12)" onclick="cancelScreen()">✕</button>
+    <span class="sep"></span>
+    <input id="txInput" class="txinput" placeholder="Cód. transacción" onkeydown="if(event.key==='Enter')openTx(this.value)">
+    <button class="icobtn" title="Ejecutar transacción" onclick="openTx(document.getElementById('txInput').value)">⏎</button>
+    <span class="sep"></span>
+    <span class="icobtn" title="Grabar">💾</span>
+    <span class="icobtn" title="Imprimir">🖨</span>
+    <span class="icobtn" title="Buscar">🔍</span>
+</div>
+
+<div id="mainArea" class="mainarea"></div>
+
+<div class="statusbar">
+    <span id="stIcon" class="sticon I">i</span>
+    <span id="stText">Bienvenido al simulador educativo tipo SAP. Ingrese una transacción o use el árbol.</span>
+    <span class="stright">Mandante 100 · Usuario: ALUMNO · ZBODEGA</span>
+</div>
+<div class="watermark">SIMULACIÓN EDUCATIVA — NO ES SAP REAL</div>
+
+<script>
+// ================= DATOS (compartidos con el Simulador WMS del curso) =================
+var DEFAULT_DATA = {
+    products: [
+        { sku: 'GNT-L', name: 'Guante Nitrilo Talla L', unit: 'par', min: 20, max: 300, rep: 70, fefo: true },
+        { sku: 'CAS-ABS', name: 'Casco Seguridad ABS c/barbiquejo', unit: 'un', min: 10, max: 120, rep: 30, fefo: false },
+        { sku: 'MAS-N95', name: 'Mascarilla N95', unit: 'un', min: 50, max: 800, rep: 150, fefo: true },
+        { sku: 'CINT-REF', name: 'Cinturón Reflectante', unit: 'un', min: 15, max: 150, rep: 40, fefo: false }
+    ],
+    lots: [
+        { sku: 'GNT-L', lot: 'L-2026-001', exp: '2027-12-31', qty: 100 },
+        { sku: 'GNT-L', lot: 'L-2026-014', exp: '2026-10-31', qty: 50 },
+        { sku: 'CAS-ABS', lot: 'S/L', exp: '', qty: 45 },
+        { sku: 'MAS-N95', lot: 'M-2026-003', exp: '2026-11-30', qty: 200 },
+        { sku: 'MAS-N95', lot: 'M-2026-010', exp: '2027-06-30', qty: 150 },
+        { sku: 'CINT-REF', lot: 'S/L', exp: '', qty: 60 }
+    ],
+    movements: [
+        { id: 1, date: '01-08-2026 09:00', type: 'IN', sku: 'GNT-L', lot: 'L-2026-001', qty: 100, doc: 'OC-1001 / GD-501' },
+        { id: 2, date: '05-08-2026 10:30', type: 'IN', sku: 'GNT-L', lot: 'L-2026-014', qty: 50, doc: 'OC-1008 / GD-522' },
+        { id: 3, date: '03-08-2026 12:00', type: 'IN', sku: 'CAS-ABS', lot: 'S/L', qty: 45, doc: 'OC-1002 / GD-505' },
+        { id: 4, date: '02-08-2026 09:15', type: 'IN', sku: 'MAS-N95', lot: 'M-2026-003', qty: 200, doc: 'OC-1003 / GD-508' },
+        { id: 5, date: '10-08-2026 11:00', type: 'IN', sku: 'MAS-N95', lot: 'M-2026-010', qty: 150, doc: 'OC-1010 / GD-540' },
+        { id: 6, date: '12-08-2026 15:20', type: 'OUT', sku: 'GNT-L', lot: 'L-2026-001', qty: 50, doc: 'VS-201' },
+        { id: 7, date: '15-08-2026 08:45', type: 'IN', sku: 'CINT-REF', lot: 'S/L', qty: 60, doc: 'OC-1012 / GD-555' }
+    ],
+    orders: []
+};
+function load() { try { var r = localStorage.getItem('wmsSim'); if (r) return JSON.parse(r); } catch (e) {} return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+function save() { localStorage.setItem('wmsSim', JSON.stringify(data)); }
+var data = load();
+if (!data.orders) data.orders = [];
+
+// ================= UTILIDADES =================
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function prod(sku) { for (var i = 0; i < data.products.length; i++) if (data.products[i].sku === sku) return data.products[i]; return null; }
+function stockOf(sku) { var t = 0; for (var i = 0; i < data.lots.length; i++) if (data.lots[i].sku === sku) t += data.lots[i].qty; return t; }
+function nowStr() { var d = new Date(); return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }); }
+function docNo() { return 5000000100 + data.movements.length; }
+function poNo() { return 4500000010 + data.orders.length; }
+function movTypeOf(m) { return m.movType || (m.type === 'IN' ? '101' : '201'); }
+function setStatus(t, txt) {
+    var ic = document.getElementById('stIcon');
+    ic.className = 'sticon ' + t;
+    ic.textContent = t === 'S' ? '✓' : t === 'E' ? '✕' : t === 'W' ? '!' : 'i';
+    document.getElementById('stText').textContent = txt;
+}
+
+// ================= NAVEGACIÓN =================
+var currentScreen = 'EASY';
+function goEasy() { currentScreen = 'EASY'; render(); }
+function openTx(code) {
+    code = (code || '').toUpperCase().trim();
+    var valid = ['MM01', 'MIGO', 'MB52', 'MB51', 'ME21N', 'MI01'];
+    if (valid.indexOf(code) >= 0) { currentScreen = code; render(); setStatus('I', 'Transacción ' + code + ' ejecutada.'); }
+    else setStatus('E', 'La transacción ' + (code || '—') + ' no existe en el sistema (SY 000).');
+    document.getElementById('txInput').value = '';
+}
+function cancelScreen() { render(); setStatus('W', 'Entrada anulada. Los campos fueron limpiados.'); }
+function primaryAction() {
+    if (currentScreen === 'MM01') mmSave();
+    else if (currentScreen === 'MIGO') migoSave();
+    else if (currentScreen === 'ME21N') poSave();
+    else if (currentScreen === 'MI01') miSave();
+    else goEasy();
+}
+
+// ================= PANTALLAS =================
+function productOptions(sel) {
+    var h = '<option value="">— Seleccione material —</option>';
+    for (var i = 0; i < data.products.length; i++) h += '<option value="' + esc(data.products[i].sku) + '"' + (data.products[i].sku === sel ? ' selected' : '') + '>' + esc(data.products[i].sku) + ' · ' + esc(data.products[i].name) + '</option>';
+    return h;
+}
+
+function screenEasy() {
+    return '<div class="screen-title">SAP Easy Access — Logística · Gestión de materiales</div>' +
+    '<div class="easy"><div class="tree">' +
+    '<div class="n1">📁 Favoritos</div>' +
+    '<div class="n1">📁 Logística</div>' +
+    '<div class="n2">📁 Gestión de materiales</div>' +
+    '<div class="n3" onclick="openTx(\'MM01\')">📄 Maestro de materiales (MM01)</div>' +
+    '<div class="n3" onclick="openTx(\'MIGO\')">📄 Movimientos de mercancías (MIGO)</div>' +
+    '<div class="n3" onclick="openTx(\'MB52\')">📄 Listado de stocks (MB52)</div>' +
+    '<div class="n3" onclick="openTx(\'MB51\')">📄 Historial de movimientos (MB51)</div>' +
+    '<div class="n3" onclick="openTx(\'ME21N\')">📄 Pedido de compra (ME21N)</div>' +
+    '<div class="n3" onclick="openTx(\'MI01\')">📄 Inventario físico (MI01)</div>' +
+    '<div class="n2">📁 Gestión de almacenes</div>' +
+    '<div class="n3" style="color:#888;">📄 (disponible en versión real)</div>' +
+    '</div>' +
+    '<div class="info-panel"><b>📘 Guía del alumno</b><br>' +
+    'Este simulador imita la apariencia de SAP GUI con fines educativos.<br><br>' +
+    '<b>Transacciones disponibles:</b><br>' +
+    '· <b>MM01</b> → crear material (maestro)<br>' +
+    '· <b>MIGO</b> → entrada (101) y salida (201) de mercancías<br>' +
+    '· <b>MB52</b> → stock actual por lote<br>' +
+    '· <b>MB51</b> → historial de movimientos (Kardex)<br>' +
+    '· <b>ME21N</b> → pedido de compra (conexión con Adquisiciones)<br>' +
+    '· <b>MI01</b> → conteo físico y diferencias (701/702)<br><br>' +
+    '⚠ Los datos se comparten con el Simulador WMS del curso: lo que muevas aquí aparece allá y viceversa.</div></div>';
+}
+
+function screenMM01() {
+    return '<div class="screen-title">Maestro de materiales: crear (MM01) — Vista: Datos básicos</div>' +
+    '<fieldset><legend>Datos generales</legend>' +
+    '<div class="frow"><label>Material *</label><input id="mm_sku" maxlength="12"><label>Descripción breve *</label><input id="mm_desc" maxlength="40"></div>' +
+    '<div class="frow"><label>Unidad de medida base</label><select id="mm_unit"><option>un</option><option>par</option><option>caja</option><option>kg</option></select>' +
+    '<label>Stock mínimo</label><input id="mm_min" type="number" value="10"></div>' +
+    '<div class="frow"><label>Stock máximo</label><input id="mm_max" type="number" value="100">' +
+    '<label>Punto de reposición</label><input id="mm_rep" type="number" value="30"></div>' +
+    '<div class="frow"><label></label><label style="width:auto;text-align:left;"><input type="checkbox" id="mm_fefo" style="width:auto;" checked> Gestión por lote y vencimiento (FEFO)</label></div>' +
+    '</fieldset>' +
+    '<div class="appbar"><button class="sbtn" onclick="mmSave()">💾 Grabar (Ctrl+S)</button></div>';
+}
+
+function screenMIGO() {
+    return '<div class="screen-title">Movimiento de mercancías (MIGO) — Centro 1000 Bodega Central</div>' +
+    '<fieldset><legend>Datos del movimiento</legend>' +
+    '<div class="frow"><label>Clase de movimiento</label><select id="mg_type"><option value="101">101 - Entrada de mercancías</option><option value="201">201 - Salida de mercancías (consumo)</option></select></div>' +
+    '<div class="frow"><label>Material *</label><select id="mg_sku">' + productOptions() + '</select></div>' +
+    '<div class="frow"><label>Lote</label><input id="mg_lot" placeholder="S/L si no aplica"><label>Fecha vencimiento</label><input id="mg_exp" type="date"></div>' +
+    '<div class="frow"><label>Cantidad *</label><input id="mg_qty" type="number" min="1"><label>Documento de referencia</label><input id="mg_doc" placeholder="OC / Guía / Vale"></div>' +
+    '</fieldset>' +
+    '<div class="appbar"><button class="sbtn" onclick="migoSave()">✓ Registrar movimiento</button></div>';
+}
+
+function screenMB52() {
+    var h = '<div class="screen-title">Listado de stocks de almacén (MB52) — Ejecutado</div>' +
+    '<table class="alv"><tr><th>Material</th><th>Descripción breve</th><th>Lote</th><th>F. venc.</th><th>Stock</th><th>UM</th></tr>';
+    for (var i = 0; i < data.products.length; i++) {
+        var p = data.products[i];
+        var ls = data.lots.filter(function (l) { return l.sku === p.sku; });
+        if (!ls.length) h += '<tr><td><b>' + esc(p.sku) + '</b></td><td>' + esc(p.name) + '</td><td>—</td><td>—</td><td><b>0</b></td><td>' + esc(p.unit) + '</td></tr>';
+        for (var j = 0; j < ls.length; j++) h += '<tr><td><b>' + esc(p.sku) + '</b></td><td>' + esc(p.name) + '</td><td>' + esc(ls[j].lot) + '</td><td>' + (ls[j].exp || '—') + '</td><td><b>' + ls[j].qty + '</b></td><td>' + esc(p.unit) + '</td></tr>';
+    }
+    return h + '</table>';
+}
+
+function screenMB51() {
+    var h = '<div class="screen-title">Historial de movimientos de material (MB51) — Ejecutado</div>' +
+    '<table class="alv"><tr><th>F. movimiento</th><th>Cl. mov.</th><th>Material</th><th>Lote</th><th>Cantidad</th><th>Documento</th></tr>';
+    var movs = data.movements.slice().sort(function (a, b) { return b.id - a.id; });
+    for (var i = 0; i < movs.length; i++) {
+        var m = movs[i];
+        h += '<tr><td>' + esc(m.date) + '</td><td><b>' + movTypeOf(m) + '</b></td><td>' + esc(m.sku) + '</td><td>' + esc(m.lot) + '</td><td>' + (m.type === 'IN' ? '+' : m.type === 'OUT' ? '-' : '±') + m.qty + '</td><td>' + esc(m.doc) + '</td></tr>';
+    }
+    return h + '</table>';
+}
+
+function screenME21N() {
+    var h = '<div class="screen-title">Pedido de compra (ME21N) — Organización de compras 1000</div>' +
+    '<fieldset><legend>Posición del pedido</legend>' +
+    '<div class="frow"><label>Proveedor *</label><input id="po_prov" placeholder="Ej: Distribuidora Safety SpA"></div>' +
+    '<div class="frow"><label>Material *</label><select id="po_sku">' + productOptions() + '</select></div>' +
+    '<div class="frow"><label>Cantidad *</label><input id="po_qty" type="number" min="1"><label>Precio unitario (CLP)</label><input id="po_price" type="number" min="0"></div>' +
+    '<div class="frow"><label>Plazo de entrega (días)</label><input id="po_plazo" type="number" value="5"></div>' +
+    '</fieldset>' +
+    '<div class="appbar"><button class="sbtn" onclick="poSave()">💾 Registrar pedido</button></div>';
+    if (data.orders.length) {
+        h += '<fieldset><legend>Pedidos abiertos</legend><table class="alv"><tr><th>Nº Pedido</th><th>Proveedor</th><th>Material</th><th>Cant.</th><th>Plazo</th><th>Fecha</th></tr>';
+        for (var i = 0; i < data.orders.length; i++) { var o = data.orders[i]; h += '<tr><td><b>' + o.id + '</b></td><td>' + esc(o.prov) + '</td><td>' + esc(o.sku) + '</td><td>' + o.qty + '</td><td>' + o.plazo + ' días</td><td>' + esc(o.date) + '</td></tr>'; }
+        h += '</table></fieldset>';
+    }
+    return h;
+}
+
+function screenMI01() {
+    return '<div class="screen-title">Inventario físico (MI01) — Conteo de existencias</div>' +
+    '<fieldset><legend>Datos del conteo</legend>' +
+    '<div class="frow"><label>Material *</label><select id="mi_sku" onchange="miShow()">' + productOptions() + '</select></div>' +
+    '<div class="frow"><label>Stock según sistema</label><input id="mi_sys" readonly value=""><label>Conteo físico *</label><input id="mi_cnt" type="number" min="0"></div>' +
+    '</fieldset>' +
+    '<div class="appbar"><button class="sbtn" onclick="miSave()">✓ Registrar conteo y diferencia</button></div>' +
+    '<div class="info-panel">💡 Si el conteo difiere del sistema, el simulador registra un ajuste <b>701</b> (sobrante) o <b>702</b> (faltante), igual que en SAP real.</div>';
+}
+
+function miShow() { var s = document.getElementById('mi_sku').value; document.getElementById('mi_sys').value = s ? stockOf(s) : ''; }
+
+// ================= ACCIONES =================
+function mmSave() {
+    var sku = (document.getElementById('mm_sku').value || '').trim().toUpperCase();
+    var desc = (document.getElementById('mm_desc').value || '').trim();
+    if (!sku || !desc) { setStatus('E', 'Complete los campos obligatorios Material y Descripción (M3 010).'); return; }
+    if (prod(sku)) { setStatus('E', 'El material ' + sku + ' ya existe en el maestro (M3 120).'); return; }
+    data.products.push({ sku: sku, name: desc, unit: document.getElementById('mm_unit').value, min: parseInt(document.getElementById('mm_min').value) || 0, max: parseInt(document.getElementById('mm_max').value) || 0, rep: parseInt(document.getElementById('mm_rep').value) || 0, fefo: document.getElementById('mm_fefo').checked });
+    save(); render();
+    setStatus('S', 'Material ' + sku + ' creado correctamente (M3 100).');
+}
+
+function migoSave() {
+    var t = document.getElementById('mg_type').value;
+    var sku = document.getElementById('mg_sku').value;
+    var lot = (document.getElementById('mg_lot').value || '').trim() || 'S/L';
+    var exp = document.getElementById('mg_exp').value || '';
+    var qty = parseInt(document.getElementById('mg_qty').value);
+    var doc = (document.getElementById('mg_doc').value || '').trim() || 'S/DOC';
+    if (!sku) { setStatus('E', 'Seleccione un material (M7 010).'); return; }
+    if (!qty || qty <= 0) { setStatus('E', 'Ingrese una cantidad válida (M7 011).'); return; }
+    if (t === '101') {
+        var l = null;
+        for (var i = 0; i < data.lots.length; i++) if (data.lots[i].sku === sku && data.lots[i].lot === lot) l = data.lots[i];
+        if (l) { l.qty += qty; if (exp) l.exp = exp; } else data.lots.push({ sku: sku, lot: lot, exp: exp, qty: qty });
+        data.movements.push({ id: Date.now(), date: nowStr(), type: 'IN', movType: '101', sku: sku, lot: lot, qty: qty, doc: doc });
+        save(); render();
+        setStatus('S', 'Entrada de mercancías contabilizada — documento ' + docNo() + ' (M7 105).');
+    } else {
+        var lt = null;
+        for (var j = 0; j < data.lots.length; j++) if (data.lots[j].sku === sku && data.lots[j].lot === lot && data.lots[j].qty > 0) lt = data.lots[j];
+        if (!lt) { setStatus('E', 'El lote indicado no tiene stock disponible (M7 021).'); return; }
+        if (qty > lt.qty) { setStatus('E', 'Cant. deficitaria en stock: disponible ' + lt.qty + ' en lote ' + lot + ' (M7 021).'); return; }
+        lt.qty -= qty;
+        data.movements.push({ id: Date.now(), date: nowStr(), type: 'OUT', movType: '201', sku: sku, lot: lot, qty: qty, doc: doc });
+        save(); render();
+        setStatus('S', 'Salida de mercancías contabilizada — documento ' + docNo() + (stockOf(sku) < prod(sku).rep ? ' · ⚠ Stock bajo punto de reposición.' : ' (M7 106).'));
+    }
+}
+
+function poSave() {
+    var prov = (document.getElementById('po_prov').value || '').trim();
+    var sku = document.getElementById('po_sku').value;
+    var qty = parseInt(document.getElementById('po_qty').value);
+    if (!prov || !sku || !qty || qty <= 0) { setStatus('E', 'Complete proveedor, material y cantidad (ME 010).'); return; }
+    data.orders.push({ id: poNo(), prov: prov, sku: sku, qty: qty, price: parseInt(document.getElementById('po_price').value) || 0, plazo: parseInt(document.getElementById('po_plazo').value) || 0, date: nowStr() });
+    save(); render();
+    setStatus('S', 'Pedido ' + poNo() + ' creado para ' + prov + ' (ME 000). Recuerde: al recibir, registre la entrada con MIGO 101.');
+}
+
+function miSave() {
+    var sku = document.getElementById('mi_sku').value;
+    var cnt = parseInt(document.getElementById('mi_cnt').value);
+    if (!sku || isNaN(cnt) || cnt < 0) { setStatus('E', 'Seleccione material e ingrese el conteo físico (M7 430).'); return; }
+    var sys = stockOf(sku);
+    var diff = cnt - sys;
+    if (diff === 0) { setStatus('S', 'Sin diferencias de inventario para ' + sku + ' (M7 434).'); return; }
+    if (diff < 0) {
+        var rest = -diff;
+        var lots = data.lots.filter(function (l) { return l.sku === sku; }).sort(function (a, b) { return b.qty - a.qty; });
+        for (var i = 0; i < lots.length && rest > 0; i++) { var q = Math.min(lots[i].qty, rest); lots[i].qty -= q; rest -= q; }
+        data.movements.push({ id: Date.now(), date: nowStr(), type: 'AJ', movType: '702', sku: sku, lot: 'AJUSTE', qty: -diff, doc: 'MI01' });
+        save(); render();
+        setStatus('W', 'Diferencia de ' + (-diff) + ' u. registrada con movimiento 702 (faltante) para ' + sku + ' (M7 435).');
+    } else {
+        var l0 = data.lots.filter(function (l) { return l.sku === sku; })[0];
+        if (l0) l0.qty += diff; else data.lots.push({ sku: sku, lot: 'AJUSTE', exp: '', qty: diff });
+        data.movements.push({ id: Date.now(), date: nowStr(), type: 'AJ', movType: '701', sku: sku, lot: 'AJUSTE', qty: diff, doc: 'MI01' });
+        save(); render();
+        setStatus('W', 'Diferencia de ' + diff + ' u. registrada con movimiento 701 (sobrante) para ' + sku + ' (M7 435).');
+    }
+}
+
+// ================= RENDER =================
+function render() {
+    var h = '';
+    if (currentScreen === 'EASY') h = screenEasy();
+    else if (currentScreen === 'MM01') h = screenMM01();
+    else if (currentScreen === 'MIGO') h = screenMIGO();
+    else if (currentScreen === 'MB52') h = screenMB52();
+    else if (currentScreen === 'MB51') h = screenMB51();
+    else if (currentScreen === 'ME21N') h = screenME21N();
+    else if (currentScreen === 'MI01') h = screenMI01();
+    document.getElementById('mainArea').innerHTML = h;
+    if (currentScreen === 'MI01') miShow();
+}
+render();
+</script>
+
+</body>
+</html>

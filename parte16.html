@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 16: Normas ISO en la Bodega (9001, 14001 y 45001)</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .comp-banner { background: linear-gradient(135deg, #8e44ad, #6c3483); color: white; padding: 20px 40px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+    .comp-banner h3 { font-size: 20px; margin-bottom: 5px; }
+    .comp-banner p { font-size: 14px; opacity: 0.9; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.ley { border-top: 5px solid #e74c3c; }
+    .caja.iso { border-top: 5px solid #27ae60; }
+    .caja.ley h5 { color: #c0392b; }
+    .caja.iso h5 { color: #27ae60; }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .back-home { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .back-home:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .iso-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .iso-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 25px; border-left: 6px solid; transition: all 0.3s; }
+    .iso-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .iso-item h5 { font-size: 20px; margin-bottom: 8px; }
+    .iso-item .sub { font-size: 14px; font-style: italic; color: #718096; margin-bottom: 12px; }
+    .iso-9001 { border-left-color: #e74c3c; } .iso-9001 h5 { color: #c0392b; }
+    .iso-14001 { border-left-color: #27ae60; } .iso-14001 h5 { color: #27ae60; }
+    .iso-45001 { border-left-color: #f39c12; } .iso-45001 h5 { color: #d68910; }
+    .pdca-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 25px 0; }
+    .pdca-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 18px; text-align: center; }
+    .pdca-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 6px; }
+    .pdca-item p { font-size: 13px; color: #718096; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 16: Normas ISO en Bodega</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. ¿Por Qué Hablar de ISO?</a></li>
+                <li><a href="#que-es">2. ¿Qué es ISO y una Norma?</a></li>
+                <li><a href="#certificacion">3. Certificación y Auditorías</a></li>
+                <li><a href="#iso9001">4. ISO 9001: Calidad</a></li>
+                <li><a href="#iso14001">5. ISO 14001: Medio Ambiente</a></li>
+                <li><a href="#iso45001">6. ISO 45001: Seguridad y Salud</a></li>
+                <li><a href="#sistema">7. Las Tres como un Sistema</a></li>
+                <li><a href="#ley">8. ISO vs Ley y Normas Internas</a></li>
+                <li><a href="#dia">9. La ISO en el Día a Día</a></li>
+                <li><a href="#mitos">10. Mitos sobre las ISO</a></li>
+                <li><a href="#cierre">Reflexión Final del Curso</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+
+            <div class="comp-banner">
+                <h3>MÓDULO COMPLEMENTARIO: MARCO DE GESTIÓN Y CERTIFICACIONES</h3>
+                <p>El cierre de gestión del curso: calidad, medio ambiente y seguridad bajo estándares internacionales</p>
+            </div>
+
+            <div class="content-header">
+                <h2>Normas ISO en la Bodega (9001, 14001 y 45001)</h2>
+                <p>Seguramente han escuchado frases como "esta empresa es certificada ISO". Pero, ¿qué significa realmente? En este módulo vamos a entender qué son estas normas, para qué sirven y cómo se viven dentro de una bodega.</p>
+            </div>
+
+            <img src="https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2ff2aefa1-4213-4986-9f58-cd4770df7755.png" alt="Auditoría de normas ISO en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. ¿Por Qué Hablar de ISO en un Curso de Bodega?</h3>
+                <p>Durante todo este curso hemos hablado de cómo recibir, almacenar, controlar, rotar y despachar mercadería. También hemos hablado de seguridad, de sustancias peligrosas y de tecnología. Y si ustedes se fijan bien, hay algo que se repite en todos los módulos: la importancia de hacer las cosas bien, de manera ordenada, registrada y segura.</p>
+
+                <p>Resulta que existe una organización internacional que lleva décadas escribiendo exactamente eso: cómo hacer las cosas bien. Y a esos documentos se les llama normas ISO.</p>
+
+                <p>Y aquí quiero que entiendan por qué este módulo importa para su vida laboral. Hoy en día, muchas empresas, especialmente las que trabajan con clientes grandes, multinacionales o licitaciones públicas, exigen que sus proveedores y sus bodegas estén certificadas en normas ISO. Entonces, si ustedes llegan a una entrevista de trabajo y saben qué es una ISO 9001, qué es una ISO 14001 y qué es una ISO 45001, tienen una ventaja enorme sobre alguien que no lo sabe.</p>
+
+                <div class="importante">
+                    <strong>El objetivo de este módulo no es transformarlos en auditores.</strong> Es que entiendan la lógica de las normas ISO, que sepan qué buscan y que comprendan cómo se aplican en el trabajo diario de una bodega. Con eso, van a tener las nociones suficientes para participar en cualquier conversación sobre el tema.
+                </div>
+
+                <p>Y algo más: gran parte de lo que vamos a ver hoy no es materia nueva. Es el mismo curso que ya pasamos, pero mirado desde el estándar internacional. Porque una bodega bien gestionada, como la que hemos descrito en los 15 módulos anteriores, es exactamente lo que una norma ISO espera encontrar.</p>
+            </section>
+
+            <section class="section" id="que-es">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. ¿Qué es ISO y Qué es una Norma?</h3>
+                <p>ISO es la Organización Internacional de Normalización, por sus siglas en inglés. Tiene su sede en Ginebra, Suiza, y reúne a los organismos de normalización de más de 160 países. Su función es crear estándares internacionales: documentos que describen la mejor manera conocida de hacer las cosas.</p>
+
+                <p>Y aquí viene lo primero que hay que entender:</p>
+
+                <div class="importante">
+                    <strong>Una norma ISO no es una ley.</strong> Es un estándar voluntario. Nadie va a multar a una empresa por no tener ISO. La ley, como el DS 594 o la Ley 16.744 que vimos en los módulos anteriores, es obligatoria. La ISO es una decisión de la empresa.
+                </div>
+
+                <p>Entonces, ¿por qué las empresas se certifican? Porque el mercado lo exige. Un cliente grande, una multinacional o una licitación pública puede decir: "solo trabajo con empresas certificadas en ISO 9001". Ahí la norma deja de ser un lujo y se convierte en una condición para hacer negocios.</p>
+
+                <div class="ejemplo-box">
+                    <h5>Una analogía para entenderlo</h5>
+                    <p>Piensen en la ley como el piso mínimo para pasar el curso: es lo obligatorio. La norma ISO es como sacar nota roja o distinción: nadie te obliga, pero demuestra que tu forma de trabajar está por encima del mínimo. Una empresa que cumple la ley, cumple lo básico. Una empresa certificada ISO demuestra además que tiene sistemas de gestión que funcionan, que se auditan y que mejoran en el tiempo.</p>
+                </div>
+
+                <h4>Las tres normas ISO más relevantes para una bodega</h4>
+                <div class="iso-grid">
+                    <div class="iso-item iso-9001">
+                        <h5>ISO 9001</h5>
+                        <p class="sub">Sistema de Gestión de Calidad</p>
+                        <p>Busca que los procesos se hagan siempre de la misma manera, bien hechos y orientados a satisfacer al cliente.</p>
+                    </div>
+                    <div class="iso-item iso-14001">
+                        <h5>ISO 14001</h5>
+                        <p class="sub">Sistema de Gestión Ambiental</p>
+                        <p>Busca que la empresa controle y reduzca el impacto de su actividad sobre el medio ambiente.</p>
+                    </div>
+                    <div class="iso-item iso-45001">
+                        <h5>ISO 45001</h5>
+                        <p class="sub">Sistema de Gestión de Seguridad y Salud en el Trabajo</p>
+                        <p>Busca prevenir accidentes y enfermedades profesionales, protegiendo la salud de los trabajadores.</p>
+                    </div>
+                </div>
+
+                <div class="destacado">
+                    Fíjense en la coincidencia: calidad de procesos, cuidado del medio ambiente y seguridad de las personas. Son exactamente los tres pilares que una bodega profesional debe gestionar. Por eso estas tres normas son las que más se ven en el mundo logístico.
+                </div>
+            </section>
+
+            <section class="section" id="certificacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Certificación y Auditorías</h3>
+                <p>Ahora viene la pregunta obvia: ¿cómo se demuestra que una empresa cumple una norma ISO? Con una certificación. Y la certificación se obtiene mediante una auditoría.</p>
+
+                <h4>El proceso, en simple</h4>
+                <ul>
+                    <li><strong>Implementación:</strong> la empresa escribe sus procedimientos, los aplica y genera registros. Por ejemplo: procedimiento de recepción, procedimiento de despacho, registro de mermas, registro de accidentes.</li>
+                    <li><strong>Auditoría interna:</strong> la propia empresa se revisa a sí misma, con auditores internos, para detectar fallas antes de la auditoría externa.</li>
+                    <li><strong>Auditoría de certificación:</strong> una entidad certificadora externa e independiente revisa que el sistema funcione y que cumpla la norma.</li>
+                    <li><strong>Certificado:</strong> si todo está conforme, se emite un certificado con vigencia, normalmente de tres años, con auditorías de seguimiento anuales.</li>
+                    <li><strong>Mejora continua:</strong> la certificación no es un premio que se guarda en un marco. Es un compromiso de seguir mejorando.</li>
+                </ul>
+
+                <div class="destacado">
+                    Hay una frase que resume el espíritu de las normas ISO y que quiero que se graben: "Di lo que haces, haz lo que dices y demuéstralo con registros". Esa frase conecta directamente con todo lo que vimos en el curso: procedimientos escritos, Kardex, registros de recepción, registros de mermas, registros de accidentes.
+                </div>
+
+                <h4>El ciclo de mejora continua (PHVA)</h4>
+                <p>Todas las normas ISO modernas funcionan con la misma lógica, que se conoce como el ciclo PHVA o ciclo de Deming:</p>
+                <div class="pdca-flow">
+                    <div class="pdca-item"><h5>Planificar</h5><p>Definir objetivos y procesos</p></div>
+                    <div class="pdca-item"><h5>Hacer</h5><p>Ejecutar lo planificado</p></div>
+                    <div class="pdca-item"><h5>Verificar</h5><p>Medir y comparar resultados</p></div>
+                    <div class="pdca-item"><h5>Actuar</h5><p>Corregir y mejorar</p></div>
+                </div>
+                <p>¿Les suena conocido? Claro que sí. Es exactamente lo que hacemos cuando detectamos una diferencia de inventario, investigamos la causa y corregimos el procedimiento. El ciclo PHVA no es teoría abstracta: es la forma de trabajar que ya practicamos en este curso.</p>
+            </section>
+
+            <section class="section" id="iso9001">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. ISO 9001: Gestión de Calidad</h3>
+                <p>La ISO 9001 es la norma de calidad más conocida del mundo. En una bodega, su idea central es muy simple: que los procesos se hagan siempre de la misma manera, para que el resultado sea siempre el mismo, independiente de quién ejecute la tarea.</p>
+
+                <h4>¿Qué exige la ISO 9001 en una bodega?</h4>
+                <ul>
+                    <li><strong>Procedimientos escritos:</strong> cómo se recibe, cómo se almacena, cómo se despacha, cómo se etiqueta. Todo documentado.</li>
+                    <li><strong>Estandarización:</strong> que un operario nuevo haga la tarea exactamente igual que uno con diez años de experiencia, porque ambos siguen el mismo procedimiento.</li>
+                    <li><strong>Registros:</strong> evidencia de que las cosas se hicieron como dice el procedimiento.</li>
+                    <li><strong>Enfoque en el cliente:</strong> en bodega, el "cliente" es quien recibe el producto: puede ser un cliente externo o un usuario interno de la empresa.</li>
+                    <li><strong>Control de errores:</strong> cuando algo sale mal (un cruce de despacho, por ejemplo), se detecta, se corrige y se analiza la causa para que no se repita.</li>
+                </ul>
+
+                <div class="ejemplo-box">
+                    <h5>Conectando con el curso</h5>
+                    <p>¿Recuerdan el Módulo 7, donde vimos que la recepción implica verificar cantidad, código, estado, lote y documentación contra la orden de compra? Eso es ISO 9001 en estado puro: un proceso estandarizado de verificación que evita errores.</p>
+                    <p>¿Recuerdan el Módulo 10, donde dijimos que el picking termina cuando verificamos y registramos? Eso también es ISO 9001: control del proceso y registro de la evidencia.</p>
+                    <p>En otras palabras: si ustedes trabajan como aprendimos en este curso, ya están trabajando con lógica de calidad.</p>
+                </div>
+
+                <div class="importante">
+                    <strong>El gran aporte de la ISO 9001 es eliminar la improvisación.</strong> En una bodega sin procedimientos, cada persona trabaja "a su manera" y los resultados dependen de la suerte y de la memoria. En una bodega con ISO 9001, el resultado depende del sistema. Y esa es la diferencia entre una bodega artesanal y una bodega profesional.
+                </div>
+            </section>
+
+            <section class="section" id="iso14001">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. ISO 14001: Gestión Ambiental</h3>
+                <p>La ISO 14001 es la norma de gestión ambiental. Su objetivo es que la empresa identifique los impactos que su actividad produce sobre el medio ambiente y los controle, los reduzca y, ojalá, los elimine.</p>
+
+                <h4>¿Qué significa eso en una bodega?</h4>
+                <ul>
+                    <li><strong>Gestión de residuos:</strong> zonas de reciclaje etiquetadas para el film plástico, los pallets de madera rotos y los cartones de embalaje. Nada de mezclar todo en un solo contenedor.</li>
+                    <li><strong>Manejo de sustancias peligrosas:</strong> los RESPEL, que vimos en el Módulo 14, deben gestionarse de manera especial, con empresas autorizadas para su disposición final.</li>
+                    <li><strong>Control de derrames:</strong> el protocolo antiderrames que aprendimos no solo protege a las personas: también protege el suelo, las aguas y los desagües. Eso es gestión ambiental en la práctica.</li>
+                    <li><strong>Uso eficiente de recursos:</strong> energía, agua, combustible de las grúas, materiales de embalaje.</li>
+                </ul>
+
+                <div class="ejemplo-box">
+                    <h5>Conectando con el curso</h5>
+                    <p>En el Módulo 14 vimos que los residuos contaminados de un derrame son residuos peligrosos y deben ir a tambores etiquetados para su disposición como RESPEL. Eso es exactamente lo que la ISO 14001 espera: identificar el residuo, segregarlo, registrarlo y disponerlo correctamente.</p>
+                    <p>Y en el Módulo 4, con las 5S, ya hablábamos de clasificar y eliminar lo que no sirve. Una bodega con buenas 5S tiene medio camino recorrido para una ISO 14001, porque ya separa, ordena y gestiona sus residuos.</p>
+                </div>
+
+                <div class="destacado">
+                    La ISO 14001 nos enseña que la bodega no existe en el vacío. Todo lo que sale de la bodega, incluido el desecho, tiene un impacto. Y gestionar ese impacto también es parte del trabajo logístico.
+                </div>
+            </section>
+
+            <section class="section" id="iso45001">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. ISO 45001: Seguridad y Salud en el Trabajo</h3>
+                <p>La ISO 45001 es la norma de seguridad y salud ocupacional. Su objetivo es prevenir accidentes y enfermedades profesionales, controlando los riesgos del trabajo antes de que produzcan daño.</p>
+
+                <h4>¿Qué exige la ISO 45001 en una bodega?</h4>
+                <ul>
+                    <li><strong>Identificación de peligros y evaluación de riesgos:</strong> exactamente lo que vimos en el Módulo 1: mirar la bodega y preguntarse qué puede salir mal.</li>
+                    <li><strong>Mapas de tránsito seguro:</strong> pasillos peatonales demarcados con líneas amarillas o azules, separados del tránsito de grúas horquilla.</li>
+                    <li><strong>Barreras físicas:</strong> protectores que eviten que las grúas golpeen las bases de los racks, como vimos en el Módulo 8.</li>
+                    <li><strong>Señalización de advertencia:</strong> zonas de ruido, tránsito de maquinaria pesada, altura de apilamiento, EPP obligatorio.</li>
+                    <li><strong>Participación de los trabajadores:</strong> la norma exige que los trabajadores sean consultados y participen en la seguridad. En Chile, esa participación se canaliza a través del Comité Paritario de Higiene y Seguridad, que existe por el DS 54 en empresas con más de 25 trabajadores.</li>
+                </ul>
+
+                <div class="ejemplo-box">
+                    <h5>Conectando con el curso</h5>
+                    <p>Prácticamente todo lo que vimos en la Parte I del curso es ISO 45001 aplicada: prevención de riesgos, EPP, señalización, orden y aseo, prevención de incendios. Y en el Módulo 9, cuando hablamos de la Ley de Saco y de las técnicas de levantamiento, estábamos hablando de controlar riesgos ergonómicos, que es uno de los temas centrales de esta norma.</p>
+                </div>
+
+                <div class="importante">
+                    <strong>La ISO 45001 no reemplaza la ley chilena: la complementa y la ordena.</strong> La Ley 16.744 y el DS 594 siguen siendo obligatorias. La ISO 45001 aporta el sistema de gestión: la metodología para identificar riesgos, controlarlos, registrarlos, auditarlos y mejorarlos de manera continua.
+                </div>
+            </section>
+
+            <section class="section" id="sistema">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Las Tres Normas como un Solo Sistema</h3>
+                <p>Ahora viene una idea muy potente: las tres normas no funcionan separadas. En la práctica, las empresas las integran en un solo sistema de gestión. Y tiene toda la lógica del mundo, porque calidad, medio ambiente y seguridad se refuerzan mutuamente.</p>
+
+                <p>Piénsenlo con un ejemplo concreto de bodega:</p>
+
+                <ul>
+                    <li>Un pasillo bien demarcado y despejado (ISO 45001) evita atropellos y caídas.</li>
+                    <li>Ese mismo pasillo despejado (5S, Módulo 4) permite que el picking sea más rápido y con menos errores (ISO 9001).</li>
+                    <li>Y una zona de reciclaje ordenada (ISO 14001) mantiene la bodega limpia, lo que a su vez reduce riesgos de incendio y accidentes (ISO 45001).</li>
+                </ul>
+
+                <div class="destacado">
+                    Una bodega ordenada y segura es también una bodega eficiente. Las tres normas apuntan al mismo lugar: una operación bien hecha. Por eso, cuando una empresa gestiona calidad, medio ambiente y seguridad como un solo sistema, todo funciona mejor.
+                </div>
+
+                <p>Y aquí viene una reflexión que quiero dejarles: cuando ustedes trabajan bien, están aportando a las tres normas a la vez. Cada vez que registran un movimiento, aportan a la calidad. Cada vez que separan un residuo, aportan al medio ambiente. Cada vez que reportan un incidente, aportan a la seguridad. El trabajador de bodega es parte activa del sistema de gestión, aunque no tenga el cargo de "jefe de calidad".</p>
+            </section>
+
+            <section class="section" id="ley">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. ISO vs Ley, y las Normas Internas de la Empresa</h3>
+                <p>Este punto es muy importante para que no se confundan. Vamos a ordenar los tres niveles de exigencia que existen en el trabajo:</p>
+
+                <div class="comparacion">
+                    <div class="caja ley">
+                        <h5>LA LEY (Obligatoria)</h5>
+                        <p>DS 594, Ley 16.744, Ley de Saco, DS 43. Es el piso mínimo. No cumplirla genera multas y responsabilidades.</p>
+                        <p><strong>Ejemplo:</strong> límite de 25 kg de levantamiento manual para hombres.</p>
+                    </div>
+                    <div class="caja iso">
+                        <h5>LA NORMA ISO (Voluntaria)</h5>
+                        <p>Estándar internacional que la empresa adopta por decisión propia, generalmente por exigencia del mercado. Va más allá de la ley.</p>
+                        <p><strong>Ejemplo:</strong> sistema de gestión de seguridad con auditorías y mejora continua.</p>
+                    </div>
+                </div>
+
+                <h4>Y el tercer nivel: el reglamento interno</h4>
+                <p>Aquí viene un principio legal que tienen que conocer: las normas internas de la empresa pueden ser más estrictas que la ley, pero nunca más permisivas.</p>
+
+                <p>Esto se materializa en el Reglamento Interno de Orden, Higiene y Seguridad, que toda empresa puede establecer. Y funciona así:</p>
+
+                <ul>
+                    <li><strong>Velocidad:</strong> si en teoría se permitiera circular a 25 km/h, la bodega puede limitar internamente a 10 km/h o incluso 5 km/h en pasillos peatonales. Lo que nunca puede hacer es permitir 60 km/h.</li>
+                    <li><strong>Peso manual:</strong> la Ley de Saco fija 25 kg como máximo. La empresa puede decidir internamente que nadie levante más de 15 kg sin ayuda mecánica. Lo que nunca puede es exigir 40 kg.</li>
+                    <li><strong>EPP:</strong> la ley exige calzado de seguridad. La empresa puede exigir además casco con barbiquejo y lentes en zonas de racks altos. Lo que nunca puede es no entregar el EPP obligatorio.</li>
+                </ul>
+
+                <div class="importante">
+                    <strong>El orden de las cosas es este: la ley es el piso, el reglamento interno puede subir ese piso, y la ISO es el sistema que ordena y mejora todo de manera continua.</strong> Ninguno de los tres niveles puede bajar lo que el nivel superior de protección ya garantiza.
+                </div>
+
+                <p>Y esto es muy útil para los debates del curso: si alguien pregunta "¿puede la empresa limitar la velocidad de las grúas a 10 km/h si la ley no lo dice?", la respuesta correcta es: sí, puede, porque las normas internas pueden ser más estrictas que la ley, pero nunca más permisivas.</p>
+            </section>
+
+            <section class="section" id="dia">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Cómo se Vive la ISO en el Día a Día de la Bodega</h3>
+                <p>Para cerrar la parte técnica, quiero bajar todo esto al trabajo diario. Porque la ISO no es un binder guardado en una repisa de la oficina de calidad. La ISO se vive en cada turno, en cada movimiento, en cada registro.</p>
+
+                <h4>¿Qué hace un trabajador de bodega en una empresa certificada?</h4>
+                <ul>
+                    <li><strong>Sigue procedimientos:</strong> no trabaja "a su manera", trabaja como dice el procedimiento documentado.</li>
+                    <li><strong>Registra:</strong> cada recepción, cada despacho, cada merma, cada diferencia queda registrada. El registro es la evidencia.</li>
+                    <li><strong>Reporta no conformidades:</strong> una no conformidad es simplemente algo que no salió como debía: un producto dañado, un error de despacho, un incidente. Se reporta, se registra y se corrige.</li>
+                    <li><strong>Participa en auditorías:</strong> cuando llega el auditor, el trabajador responde cómo hace su tarea. Y lo que dice debe coincidir con el procedimiento.</li>
+                    <li><strong>Propone mejoras:</strong> la mejora continua no es tarea solo de los jefes. Un operario que propone una mejora a su proceso está haciendo ISO en su forma más pura.</li>
+                </ul>
+
+                <div class="ejemplo-box">
+                    <h5>La pregunta del auditor</h5>
+                    <p>Imaginen que llega un auditor externo y les pregunta: "¿cómo verifica usted una recepción?"</p>
+                    <p>Si ustedes responden con lo que aprendimos en el Módulo 7: "verifico cantidad, código, descripción, estado, lote, vencimiento y documentación contra la orden de compra y la guía de despacho; si hay diferencia, la registro y la informo", el auditor queda conforme. Porque eso es exactamente lo que el procedimiento dice y lo que la norma espera.</p>
+                    <p>Ese es el nivel de conocimiento que este curso les dio. No es teoría: es la forma de trabajar que una auditoría espera encontrar.</p>
+                </div>
+
+                <div class="destacado">
+                    La ISO no la hace el departamento de calidad. La hacen todas las personas de la empresa, todos los días, trabajando bien y dejando evidencia de que trabajaron bien.
+                </div>
+            </section>
+
+            <section class="section" id="mitos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Mitos y Errores sobre las Normas ISO</h3>
+                <p>Para que nadie los engañe, y para que ustedes no se engañen, vamos a repasar los mitos más comunes sobre las normas ISO.</p>
+
+                <h4>Mito 1: "La ISO es puro papeleo"</h4>
+                <p>Falso. La ISO es hacer las cosas bien y demostrarlo. El registro no es papeleo: es evidencia. El problema aparece cuando una empresa escribe procedimientos solo para la auditoría y no los aplica. Eso no es ISO, es teatro.</p>
+
+                <h4>Mito 2: "La ISO es cosa del departamento de calidad"</h4>
+                <p>Falso. La ISO es cosa de todos. El operario que registra una merma, el bodeguero que reporta un incidente, el comprador que evalúa a un proveedor: todos están haciendo gestión de calidad, ambiental o de seguridad.</p>
+
+                <h4>Mito 3: "Certificarse es la meta"</h4>
+                <p>Falso. Certificarse es el punto de partida. La norma exige mejora continua. Una empresa que se certifica y se duerme, pierde el certificado en la siguiente auditoría de seguimiento.</p>
+
+                <h4>Mito 4: "La ISO reemplaza a la ley"</h4>
+                <p>Falso. La ley es obligatoria y la ISO es voluntaria. La ISO complementa y ordena, pero nunca reemplaza el cumplimiento legal. Una empresa certificada que incumple la ley tiene un problema grave igual.</p>
+
+                <h4>Mito 5: "Las ISO son solo para empresas grandes"</h4>
+                <p>Falso. Cualquier empresa puede implementar una norma ISO, partiendo por lo básico: procedimientos, registros y mejora continua. De hecho, una pyme ordenada y registrada ya está haciendo gran parte del camino.</p>
+
+                <div class="destacado">
+                    El peor enemigo de una norma ISO no es la falta de recursos: es la cultura del "siempre lo hemos hecho así". Porque la norma exige justamente lo contrario: hacer las cosas como corresponde, y mejorarlas en el tiempo.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final del Curso</h3>
+                <p>Y con esto cerramos realmente el curso. Dieciséis módulos que partieron por lo más importante, que son las personas y su seguridad, pasaron por toda la operación de la bodega, llegaron al control y la tecnología, y terminan hoy con el marco de gestión que ordena todo: las normas ISO.</p>
+                <p>Si miran hacia atrás, van a darse cuenta de algo muy potente: todo lo que aprendimos en este curso es exactamente lo que las normas ISO esperan encontrar en una bodega. Procedimientos, registros, seguridad, orden, control, trazabilidad y mejora continua. Ustedes ya trabajan con lógica ISO, aunque todavía no lo sabían.</p>
+                <p>Y eso es lo que los transforma en profesionales completos: no solo saben mover cajas, saben por qué las cosas se hacen como se hacen, y saben explicarlo. Eso vale oro en una entrevista de trabajo y en cualquier bodega seria.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"La ley es el piso.<br>La ISO es el sistema que te ayuda a subirlo.<br>Y las personas que trabajan bien, todos los días,<br>son las que sostienen todo lo demás."</p>
+                <p style="margin-top: 30px; font-size: 16px; opacity: 0.85;">Gracias por recorrer estos dieciséis módulos. Nos vemos en la bodega.</p>
+                <a href="index.html" class="back-home">Volver al Menú Principal</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollPosition >= (sectionTop - 150)) { current = section.getAttribute('id'); }
+            });
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) { link.classList.add('active'); }
+            });
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (scrollPosition / totalHeight) * 100 + '%';
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) { scrollTop.classList.add('visible'); } else { scrollTop.classList.remove('visible'); }
+        });
+
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            clone.querySelectorAll('.tts-controls').forEach(c => c.remove());
+            clone.querySelectorAll('.video-container, .image-gallery').forEach(v => v.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

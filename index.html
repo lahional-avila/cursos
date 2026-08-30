@@ -16,7 +16,7 @@
     .hero { background: linear-gradient(135deg, rgba(30, 58, 95, 0.92), rgba(44, 82, 130, 0.92)), url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/4fd1a0a28-d648-49e5-ae57-f7108f90a8ff3101.png'); background-size: cover; background-position: center; color: white; padding: 100px 40px; text-align: center; }
     .hero h2 { font-size: 42px; margin-bottom: 20px; font-weight: 700; line-height: 1.2; max-width: 1000px; margin-left: auto; margin-right: auto; }
     .hero p { font-size: 18px; max-width: 800px; margin: 0 auto 40px auto; opacity: 0.9; line-height: 1.6; }
-    .hero-stats { display: flex; justify-content: center; gap: 60px; margin-top: 60px; flex-wrap: wrap; }
+    .hero-stats { display: flex; justify-content: center; gap: 50px; margin-top: 60px; flex-wrap: wrap; }
     .stat { text-align: center; }
     .stat-number { font-size: 48px; font-weight: 700; color: #f39c12; display: block; }
     .stat-label { font-size: 16px; opacity: 0.9; }
@@ -26,19 +26,24 @@
     .parte-header.parte-1 { border-left-color: #e74c3c; }
     .parte-header.parte-2 { border-left-color: #f39c12; }
     .parte-header.parte-3 { border-left-color: #27ae60; }
+    .parte-header.parte-4 { border-left-color: #8e44ad; }
     .parte-header h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 10px; }
     .parte-header p { color: #718096; font-size: 15px; }
     .parte-tag { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-size: 13px; font-weight: 600; margin-bottom: 15px; }
     .parte-1 .parte-tag { background: #e74c3c; }
     .parte-2 .parte-tag { background: #f39c12; }
     .parte-3 .parte-tag { background: #27ae60; }
+    .parte-4 .parte-tag { background: #8e44ad; }
     .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; background: white; padding: 40px; border-radius: 0 0 15px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     .module-card { background: #f8f9fa; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; border: 2px solid #27ae60; }
     .module-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    .module-card.practica { border: 2px solid #8e44ad; }
     .module-image { height: 180px; background-size: cover; background-position: center; position: relative; }
     .module-badge { position: absolute; top: 15px; right: 15px; background: #27ae60; color: white; padding: 6px 15px; border-radius: 20px; font-weight: 600; font-size: 12px; }
+    .module-badge.practica { background: #8e44ad; }
     .module-content { padding: 25px; }
     .module-number { color: #f39c12; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .module-number.practica { color: #8e44ad; }
     .module-title { color: #1e3a5f; font-size: 18px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
     .module-description { color: #718096; font-size: 14px; line-height: 1.5; margin-bottom: 15px; }
     .module-meta { display: flex; gap: 15px; font-size: 13px; color: #a0aec0; }
@@ -79,10 +84,11 @@
 
     <section class="hero">
         <h2>Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</h2>
-        <p>Formación integral para dominar el flujo completo de una bodega: desde la seguridad y prevención de riesgos, pasando por la recepción y almacenamiento, hasta el control de inventarios y la tecnología logística moderna.</p>
+        <p>Formación integral para dominar el flujo completo de una bodega: desde la seguridad y prevención de riesgos, pasando por la recepción y almacenamiento, hasta el control de inventarios, la tecnología logística y la práctica en simuladores interactivos.</p>
         <div class="hero-stats">
-            <div class="stat"><span class="stat-number">15</span><span class="stat-label">Módulos</span></div>
-            <div class="stat"><span class="stat-number">3</span><span class="stat-label">Partes</span></div>
+            <div class="stat"><span class="stat-number">16</span><span class="stat-label">Módulos</span></div>
+            <div class="stat"><span class="stat-number">2</span><span class="stat-label">Simuladores</span></div>
+            <div class="stat"><span class="stat-number">4</span><span class="stat-label">Partes</span></div>
             <div class="stat"><span class="stat-number">100%</span><span class="stat-label">Práctico</span></div>
         </div>
     </section>
@@ -297,8 +303,56 @@
                     <div class="module-content">
                         <div class="module-number">Módulo 15</div>
                         <h3 class="module-title">Tecnología en Bodega (WMS, ERP y Trazabilidad)</h3>
-                        <p class="module-description">Sistemas WMS y ERP, código de barras, trazabilidad, KPIs y evaluación final del curso.</p>
+                        <p class="module-description">Sistemas WMS y ERP, código de barras, trazabilidad, KPIs y cierre del recorrido operativo.</p>
                         <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 55 min</span></div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- PARTE IV -->
+        <div class="parte-section">
+            <div class="parte-header parte-4">
+                <span class="parte-tag">PARTE IV</span>
+                <h3>Complemento y Práctica Interactiva</h3>
+                <p>Marco de gestión internacional y simuladores para practicar con las manos lo aprendido en el curso</p>
+            </div>
+            <div class="modules-grid">
+
+                <a href="parte16.html" class="module-card">
+                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2ff2aefa1-4213-4986-9f58-cd4770df7755.png');">
+                        <span class="module-badge">✓ Disponible</span>
+                    </div>
+                    <div class="module-content">
+                        <div class="module-number">Módulo 16</div>
+                        <h3 class="module-title">Normas ISO en la Bodega (9001, 14001 y 45001)</h3>
+                        <p class="module-description">Qué son las normas ISO, certificación, auditorías, y cómo se viven la calidad, el medio ambiente y la seguridad en el día a día.</p>
+                        <div class="module-meta"><span>📚 11 lecciones</span><span>⏱️ 40 min</span></div>
+                    </div>
+                </a>
+
+                <a href="simulador.html" class="module-card practica">
+                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/27edc736c-1451-41cb-82d1-cdacc0d8a9cb6307.png');">
+                        <span class="module-badge practica">🖥️ Práctica</span>
+                    </div>
+                    <div class="module-content">
+                        <div class="module-number practica">Práctica Interactiva</div>
+                        <h3 class="module-title">Simulador WMS / ERP Educativo</h3>
+                        <p class="module-description">Crea productos, registra recepciones y despachos, aplica FEFO, revisa el Kardex y recibe alertas de reposición en un sistema amigable con ejercicios guiados.</p>
+                        <div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div>
+                    </div>
+                </a>
+
+                <a href="sap.html" class="module-card practica">
+                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/07edc736c-1451-41cb-82d1-cdacc0d8a9cb9382.png');">
+                        <span class="module-badge practica">🖥️ Práctica</span>
+                    </div>
+                    <div class="module-content">
+                        <div class="module-number practica">Práctica Interactiva</div>
+                        <h3 class="module-title">Simulador Tipo SAP (Transacciones MM)</h3>
+                        <p class="module-description">Aprende la lógica de SAP con transacciones reales: MM01, MIGO, MB52, MB51, ME21N y MI01, en una interfaz idéntica a SAP GUI.</p>
+                        <div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div>
                     </div>
                 </a>
 
@@ -307,6 +361,7 @@
 
     </div>
 
+    <!-- CARACTERÍSTICAS -->
     <section class="features">
         <div class="features-container">
             <h3>¿Por qué tomar este curso?</h3>
@@ -322,19 +377,20 @@
                     <p>Cada sección incluye reproducción de texto a voz para estudiar mientras realizas otras actividades.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-icon">📱</div>
-                    <h4>Acceso Total</h4>
-                    <p>Estudia a tu ritmo, desde cualquier dispositivo y en cualquier momento. Sin límites de tiempo.</p>
+                    <div class="feature-icon">🖥️</div>
+                    <h4>Simuladores Reales</h4>
+                    <p>Practica con un WMS educativo y un simulador tipo SAP que comparten los mismos datos, como en la vida real.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🏆</div>
-                    <h4>Normativa Chilena</h4>
-                    <p>Contenido alineado con la Ley 16.744, DS 594, DS 43 y todas las normas vigentes en Chile.</p>
+                    <h4>Normativa Chilena e ISO</h4>
+                    <p>Contenido alineado con la Ley 16.744, DS 594, DS 43 y las normas ISO 9001, 14001 y 45001.</p>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <p>&copy; 2026 Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</p>
         <p style="margin-top: 10px; font-size: 12px;">Formando profesionales comprometidos con la seguridad y la eficiencia logística</p>
