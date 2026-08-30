@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 12: Sistemas de Rotación (FIFO, FEFO, LIFO)</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.fifo { border-top: 5px solid #3498db; }
+    .caja.fefo { border-top: 5px solid #e74c3c; }
+    .caja.lifo { border-top: 5px solid #f39c12; }
+    .caja.fifo h5 { color: #2980b9; }
+    .caja.fefo h5 { color: #c0392b; }
+    .caja.lifo h5 { color: #d68910; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .rotacion-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .rotacion-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 25px; transition: all 0.3s; border-left: 6px solid; }
+    .rotacion-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .rotacion-item.fifo { border-left-color: #3498db; }
+    .rotacion-item.fefo { border-left-color: #e74c3c; }
+    .rotacion-item.lifo { border-left-color: #f39c12; }
+    .rotacion-item h5 { color: #1e3a5f; font-size: 20px; margin-bottom: 10px; }
+    .rotacion-item .ingles { color: #718096; font-size: 14px; font-style: italic; margin-bottom: 15px; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    .tabla-ejemplo { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .tabla-ejemplo th { background: #1e3a5f; color: white; padding: 12px; text-align: left; font-size: 14px; }
+    .tabla-ejemplo td { padding: 12px; border: 1px solid #ddd; font-size: 14px; }
+    .tabla-ejemplo tr:nth-child(even) { background: #f8f9fa; }
+    .tabla-ejemplo tr:hover { background: #e8f4f8; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 25px 0; }
+    .kpi-item { background: #f8f9fa; border-radius: 10px; padding: 25px; text-align: center; border-top: 4px solid #27ae60; }
+    .kpi-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 10px; }
+    .kpi-item .formula { font-family: 'Courier New', monospace; font-size: 13px; color: #2c5282; background: #e8f4f8; padding: 8px; border-radius: 5px; margin-top: 10px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 12: Sistemas de Rotación</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción a la Rotación</a></li>
+                <li><a href="#fifo">2. FIFO: Primero en Entrar, Primero en Salir</a></li>
+                <li><a href="#fefo">3. FEFO: Primero en Vencer, Primero en Salir</a></li>
+                <li><a href="#lifo">4. LIFO: Último en Entrar, Primero en Salir</a></li>
+                <li><a href="#debate">5. El Gran Debate: FIFO vs FEFO</a></li>
+                <li><a href="#implementacion">6. Cómo Implementar la Rotación</a></li>
+                <li><a href="#almacenamiento">7. Rotación y Almacenamiento</a></li>
+                <li><a href="#tecnologia">8. Rotación y Tecnología</a></li>
+                <li><a href="#indicadores">9. Indicadores de Rotación</a></li>
+                <li><a href="#compras">10. La Conexión con Compras</a></li>
+                <li><a href="#errores">11. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Sistemas de Rotación (FIFO, FEFO, LIFO)</h2>
+                <p>Ya sabemos recibir, almacenar y controlar. Ahora viene una pregunta fundamental: ¿qué producto sale primero? Porque de esa decisión depende cuánto dinero perdemos por vencimientos, obsolescencia y deterioro.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1553413077-190dd342872f?w=1200" alt="Rotación de productos en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción a la Rotación</h3>
+                <p>En el módulo anterior hablamos de inventarios, de stock, de mermas y de diferencias. Y quedó una pregunta flotando: cuando tengo varios lotes del mismo producto, ¿cuál despacho primero?</p>
+                
+                <p>Esa pregunta parece simple, pero tiene una respuesta muy importante. Porque si despacho el producto equivocado, puedo generar vencimientos, obsolescencia, mermas y pérdidas de dinero.</p>
+                
+                <p>Imaginen esta situación: tengo dos lotes del mismo guante. Uno llegó en enero y vence en diciembre. El otro llegó en marzo y vence en octubre. Si despacho el de enero primero porque llegó primero, el de octubre se me va a vencer en bodega. Perdí plata.</p>
+                
+                <div class="importante">
+                    <strong>La rotación es la política que define qué producto sale primero cuando hay varios lotes disponibles.</strong> Y esa política no es arbitraria: depende de las características del producto, de su vencimiento, de su deterioro y de las condiciones del negocio.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se les grabe: la rotación no es solo un tema de bodega. Es un tema que conecta directamente con Compras, con Finanzas, con Planificación y con la operación completa. Porque la decisión de cuándo y cuánto comprar afecta directamente cómo rotamos el inventario.</p>
+                
+                <div class="destacado">
+                    Una buena política de rotación evita vencimientos, reduce mermas, optimiza el capital inmovilizado y mejora la calidad del servicio. Una mala política de rotación genera pérdidas silenciosas que muchas veces nadie ve hasta que es demasiado tarde.
+                </div>
+                
+                <p>Así que vamos a ver los tres sistemas principales: FIFO, FEFO y LIFO. Cada uno tiene su lógica, sus ventajas, sus desventajas y sus casos de uso. Y al final, vamos a ver cómo se conectan con el mundo de Compras y Adquisiciones.</p>
+            </section>
+
+            <section class="section" id="fifo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. FIFO: Primero en Entrar, Primero en Salir</h3>
+                
+                <div class="rotacion-item fifo">
+                    <h5>FIFO</h5>
+                    <p class="ingles">First In, First Out</p>
+                    <p><strong>Traducción:</strong> Primero en Entrar, Primero en Salir</p>
+                    <p><strong>Regla:</strong> El producto que llegó primero a la bodega es el primero que se despacha.</p>
+                </div>
+                
+                <h4>¿Cómo funciona FIFO?</h4>
+                <p>Imaginemos que tenemos un producto que llega en diferentes fechas. Con FIFO, cuando alguien solicita ese producto, despachamos el lote más antiguo, el que lleva más tiempo en bodega.</p>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico de FIFO</h5>
+                    <p>Tengo guantes de nitrilo talla L en tres lotes:</p>
+                    <table class="tabla-ejemplo">
+                        <thead>
+                            <tr>
+                                <th>Lote</th>
+                                <th>Fecha de Ingreso</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Lote A</td>
+                                <td>15 de enero</td>
+                                <td>100 unidades</td>
+                            </tr>
+                            <tr>
+                                <td>Lote B</td>
+                                <td>20 de febrero</td>
+                                <td>150 unidades</td>
+                            </tr>
+                            <tr>
+                                <td>Lote C</td>
+                                <td>10 de marzo</td>
+                                <td>200 unidades</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Llega una solicitud por 120 unidades. Con FIFO, despacho:</p>
+                    <ul>
+                        <li>100 unidades del Lote A (enero) - se agota</li>
+                        <li>20 unidades del Lote B (febrero)</li>
+                    </ul>
+                    <p>El Lote C queda intacto porque es el más nuevo.</p>
+                </div>
+                
+                <h4>¿Cuándo se usa FIFO?</h4>
+                <ul>
+                    <li><strong>Productos sin vencimiento:</strong> herramientas, repuestos, materiales de construcción.</li>
+                    <li><strong>Productos con deterioro por tiempo:</strong> productos que pueden degradarse con los años aunque no tengan fecha de vencimiento.</li>
+                    <li><strong>Productos de moda o tecnología:</strong> para evitar obsolescencia.</li>
+                    <li><strong>Cuando la política de la empresa es FIFO por defecto.</strong></li>
+                </ul>
+                
+                <h4>Ventajas de FIFO</h4>
+                <ul>
+                    <li>Es simple de entender y de aplicar.</li>
+                    <li>Evita que los productos queden "olvidados" en bodega.</li>
+                    <li>Reduce el riesgo de obsolescencia.</li>
+                    <li>Es el método más usado en contabilidad de inventarios.</li>
+                </ul>
+                
+                <h4>Desventajas de FIFO</h4>
+                <ul>
+                    <li>No considera la fecha de vencimiento.</li>
+                    <li>Puede no ser óptimo para productos perecederos.</li>
+                    <li>Requiere un control estricto de las fechas de ingreso.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>FIFO es el método más común y más simple.</strong> Pero no siempre es el mejor. Si el producto tiene fecha de vencimiento, hay que considerar FEFO. Eso lo veremos en la próxima sección.
+                </div>
+            </section>
+
+            <section class="section" id="fefo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. FEFO: Primero en Vencer, Primero en Salir</h3>
+                
+                <div class="rotacion-item fefo">
+                    <h5>FEFO</h5>
+                    <p class="ingles">First Expired, First Out</p>
+                    <p><strong>Traducción:</strong> Primero en Vencer, Primero en Salir</p>
+                    <p><strong>Regla:</strong> El producto que vence primero es el primero que se despacha, sin importar cuándo llegó.</p>
+                </div>
+                
+                <h4>¿Cómo funciona FEFO?</h4>
+                <p>Con FEFO, la prioridad no es la fecha de ingreso, sino la fecha de vencimiento. Despacho primero el producto que está más próximo a vencer, aunque haya llegado después que otros.</p>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico de FEFO</h5>
+                    <p>Tengo dos lotes de mascarillas:</p>
+                    <table class="tabla-ejemplo">
+                        <thead>
+                            <tr>
+                                <th>Lote</th>
+                                <th>Fecha de Ingreso</th>
+                                <th>Fecha de Vencimiento</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Lote A</td>
+                                <td>15 de enero</td>
+                                <td>31 de diciembre</td>
+                                <td>100 unidades</td>
+                            </tr>
+                            <tr>
+                                <td>Lote B</td>
+                                <td>10 de marzo</td>
+                                <td>31 de octubre</td>
+                                <td>150 unidades</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Llega una solicitud por 80 unidades.</p>
+                    <p><strong>Con FIFO</strong> despacharía el Lote A (enero) porque llegó primero. Pero el Lote A vence en diciembre, así que todavía tiene tiempo.</p>
+                    <p><strong>Con FEFO</strong> despacho el Lote B (marzo) porque vence en octubre, aunque llegó después. Así evito que el Lote B se venza en bodega.</p>
+                    <p>Resultado: con FEFO, el producto que vence primero sale primero. Ningún producto se vence en bodega.</p>
+                </div>
+                
+                <h4>¿Cuándo se usa FEFO?</h4>
+                <ul>
+                    <li><strong>Productos con fecha de vencimiento:</strong> alimentos, medicamentos, productos químicos.</li>
+                    <li><strong>Productos perecederos:</strong> todo aquello que tiene vida útil limitada.</li>
+                    <li><strong>Productos regulados:</strong> donde la normativa exige controlar vencimientos.</li>
+                    <li><strong>Cuando la merma por vencimiento es un costo importante.</strong></li>
+                </ul>
+                
+                <h4>Ventajas de FEFO</h4>
+                <ul>
+                    <li>Evita vencimientos en bodega.</li>
+                    <li>Reduce mermas por productos vencidos.</li>
+                    <li>Optimiza el uso del stock disponible.</li>
+                    <li>Mejora la calidad del producto entregado.</li>
+                    <li>Es el método más adecuado para productos perecederos.</li>
+                </ul>
+                
+                <h4>Desventajas de FEFO</h4>
+                <ul>
+                    <li>Requiere registrar la fecha de vencimiento de cada lote.</li>
+                    <li>Es más complejo de implementar que FIFO.</li>
+                    <li>Requiere un sistema que gestione vencimientos (WMS o ERP).</li>
+                    <li>Puede generar movimientos internos para reordenar el stock.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>FEFO es el método correcto para productos con vencimiento.</strong> Pero requiere más disciplina en el registro y más control en la operación. Si no se registran bien las fechas de vencimiento, FEFO no funciona.
+                </div>
+            </section>
+
+            <section class="section" id="lifo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. LIFO: Último en Entrar, Primero en Salir</h3>
+                
+                <div class="rotacion-item lifo">
+                    <h5>LIFO</h5>
+                    <p class="ingles">Last In, First Out</p>
+                    <p><strong>Traducción:</strong> Último en Entrar, Primero en Salir</p>
+                    <p><strong>Regla:</strong> El producto que llegó último a la bodega es el primero que se despacha.</p>
+                </div>
+                
+                <h4>¿Cómo funciona LIFO?</h4>
+                <p>Con LIFO, despacho primero el producto más reciente, el que acaba de llegar. Los productos más antiguos quedan en bodega.</p>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico de LIFO</h5>
+                    <p>Tengo pallets de cemento en block stacking (apilados en el suelo):</p>
+                    <table class="tabla-ejemplo">
+                        <thead>
+                            <tr>
+                                <th>Lote</th>
+                                <th>Fecha de Ingreso</th>
+                                <th>Posición</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Lote A</td>
+                                <td>Enero</td>
+                                <td>Abajo (base)</td>
+                            </tr>
+                            <tr>
+                                <td>Lote B</td>
+                                <td>Febrero</td>
+                                <td>Medio</td>
+                            </tr>
+                            <tr>
+                                <td>Lote C</td>
+                                <td>Marzo</td>
+                                <td>Arriba</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Con LIFO, despacho primero el Lote C (arriba) porque es el más accesible. Los lotes A y B quedan abajo.</p>
+                </div>
+                
+                <h4>¿Cuándo se usa LIFO?</h4>
+                <ul>
+                    <li><strong>Productos sin vencimiento y sin deterioro:</strong> materiales de construcción, metales, áridos.</li>
+                    <li><strong>Block stacking:</strong> cuando los pallets se apilan unos sobre otros y el de arriba es el más accesible.</li>
+                    <li><strong>Racks drive-in:</strong> donde el último pallet en entrar es el primero en salir por la configuración física.</li>
+                    <li><strong>Contabilidad:</strong> en algunos países se usa LIFO para valorización contable, aunque en Chile no es común.</li>
+                </ul>
+                
+                <h4>Ventajas de LIFO</h4>
+                <ul>
+                    <li>Es práctico cuando la configuración física lo exige (block stacking, drive-in).</li>
+                    <li>Reduce movimientos internos.</li>
+                    <li>Es eficiente para productos que no se deterioran con el tiempo.</li>
+                </ul>
+                
+                <h4>Desventajas de LIFO</h4>
+                <ul>
+                    <li>Los productos antiguos pueden quedar "olvidados" en bodega.</li>
+                    <li>Puede generar obsolescencia en productos que sí se deterioran.</li>
+                    <li>No es adecuado para productos con vencimiento.</li>
+                    <li>En contabilidad, puede distorsionar el valor del inventario en períodos de inflación.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>LIFO se usa poco en bodegas modernas</strong> porque la mayoría de los productos tienen algún tipo de deterioro o vencimiento. Pero es importante conocerlo porque aparece en block stacking y racks drive-in, donde la configuración física lo impone.
+                </div>
+            </section>
+
+            <section class="section" id="debate">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. El Gran Debate: FIFO vs FEFO</h3>
+                <p>Ahora viene una pregunta que genera mucho debate en las bodegas: ¿FIFO o FEFO? ¿Cuál es mejor?</p>
+                
+                <p>Y la respuesta inteligente es: depende del producto.</p>
+                
+                <div class="comparacion">
+                    <div class="caja fifo">
+                        <h5>FIFO</h5>
+                        <p><strong>Prioriza:</strong> fecha de ingreso</p>
+                        <p><strong>Ideal para:</strong> productos sin vencimiento o con deterioro por tiempo</p>
+                        <p><strong>Ventaja:</strong> simple de implementar</p>
+                        <p><strong>Desventaja:</strong> no considera vencimientos</p>
+                    </div>
+                    <div class="caja fefo">
+                        <h5>FEFO</h5>
+                        <p><strong>Prioriza:</strong> fecha de vencimiento</p>
+                        <p><strong>Ideal para:</strong> productos perecederos o con vencimiento</p>
+                        <p><strong>Ventaja:</strong> evita vencimientos en bodega</p>
+                        <p><strong>Desventaja:</strong> requiere más control y registro</p>
+                    </div>
+                </div>
+                
+                <h4>La pregunta clave</h4>
+                <p>Antes de decidir entre FIFO y FEFO, hay que preguntarse: ¿este producto tiene fecha de vencimiento? ¿Se deteriora con el tiempo? ¿Qué pasa si se vence en bodega?</p>
+                
+                <ul>
+                    <li><strong>Si tiene vencimiento y la merma por vencimiento es cara:</strong> FEFO.</li>
+                    <li><strong>Si no tiene vencimiento pero puede deteriorarse con los años:</strong> FIFO.</li>
+                    <li><strong>Si no tiene vencimiento ni deterioro:</strong> cualquiera de los dos, o incluso LIFO si la configuración física lo exige.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>El ejemplo clásico del debate</h5>
+                    <p>Tengo dos productos:</p>
+                    <ul>
+                        <li><strong>Producto A:</strong> ingresó en enero, vence en diciembre.</li>
+                        <li><strong>Producto B:</strong> ingresó en marzo, vence en octubre.</li>
+                    </ul>
+                    <p>Con FIFO despacho primero el Producto A (porque llegó primero). Pero el Producto B vence antes, así que si despacho A primero, B se me vence en bodega.</p>
+                    <p>Con FEFO despacho primero el Producto B (porque vence primero). Así evito que se venza.</p>
+                    <p>Por eso, para productos con vencimiento, FEFO es la política correcta.</p>
+                </div>
+                
+                <div class="destacado">
+                    El criterio de rotación debe responder a las características del producto, no aplicarse automáticamente. No todos los productos deberían rotar con el mismo método. Una bodega puede tener FIFO para algunos productos y FEFO para otros.
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿qué pasa cuando un producto tiene vencimiento pero el proveedor entrega lotes con fechas de vencimiento diferentes en cada recepción? ¿Cómo controlo eso? La respuesta es: con un sistema que registre el lote y el vencimiento de cada unidad. Y eso nos lleva al siguiente tema: la implementación.</p>
+            </section>
+
+            <section class="section" id="implementacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Cómo Implementar la Rotación en la Bodega</h3>
+                <p>Saber qué método usar es solo el primer paso. Después hay que implementarlo. Y eso requiere disciplina, procedimientos y herramientas.</p>
+                
+                <h4>Pasos para implementar la rotación</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Definir la política por producto:</strong> no todos los productos rotan igual. Hay que definir qué método se usa para cada uno.</li>
+                        <li><strong>Registrar la información necesaria:</strong> fecha de ingreso, lote, fecha de vencimiento cuando corresponda.</li>
+                        <li><strong>Identificar físicamente el stock:</strong> etiquetar los productos con la información necesaria para aplicar la rotación.</li>
+                        <li><strong>Ubicar correctamente:</strong> colocar el stock de manera que el picking respete la rotación definida.</li>
+                        <li><strong>Capacitar al equipo:</strong> todos deben saber cómo aplicar la rotación durante el picking.</li>
+                        <li><strong>Verificar durante el picking:</strong> antes de despachar, confirmar que se está tomando el lote correcto.</li>
+                        <li><strong>Registrar la salida:</strong> actualizar el sistema con el lote despachado.</li>
+                        <li><strong>Monitorear:</strong> revisar periódicamente que la rotación se esté aplicando correctamente.</li>
+                    </ol>
+                </div>
+                
+                <h4>Herramientas para implementar la rotación</h4>
+                <ul>
+                    <li><strong>Etiquetas de lote y vencimiento:</strong> cada producto debe tener visible su lote y vencimiento.</li>
+                    <li><strong>Ubicación por fecha:</strong> en el rack, colocar lo más antiguo adelante y lo más nuevo atrás (para FIFO/FEFO).</li>
+                    <li><strong>Sistema informático:</strong> un WMS o ERP que gestione lotes y vencimientos automáticamente.</li>
+                    <li><strong>Código de barras:</strong> para escanear el lote y verificar que se está tomando el correcto.</li>
+                    <li><strong>Checklist de picking:</strong> una lista que indique qué lote despachar.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La rotación no funciona si no hay disciplina.</strong> Si el bodeguero toma el producto que está más a mano en vez del que corresponde según la política, el sistema falla. Por eso la capacitación y la verificación son fundamentales.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se les grabe: la rotación no se aplica solo al momento del despacho. Se aplica desde el momento en que el producto llega a la bodega. Si en la recepción no registro el lote y el vencimiento, después no puedo aplicar FEFO.</p>
+            </section>
+
+            <section class="section" id="almacenamiento">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Rotación y Almacenamiento</h3>
+                <p>La rotación no es solo un concepto abstracto. Se materializa en la forma en que almacenamos físicamente los productos. La configuración del almacenamiento puede facilitar o dificultar la rotación.</p>
+                
+                <h4>Racks selectivos</h4>
+                <p>Permiten acceso directo a cada pallet. Son los más flexibles para aplicar FIFO o FEFO porque el operador puede elegir cualquier pallet. Pero requieren pasillos anchos y no aprovechan tan bien el espacio.</p>
+                
+                <h4>Racks drive-in</h4>
+                <p>La grúa entra dentro del rack. La configuración física impone LIFO: el último pallet en entrar es el primero en salir. No es ideal para productos con vencimiento.</p>
+                
+                <h4>Racks dinámicos (flow racks)</h4>
+                <p>Los productos entran por un extremo y salen por el otro, aprovechando la gravedad. Permiten aplicar FIFO automáticamente. Son ideales para productos con alta rotación.</p>
+                
+                <h4>Block stacking</h4>
+                <p>Los pallets se apilan en el suelo. La configuración física impone LIFO: el pallet de arriba es el más accesible. Solo es adecuado para productos sin vencimiento.</p>
+                
+                <h4>Ubicación por fecha</h4>
+                <p>En racks selectivos, una práctica común es colocar lo más antiguo adelante y lo más nuevo atrás. Así, cuando el operador hace picking, naturalmente toma lo más antiguo primero. Esto facilita FIFO y FEFO sin necesidad de sistemas complejos.</p>
+                
+                <div class="destacado">
+                    La configuración del almacenamiento debe estar alineada con la política de rotación. Si uso racks drive-in para productos con vencimiento, estoy generando un problema. Si uso racks dinámicos para productos sin vencimiento, estoy desaprovechando la inversión.
+                </div>
+                
+                <p>Y una pregunta que me gusta hacer: ¿ustedes saben qué tipo de racks tiene su bodega? ¿Esa configuración facilita o dificulta la rotación que necesitan? Si no lo saben, tenemos un problema de planificación.</p>
+            </section>
+
+            <section class="section" id="tecnologia">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Rotación y Tecnología</h3>
+                <p>Implementar FIFO o FEFO manualmente es posible, pero requiere mucha disciplina y es propenso a errores. La tecnología facilita enormemente el proceso.</p>
+                
+                <h4>WMS (Warehouse Management System)</h4>
+                <p>Un WMS puede gestionar automáticamente la rotación. Cuando llega un producto, se registra el lote y el vencimiento. Cuando se necesita despachar, el sistema indica qué lote tomar según la política definida (FIFO o FEFO).</p>
+                
+                <p>Ventajas del WMS para rotación:</p>
+                <ul>
+                    <li>Gestiona lotes y vencimientos automáticamente.</li>
+                    <li>Indica al operador qué lote tomar.</li>
+                    <li>Alerta sobre productos próximos a vencer.</li>
+                    <li>Genera reportes de stock por lote y vencimiento.</li>
+                    <li>Reduce errores humanos.</li>
+                </ul>
+                
+                <h4>ERP (Enterprise Resource Planning)</h4>
+                <p>El ERP integra la información de compras, inventario, finanzas y logística. Cuando Compras genera una orden de compra, el ERP puede registrar el lote esperado. Cuando Bodega recibe, registra el lote real. El ERP mantiene la trazabilidad completa.</p>
+                
+                <h4>Código de barras</h4>
+                <p>El código de barras permite identificar el producto y su lote rápidamente. Al escanear, el sistema sabe qué lote es y puede verificar si es el correcto según la rotación.</p>
+                
+                <h4>RFID</h4>
+                <p>La identificación por radiofrecuencia permite leer múltiples productos a la vez sin contacto visual. Es más rápida que el código de barras, pero más cara.</p>
+                
+                <div class="importante">
+                    <strong>La tecnología no reemplaza la disciplina.</strong> Un WMS puede decirte qué lote tomar, pero si el operador no lo verifica o toma otro, el sistema no sirve. La tecnología facilita, pero la responsabilidad sigue siendo de las personas.
+                </div>
+                
+                <p>Y aquí viene una conexión importante: si el WMS está integrado con el ERP, la información de Compras (lote esperado, vencimiento esperado) fluye automáticamente a Bodega. Eso reduce errores de recepción y mejora la rotación. Eso lo veremos en el Módulo 15 sobre tecnología.</p>
+            </section>
+
+            <section class="section" id="indicadores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Indicadores de Rotación</h3>
+                <p>¿Cómo sé si la rotación está funcionando? Con indicadores. Sin indicadores, estamos trabajando a ciegas.</p>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <h5>Índice de Rotación</h5>
+                        <p>Cuántas veces se renueva el stock en un período</p>
+                        <div class="formula">Consumo anual / Stock promedio</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Días de Inventario</h5>
+                        <p>Cuántos días alcanza el stock con el consumo actual</p>
+                        <div class="formula">365 / Índice de rotación</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Tasa de Vencimiento</h5>
+                        <p>Porcentaje del stock que se vence en bodega</p>
+                        <div class="formula">(Valor vencido / Valor total) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Tasa de Obsolescencia</h5>
+                        <p>Porcentaje del stock que se vuelve obsoleto</p>
+                        <div class="formula">(Valor obsoleto / Valor total) × 100</div>
+                    </div>
+                </div>
+                
+                <h4>¿Qué me dicen estos indicadores?</h4>
+                <ul>
+                    <li><strong>Índice de rotación alto:</strong> el producto se mueve mucho. Buena rotación.</li>
+                    <li><strong>Índice de rotación bajo:</strong> el producto casi no se mueve. Puede ser stock muerto.</li>
+                    <li><strong>Tasa de vencimiento alta:</strong> la política de rotación no está funcionando. Hay que revisar.</li>
+                    <li><strong>Tasa de obsolescencia alta:</strong> se está comprando de más o los productos se están volviendo obsoletos.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de análisis de indicadores</h5>
+                    <p>Supongamos que tengo un producto con estos datos:</p>
+                    <ul>
+                        <li>Consumo anual: 1.200 unidades</li>
+                        <li>Stock promedio: 100 unidades</li>
+                        <li>Índice de rotación: 1.200 / 100 = 12 veces al año</li>
+                        <li>Días de inventario: 365 / 12 = 30 días</li>
+                    </ul>
+                    <p>¿Qué me dice esto?</p>
+                    <ul>
+                        <li>El producto se renueva cada 30 días aproximadamente.</li>
+                        <li>Es un producto de alta rotación.</li>
+                        <li>Debo asegurar disponibilidad para no generar quiebres.</li>
+                        <li>La rotación está funcionando bien.</li>
+                    </ul>
+                </div>
+                
+                <div class="destacado">
+                    Los indicadores no son números para guardar en un cajón. Son herramientas de gestión que deben revisarse periódicamente y usarse para tomar decisiones. Si la tasa de vencimiento sube, hay que investigar por qué. Si el índice de rotación baja, hay que analizar si ese producto todavía tiene sentido en la bodega.
+                </div>
+            </section>
+
+            <section class="section" id="compras">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. La Conexión con Compras</h3>
+                <p>Y aquí viene un tema que me parece fundamental, y que muchas veces no se ve con claridad: la conexión entre la rotación y el área de Compras o Adquisiciones.</p>
+                
+                <p>Porque la rotación no empieza ni termina en la bodega. La rotación es el resultado de decisiones que se toman mucho antes de que el producto llegue.</p>
+                
+                <h4>¿Cómo afecta Compras a la rotación?</h4>
+                <ul>
+                    <li><strong>Cantidad comprada:</strong> si se compra demasiado, el stock puede vencer antes de usarse. Si se compra poco, puede haber quiebres.</li>
+                    <li><strong>Frecuencia de compra:</strong> compras frecuentes generan stock fresco. Compras esporádicas generan stock viejo.</li>
+                    <li><strong>Plazo de entrega (lead time):</strong> si el proveedor demora mucho, hay que mantener más stock de seguridad, y ese stock puede vencer.</li>
+                    <li><strong>Lote mínimo del proveedor:</strong> si el proveedor exige comprar 1.000 unidades, pero solo necesito 100, tengo 900 unidades que pueden vencer.</li>
+                    <li><strong>Fecha de vencimiento del lote entregado:</strong> si el proveedor entrega productos con vencimiento próximo, la rotación se complica.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo del impacto de Compras en la rotación</h5>
+                    <p>Imaginen dos escenarios:</p>
+                    <p><strong>Escenario A:</strong> Compras adquiere 1.000 unidades de un producto porque el proveedor ofrece un descuento del 15% por volumen. El producto vence en 12 meses. El consumo es de 50 unidades al mes.</p>
+                    <ul>
+                        <li>Tiempo para consumir 1.000 unidades: 20 meses</li>
+                        <li>Vencimiento: 12 meses</li>
+                        <li>Resultado: 400 unidades se van a vencer en bodega.</li>
+                    </ul>
+                    <p><strong>Escenario B:</strong> Compras adquiere 200 unidades cada dos meses, sin descuento. El producto vence en 12 meses. El consumo es de 50 unidades al mes.</p>
+                    <ul>
+                        <li>Tiempo para consumir 200 unidades: 4 meses</li>
+                        <li>Vencimiento: 12 meses</li>
+                        <li>Resultado: ningún producto se vence.</li>
+                    </ul>
+                    <p>A primera vista, el Escenario A parece mejor porque se compra más barato. Pero hay que considerar el costo de las 400 unidades que se vencen. Si cada unidad cuesta $1.000, son $400.000 perdidos. El descuento del 15% no compensa esa pérdida.</p>
+                </div>
+                
+                <h4>Conceptos clave desde Adquisiciones</h4>
+                <ul>
+                    <li><strong>Costo total de adquisición (TCO):</strong> no solo el precio del producto, sino también el costo de almacenamiento, el riesgo de vencimiento, el capital inmovilizado y la merma.</li>
+                    <li><strong>Lote económico de compra:</strong> la cantidad óptima que minimiza el costo total, considerando el precio, el almacenamiento y el vencimiento.</li>
+                    <li><strong>Lead time:</strong> tiempo total desde que se genera la necesidad hasta que el producto está disponible. Afecta directamente cuánto stock de seguridad necesito.</li>
+                    <li><strong>Criticidad del material:</strong> no todos los productos tienen la misma importancia. Un repuesto crítico que detiene la operación merece un tratamiento diferente que un tornillo común.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Compras y Bodega no deberían funcionar como áreas separadas.</strong> Las decisiones de compra determinan en gran medida lo que posteriormente ocurre en almacenamiento, rotación y despacho. Por eso la comunicación entre ambas áreas es fundamental.
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿quién es responsable de un producto vencido en bodega? ¿Bodega porque no lo despachó a tiempo? ¿Compras porque compró de más? ¿El proveedor porque entregó con vencimiento próximo? ¿Planificación porque estimó mal la demanda?</p>
+                
+                <p>La respuesta es: depende. Y para saber de quién es la responsabilidad, necesitamos tener registros claros de todo el proceso. Por eso la trazabilidad es tan importante.</p>
+                
+                <div class="destacado">
+                    El desempeño de la bodega también está condicionado por la calidad del proceso de abastecimiento. Por eso, cuando hablamos de rotación, tenemos que mirar toda la cadena, no solo lo que pasa dentro de las cuatro paredes de la bodega.
+                </div>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>11. Errores Comunes en la Rotación</h3>
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes. Conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: No registrar el lote y el vencimiento en la recepción</h4>
+                <p>Si en la recepción no registro el lote y el vencimiento, después no puedo aplicar FEFO. La información se pierde y la rotación falla.</p>
+                
+                <h4>Error 2: Aplicar el método equivocado</h4>
+                <p>Usar FIFO para productos con vencimiento. Resultado: productos vencidos en bodega.</p>
+                
+                <h4>Error 3: No verificar durante el picking</h4>
+                <p>El operador toma el producto que está más a mano en vez del que corresponde según la rotación. Resultado: se despacha el lote equivocado.</p>
+                
+                <h4>Error 4: No reordenar el stock</h4>
+                <p>Cuando llega stock nuevo, no se coloca detrás del stock antiguo. Resultado: el stock antiguo queda atrás y puede vencer.</p>
+                
+                <h4>Error 5: No monitorear los indicadores</h4>
+                <p>No revisar la tasa de vencimiento, el índice de rotación o la tasa de obsolescencia. Resultado: los problemas se acumulan sin que nadie se dé cuenta.</p>
+                
+                <h4>Error 6: Comprar sin considerar la rotación</h4>
+                <p>Compras adquiere grandes cantidades por descuento sin considerar el vencimiento. Resultado: stock que se vence antes de usarse.</p>
+                
+                <div class="destacado">
+                    La rotación no es un tema que se resuelve solo. Requiere coordinación entre Bodega, Compras, Planificación y el proveedor. Si alguna de esas partes falla, el sistema completo se ve afectado.
+                </div>
+                
+                <p>Y quiero cerrar con una idea: la rotación es una de esas cosas que cuando funciona bien, nadie la nota. Pero cuando falla, el problema aparece en forma de productos vencidos, mermas y pérdidas de dinero. Por eso la rotación debe ser una prioridad, no un tema secundario.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>La rotación es una de las decisiones más importantes en la gestión de bodega. Porque de esa decisión depende cuánto dinero perdemos por vencimientos, obsolescencia y deterioro.</p>
+                <p>FIFO, FEFO y LIFO no son solo siglas en inglés. Son políticas concretas que determinan qué producto sale primero. Y esa decisión debe estar alineada con las características del producto, con la configuración del almacenamiento y con las decisiones de compra.</p>
+                <p>Y recuerden: la rotación no es tarea de una sola persona. Es responsabilidad de todos los que participan en la cadena: Compras decide cuánto comprar, Bodega decide cómo almacenar y despachar, y el sistema registra y controla. Si alguna de esas partes falla, la rotación no funciona.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"El criterio de rotación debe responder a las características del producto,<br>no aplicarse automáticamente."</p>
+                
+                <a href="parte13.html" class="next-module">Siguiente Módulo: Provisión, Reposición y Abastecimiento →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

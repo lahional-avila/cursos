@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 13: Provisión, Reposición y Abastecimiento</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .concepto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 25px 0; }
+    .concepto-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 25px; text-align: center; transition: all 0.3s; border-top: 5px solid; }
+    .concepto-item:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .concepto-item h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 10px; }
+    .concepto-item.minimo { border-top-color: #e74c3c; }
+    .concepto-item.maximo { border-top-color: #27ae60; }
+    .concepto-item.reposicion { border-top-color: #f39c12; }
+    .concepto-item.seguridad { border-top-color: #9b59b6; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    .formula-box { background: #1e3a5f; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; font-family: 'Courier New', monospace; text-align: center; }
+    .formula-box .formula { font-size: 18px; margin: 10px 0; }
+    .formula-box .descripcion { font-size: 13px; opacity: 0.9; margin-top: 10px; }
+    .lead-time-flow { display: flex; flex-direction: column; gap: 10px; margin: 25px 0; }
+    .flow-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; }
+    .flow-item:hover { border-color: #f39c12; transform: translateX(5px); }
+    .flow-num { background: #f39c12; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 13: Provisión y Reposición</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción a la Provisión</a></li>
+                <li><a href="#stock-minimo">2. Stock Mínimo</a></li>
+                <li><a href="#stock-maximo">3. Stock Máximo</a></li>
+                <li><a href="#punto-reposicion">4. Punto de Reposición</a></li>
+                <li><a href="#lead-time">5. Lead Time</a></li>
+                <li><a href="#stock-seguridad">6. Stock de Seguridad</a></li>
+                <li><a href="#lote-economico">7. Lote Económico de Compra</a></li>
+                <li><a href="#calculo">8. Cómo Calcular Cuándo Reponer</a></li>
+                <li><a href="#compras">9. La Conexión con Compras</a></li>
+                <li><a href="#errores">10. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Provisión, Reposición y Abastecimiento</h2>
+                <p>Ya sabemos controlar el inventario y rotar los productos. Ahora viene la pregunta clave: ¿cuándo y cuánto comprar? Porque de esa decisión depende si tenemos quiebres de stock o sobrestock.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200" alt="Provisión y reposición de stock" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción a la Provisión</h3>
+                <p>En los módulos anteriores aprendimos a controlar el inventario, a contar, a registrar y a rotar. Pero hay una pregunta que todavía no hemos respondido del todo: ¿cuándo necesitamos comprar más?</p>
+                
+                <p>Porque el inventario no es estático. Los productos entran y salen todos los días. Y si no reponemos a tiempo, nos quedamos sin stock. Y si reponemos demasiado, generamos sobrestock.</p>
+                
+                <div class="importante">
+                    <strong>La provisión busca asegurar que existan los productos necesarios en el momento oportuno.</strong> Pero evitando dos extremos: la falta de stock (quiebre) y la acumulación innecesaria (sobrestock). El objetivo es encontrar un equilibrio.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se les grabe: la provisión no es solo tarea de bodega. Es un proceso que conecta directamente con Compras, con Planificación, con Finanzas y con la operación completa. Porque la decisión de cuánto y cuándo comprar afecta todo lo que viene después.</p>
+                
+                <p>Piénsenlo así: si Compras compra demasiado, generamos sobrestock, ocupamos espacio, inmovilizamos capital y aumentamos el riesgo de vencimiento. Si Compras compra poco, generamos quiebres, urgencias, compras extraordinarias y riesgo de detener la operación.</p>
+                
+                <div class="destacado">
+                    La provisión es el puente entre lo que tenemos en bodega y lo que necesitamos tener. Y ese puente se construye con datos, con análisis y con coordinación entre áreas.
+                </div>
+                
+                <p>Así que vamos a ver los conceptos fundamentales: stock mínimo, stock máximo, punto de reposición, lead time, stock de seguridad y lote económico de compra. Cada uno de estos conceptos nos ayuda a tomar mejores decisiones sobre cuándo y cuánto reponer.</p>
+            </section>
+
+            <section class="section" id="stock-minimo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Stock Mínimo</h3>
+                
+                <div class="concepto-item minimo">
+                    <h5>Stock Mínimo</h5>
+                    <p>Es la cantidad mínima de un producto que debe mantenerse disponible para evitar quiebres de stock mientras llega la reposición.</p>
+                </div>
+                
+                <h4>¿Para qué sirve el stock mínimo?</h4>
+                <p>El stock mínimo es una alerta. Cuando el stock disponible baja del nivel mínimo, significa que debemos evaluar o iniciar un proceso de reposición.</p>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que tenemos guantes de nitrilo talla L.</p>
+                    <p><strong>Stock mínimo:</strong> 20 unidades</p>
+                    <p><strong>Stock actual:</strong> 18 unidades</p>
+                    <p>¿Qué significa esto? Que estamos por debajo del stock mínimo. Hay que evaluar si corresponde iniciar una reposición.</p>
+                    <p>Pero ojo: bajar del stock mínimo no significa automáticamente que hay que comprar. Significa que hay que analizar la situación: ¿hay una orden de compra en camino? ¿El proveedor demora mucho? ¿La demanda ha aumentado? ¿Tenemos stock de seguridad?</p>
+                </div>
+                
+                <h4>¿Cómo se calcula el stock mínimo?</h4>
+                <p>El stock mínimo depende de varios factores:</p>
+                <ul>
+                    <li><strong>Consumo promedio:</strong> cuántas unidades se usan por día, semana o mes.</li>
+                    <li><strong>Lead time:</strong> cuánto demora el proveedor en entregar desde que se genera la orden de compra.</li>
+                    <li><strong>Variabilidad de la demanda:</strong> si el consumo es estable o fluctúa mucho.</li>
+                    <li><strong>Variabilidad del lead time:</strong> si el proveedor entrega siempre a tiempo o a veces se atrasa.</li>
+                    <li><strong>Criticidad del producto:</strong> si es un producto crítico que detiene la operación o si es un producto común.</li>
+                </ul>
+                
+                <div class="formula-box">
+                    <div class="formula">Stock Mínimo = (Consumo diario × Lead time) + Stock de Seguridad</div>
+                    <div class="descripcion">Esta es una fórmula simplificada. En la práctica puede ser más compleja.</div>
+                </div>
+                
+                <div class="importante">
+                    <strong>El stock mínimo no es un número fijo para siempre.</strong> Debe revisarse periódicamente. Si el consumo cambia, si el lead time cambia, si el proveedor cambia, el stock mínimo debe ajustarse.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben cuál es el stock mínimo de sus productos más importantes? Si no lo saben, estamos trabajando sin una referencia clara. Y sin referencia, es difícil saber cuándo reponer.</p>
+            </section>
+
+            <section class="section" id="stock-maximo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Stock Máximo</h3>
+                
+                <div class="concepto-item maximo">
+                    <h5>Stock Máximo</h5>
+                    <p>Es la cantidad máxima conveniente de un producto que debe mantenerse en bodega, considerando capacidad, demanda, conservación y costos.</p>
+                </div>
+                
+                <h4>¿Para qué sirve el stock máximo?</h4>
+                <p>El stock máximo es un límite. Nos dice hasta cuánto conviene tener. Porque tener más de lo necesario genera problemas:</p>
+                <ul>
+                    <li><strong>Espacio ocupado:</strong> la bodega se llena y no hay dónde poner otros productos.</li>
+                    <li><strong>Capital inmovilizado:</strong> dinero que podría usarse en otra cosa está parado en la bodega.</li>
+                    <li><strong>Riesgo de vencimiento:</strong> si el producto tiene vencimiento, puede vencerse antes de usarse.</li>
+                    <li><strong>Riesgo de obsolescencia:</strong> si el producto se vuelve obsoleto, se convierte en stock muerto.</li>
+                    <li><strong>Mayor manipulación:</strong> más productos significa más movimiento, más riesgo de daño.</li>
+                    <li><strong>Costos de almacenamiento:</strong> más espacio, más seguros, más administración.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que tenemos un producto con estos datos:</p>
+                    <ul>
+                        <li><strong>Consumo mensual:</strong> 100 unidades</li>
+                        <li><strong>Stock máximo:</strong> 300 unidades (3 meses de consumo)</li>
+                        <li><strong>Stock actual:</strong> 350 unidades</li>
+                    </ul>
+                    <p>¿Qué significa esto? Que tenemos más stock del máximo conveniente. Estamos generando sobrestock. Hay que analizar por qué: ¿compramos de más? ¿bajó la demanda? ¿el proveedor entregó antes de tiempo?</p>
+                    <p>Y hay que tomar decisiones: ¿dejamos que se consuma naturalmente? ¿promocionamos el producto? ¿devolvemos al proveedor? ¿trasladamos a otra bodega?</p>
+                </div>
+                
+                <h4>¿Cómo se calcula el stock máximo?</h4>
+                <p>El stock máximo depende de varios factores:</p>
+                <ul>
+                    <li><strong>Consumo promedio:</strong> cuánto se usa por período.</li>
+                    <li><strong>Capacidad de almacenamiento:</strong> cuánto espacio tenemos disponible.</li>
+                    <li><strong>Vencimiento del producto:</strong> si tiene vencimiento, no conviene tener más de lo que se puede consumir antes de que venza.</li>
+                    <li><strong>Costo de almacenamiento:</strong> cuánto cuesta mantener el stock.</li>
+                    <li><strong>Política de la empresa:</strong> algunas empresas prefieren tener más stock para asegurar disponibilidad, otras prefieren minimizar el inventario.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El stock máximo no es un número arbitrario.</strong> Debe calcularse considerando todos los factores. Y debe revisarse periódicamente, porque si el consumo cambia, el stock máximo también debe cambiar.
+                </div>
+                
+                <p>Y aquí viene una idea importante: el stock máximo y el stock mínimo definen un rango. El stock ideal debería estar dentro de ese rango. Si está por debajo del mínimo, hay riesgo de quiebre. Si está por encima del máximo, hay sobrestock.</p>
+            </section>
+
+            <section class="section" id="punto-reposicion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Punto de Reposición</h3>
+                
+                <div class="concepto-item reposicion">
+                    <h5>Punto de Reposición</h5>
+                    <p>Es el nivel de stock que indica que debe comenzar un nuevo proceso de reposición. Es la señal de que hay que generar una orden de compra.</p>
+                </div>
+                
+                <h4>¿Para qué sirve el punto de reposición?</h4>
+                <p>El punto de reposición es una señal. Nos dice: "atención, el stock está bajando, es momento de iniciar una compra para que llegue antes de que se agote".</p>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que tenemos un producto con estos datos:</p>
+                    <ul>
+                        <li><strong>Consumo diario:</strong> 10 unidades</li>
+                        <li><strong>Lead time:</strong> 5 días (el proveedor demora 5 días en entregar)</li>
+                        <li><strong>Stock de seguridad:</strong> 20 unidades</li>
+                    </ul>
+                    <p>El punto de reposición se calcula así:</p>
+                    <p><strong>Punto de Reposición = (Consumo diario × Lead time) + Stock de seguridad</strong></p>
+                    <p><strong>Punto de Reposición = (10 × 5) + 20 = 70 unidades</strong></p>
+                    <p>¿Qué significa esto? Que cuando el stock baje a 70 unidades, hay que generar una orden de compra. Porque en los próximos 5 días (mientras llega el proveedor) vamos a consumir 50 unidades, y nos van a quedar 20 unidades de stock de seguridad.</p>
+                    <p>Si esperamos a que el stock baje más, corremos el riesgo de quedarnos sin producto antes de que llegue la reposición.</p>
+                </div>
+                
+                <h4>¿Cómo se calcula el punto de reposición?</h4>
+                <div class="formula-box">
+                    <div class="formula">Punto de Reposición = (Consumo diario × Lead time) + Stock de Seguridad</div>
+                    <div class="descripcion">Esta fórmula considera el consumo durante el lead time más un colchón de seguridad.</div>
+                </div>
+                
+                <h4>Factores que afectan el punto de reposición</h4>
+                <ul>
+                    <li><strong>Consumo:</strong> si el consumo aumenta, el punto de reposición sube.</li>
+                    <li><strong>Lead time:</strong> si el proveedor demora más, el punto de reposición sube.</li>
+                    <li><strong>Stock de seguridad:</strong> si aumentamos el stock de seguridad, el punto de reposición sube.</li>
+                    <li><strong>Variabilidad:</strong> si el consumo o el lead time son muy variables, conviene aumentar el punto de reposición.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El punto de reposición es dinámico.</strong> No es un número que se define una vez y se olvida. Debe revisarse periódicamente y ajustarse cuando cambian las condiciones.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben cuál es el punto de reposición de sus productos más importantes? Si no lo saben, están reponiendo "cuando se acuerdan" o "cuando ya casi no queda". Y eso genera quiebres o urgencias.</p>
+            </section>
+
+            <section class="section" id="lead-time">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Lead Time</h3>
+                
+                <p>El lead time es uno de los conceptos más importantes en la gestión de inventarios y abastecimiento. Y es un concepto que muchas veces se subestima.</p>
+                
+                <h4>¿Qué es el lead time?</h4>
+                <p>El lead time es el tiempo total desde que se genera la necesidad de un producto hasta que ese producto está disponible en bodega para ser usado.</p>
+                
+                <div class="importante">
+                    <strong>El lead time no es solo el tiempo de transporte.</strong> Es el tiempo completo del proceso de abastecimiento. Y eso incluye muchas etapas que a veces no se consideran.
+                </div>
+                
+                <h4>Etapas del lead time</h4>
+                <div class="lead-time-flow">
+                    <div class="flow-item">
+                        <div class="flow-num">1</div>
+                        <div>
+                            <strong>Detección de la necesidad</strong>
+                            <p>Alguien identifica que se necesita un producto.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">2</div>
+                        <div>
+                            <strong>Solicitud formal</strong>
+                            <p>Se genera una solicitud de compra o requerimiento.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">3</div>
+                        <div>
+                            <strong>Aprobación</strong>
+                            <p>La solicitud pasa por un proceso de aprobación (presupuesto, autorización).</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">4</div>
+                        <div>
+                            <strong>Cotización</strong>
+                            <p>Se solicitan cotizaciones a proveedores.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">5</div>
+                        <div>
+                            <strong>Negociación</strong>
+                            <p>Se negocian condiciones: precio, plazo, forma de pago.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">6</div>
+                        <div>
+                            <strong>Orden de compra</strong>
+                            <p>Se emite formalmente la orden de compra al proveedor.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">7</div>
+                        <div>
+                            <strong>Preparación del proveedor</strong>
+                            <p>El proveedor prepara el pedido.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">8</div>
+                        <div>
+                            <strong>Despacho y transporte</strong>
+                            <p>El proveedor despacha y la carga viaja.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">9</div>
+                        <div>
+                            <strong>Recepción en bodega</strong>
+                            <p>La mercadería llega a la bodega.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">10</div>
+                        <div>
+                            <strong>Inspección y verificación</strong>
+                            <p>Se verifica cantidad, calidad y documentación.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">11</div>
+                        <div>
+                            <strong>Ingreso al sistema</strong>
+                            <p>Se registra la recepción en el sistema.</p>
+                        </div>
+                    </div>
+                    <div class="flow-item">
+                        <div class="flow-num">12</div>
+                        <div>
+                            <strong>Disponibilidad</strong>
+                            <p>El producto está disponible para ser usado o despachado.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de lead time</h5>
+                    <p>Supongamos que necesitamos un repuesto específico para una máquina.</p>
+                    <ul>
+                        <li>Día 1: Se detecta la necesidad.</li>
+                        <li>Día 2: Se genera la solicitud.</li>
+                        <li>Día 3: Se aprueba la solicitud.</li>
+                        <li>Día 4-6: Se solicitan y reciben cotizaciones.</li>
+                        <li>Día 7: Se emite la orden de compra.</li>
+                        <li>Día 8-12: El proveedor prepara el pedido.</li>
+                        <li>Día 13-15: Transporte.</li>
+                        <li>Día 16: Recepción en bodega.</li>
+                        <li>Día 17: Inspección e ingreso al sistema.</li>
+                    </ul>
+                    <p><strong>Lead time total:</strong> 17 días desde que se detectó la necesidad hasta que el producto está disponible.</p>
+                    <p>Si solo consideramos el tiempo de transporte (3 días), estamos subestimando el lead time real. Y eso puede generar quiebres de stock.</p>
+                </div>
+                
+                <h4>¿Por qué es importante conocer el lead time?</h4>
+                <ul>
+                    <li><strong>Para calcular el punto de reposición:</strong> si no conocemos el lead time, no sabemos cuándo reponer.</li>
+                    <li><strong>Para calcular el stock de seguridad:</strong> si el lead time es variable, necesitamos más stock de seguridad.</li>
+                    <li><strong>Para planificar:</strong> si sabemos que un producto demora 30 días en llegar, podemos planificar con anticipación.</li>
+                    <li><strong>Para evaluar proveedores:</strong> un proveedor con lead time corto puede ser más valioso que uno con lead time largo, aunque sea un poco más caro.</li>
+                </ul>
+                
+                <div class="destacado">
+                    El lead time no es un número fijo. Puede variar según el proveedor, según la época del año, según la disponibilidad del producto. Por eso es importante medirlo y monitorearlo continuamente.
+                </div>
+                
+                <p>Y aquí viene una conexión importante con Compras: si Compras conoce bien el lead time de cada producto, puede planificar mejor las compras y evitar urgencias. Y si Bodega conoce el lead time, puede calcular mejor el punto de reposición y el stock de seguridad.</p>
+            </section>
+
+            <section class="section" id="stock-seguridad">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Stock de Seguridad</h3>
+                
+                <div class="concepto-item seguridad">
+                    <h5>Stock de Seguridad</h5>
+                    <p>Es una cantidad adicional de stock que se mantiene para protegerse contra variaciones en la demanda o en el lead time del proveedor.</p>
+                </div>
+                
+                <h4>¿Para qué sirve el stock de seguridad?</h4>
+                <p>El stock de seguridad es un colchón. Nos protege cuando las cosas no salen como esperamos:</p>
+                <ul>
+                    <li><strong>Si la demanda aumenta:</strong> si consumimos más de lo esperado, el stock de seguridad nos da tiempo mientras llega la reposición.</li>
+                    <li><strong>Si el proveedor se atrasa:</strong> si el proveedor demora más de lo esperado, el stock de seguridad nos cubre.</li>
+                    <li><strong>Si hay problemas de calidad:</strong> si llega mercadería dañada o incorrecta, el stock de seguridad nos permite seguir operando mientras se resuelve.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que tenemos un producto con estos datos:</p>
+                    <ul>
+                        <li><strong>Consumo diario promedio:</strong> 10 unidades</li>
+                        <li><strong>Lead time promedio:</strong> 5 días</li>
+                        <li><strong>Consumo diario máximo:</strong> 15 unidades (en épocas de alta demanda)</li>
+                        <li><strong>Lead time máximo:</strong> 7 días (cuando el proveedor se atrasa)</li>
+                    </ul>
+                    <p>Si calculamos el punto de reposición solo con los promedios:</p>
+                    <p><strong>Punto de reposición = 10 × 5 = 50 unidades</strong></p>
+                    <p>Pero si la demanda sube a 15 unidades diarias y el proveedor demora 7 días:</p>
+                    <p><strong>Consumo durante el lead time = 15 × 7 = 105 unidades</strong></p>
+                    <p>Si solo teníamos 50 unidades cuando generamos la orden de compra, nos vamos a quedar sin stock antes de que llegue la reposición.</p>
+                    <p>Por eso necesitamos stock de seguridad:</p>
+                    <p><strong>Stock de seguridad = (Consumo máximo × Lead time máximo) - (Consumo promedio × Lead time promedio)</strong></p>
+                    <p><strong>Stock de seguridad = (15 × 7) - (10 × 5) = 105 - 50 = 55 unidades</strong></p>
+                    <p>Con 55 unidades de stock de seguridad, estamos protegidos contra variaciones en la demanda y en el lead time.</p>
+                </div>
+                
+                <h4>¿Cómo se calcula el stock de seguridad?</h4>
+                <p>Hay varias formas de calcular el stock de seguridad. Una fórmula simplificada es:</p>
+                
+                <div class="formula-box">
+                    <div class="formula">Stock de Seguridad = (Consumo máximo × Lead time máximo) - (Consumo promedio × Lead time promedio)</div>
+                    <div class="descripcion">Esta fórmula considera el peor escenario posible.</div>
+                </div>
+                
+                <h4>Factores que afectan el stock de seguridad</h4>
+                <ul>
+                    <li><strong>Variabilidad de la demanda:</strong> si la demanda es muy variable, necesitamos más stock de seguridad.</li>
+                    <li><strong>Variabilidad del lead time:</strong> si el proveedor es inconsistente en sus entregas, necesitamos más stock de seguridad.</li>
+                    <li><strong>Criticidad del producto:</strong> si es un producto crítico que detiene la operación, conviene tener más stock de seguridad.</li>
+                    <li><strong>Costo de quiebre:</strong> si quedarse sin stock es muy costoso, conviene tener más stock de seguridad.</li>
+                    <li><strong>Costo de almacenamiento:</strong> si mantener stock es muy costoso, conviene tener menos stock de seguridad.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El stock de seguridad no es gratis.</strong> Es capital inmovilizado, es espacio ocupado, es riesgo de vencimiento u obsolescencia. Por eso debe calcularse con cuidado: ni demasiado (genera sobrestock) ni muy poco (genera quiebres).
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿qué es peor, tener sobrestock o tener quiebre de stock? La respuesta inteligente es: depende del producto y del impacto operacional. Para un tornillo común, el sobrestock puede ser tolerable. Para un repuesto crítico que detiene la operación, el quiebre puede ser catastrófico.</p>
+            </section>
+
+            <section class="section" id="lote-economico">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Lote Económico de Compra</h3>
+                
+                <p>Ahora viene una pregunta fundamental: ¿cuánto comprar cada vez que reponemos? Porque no es lo mismo comprar 100 unidades cada mes que 1.200 unidades una vez al año.</p>
+                
+                <h4>El dilema de la cantidad a comprar</h4>
+                <ul>
+                    <li><strong>Comprar poco y seguido:</strong> menos capital inmovilizado, menos riesgo de vencimiento, pero más órdenes de compra, más recepciones, más transporte, más trabajo administrativo.</li>
+                    <li><strong>Comprar mucho y espaciado:</strong> menos órdenes de compra, menos recepciones, posible descuento por volumen, pero más capital inmovilizado, más espacio ocupado, más riesgo de vencimiento u obsolescencia.</li>
+                </ul>
+                
+                <h4>¿Qué es el lote económico de compra?</h4>
+                <p>El lote económico de compra (también llamado EOQ por sus siglas en inglés: Economic Order Quantity) es la cantidad óptima que minimiza el costo total de adquisición, considerando el costo de pedir y el costo de mantener inventario.</p>
+                
+                <div class="formula-box">
+                    <div class="formula">EOQ = √((2 × Demanda anual × Costo de pedir) / Costo de mantener por unidad)</div>
+                    <div class="descripcion">Esta es la fórmula clásica del lote económico.</div>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que tenemos un producto con estos datos:</p>
+                    <ul>
+                        <li><strong>Demanda anual:</strong> 1.200 unidades (100 por mes)</li>
+                        <li><strong>Costo de pedir:</strong> $5.000 por orden de compra (tiempo administrativo, recepción, etc.)</li>
+                        <li><strong>Costo de mantener:</strong> $500 por unidad por año (almacenamiento, seguros, capital inmovilizado)</li>
+                    </ul>
+                    <p>Calculamos el lote económico:</p>
+                    <p><strong>EOQ = √((2 × 1.200 × 5.000) / 500) = √(12.000.000 / 500) = √24.000 = 155 unidades</strong></p>
+                    <p>Esto significa que la cantidad óptima a comprar cada vez es aproximadamente 155 unidades. Si compramos mucho más, aumentamos el costo de mantener inventario. Si compramos mucho menos, aumentamos el costo de pedir (más órdenes de compra).</p>
+                </div>
+                
+                <h4>Limitaciones del modelo EOQ</h4>
+                <p>El modelo EOQ asume condiciones ideales que no siempre se cumplen en la realidad:</p>
+                <ul>
+                    <li>Asume demanda constante y conocida.</li>
+                    <li>Asume lead time constante y conocido.</li>
+                    <li>Asume que no hay descuentos por volumen.</li>
+                    <li>Asume que no hay restricciones de espacio.</li>
+                    <li>Asume que no hay vencimientos.</li>
+                </ul>
+                
+                <p>Por eso, el EOQ es una referencia, no una regla absoluta. En la práctica, hay que ajustar la cantidad considerando:</p>
+                <ul>
+                    <li>Lotes mínimos del proveedor.</li>
+                    <li>Descuentos por volumen.</li>
+                    <li>Capacidad de almacenamiento.</li>
+                    <li>Vencimiento del producto.</li>
+                    <li>Disponibilidad de capital.</li>
+                </ul>
+                
+                <div class="destacado">
+                    El lote económico de compra es una herramienta útil para tomar decisiones, pero no debe aplicarse ciegamente. Hay que considerar el contexto completo: el producto, el proveedor, la bodega, la demanda y las restricciones de la empresa.
+                </div>
+            </section>
+
+            <section class="section" id="calculo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Cómo Calcular Cuándo y Cuánto Reponer</h3>
+                
+                <p>Ahora vamos a juntar todos los conceptos que hemos visto para responder la pregunta práctica: ¿cuándo y cuánto reponer?</p>
+                
+                <h4>El proceso completo</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Monitorear el stock:</strong> revisar periódicamente el stock disponible de cada producto.</li>
+                        <li><strong>Comparar con el punto de reposición:</strong> si el stock baja del punto de reposición, es momento de evaluar una compra.</li>
+                        <li><strong>Verificar si hay órdenes en camino:</strong> antes de generar una nueva orden, verificar si ya hay una orden de compra pendiente.</li>
+                        <li><strong>Calcular la cantidad a comprar:</strong> considerar el lote económico, los lotes mínimos del proveedor, los descuentos por volumen y la capacidad de almacenamiento.</li>
+                        <li><strong>Generar la orden de compra:</strong> emitir formalmente la orden al proveedor.</li>
+                        <li><strong>Monitorear el lead time:</strong> hacer seguimiento a la orden para asegurar que llegue a tiempo.</li>
+                        <li><strong>Recibir y registrar:</strong> cuando llega la mercadería, verificar y registrar en el sistema.</li>
+                        <li><strong>Ajustar parámetros:</strong> si las condiciones cambian (consumo, lead time, etc.), ajustar el punto de reposición y el stock de seguridad.</li>
+                    </ol>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo completo</h5>
+                    <p>Supongamos que tenemos un producto con estos parámetros:</p>
+                    <ul>
+                        <li><strong>Consumo diario promedio:</strong> 10 unidades</li>
+                        <li><strong>Lead time promedio:</strong> 5 días</li>
+                        <li><strong>Stock de seguridad:</strong> 20 unidades</li>
+                        <li><strong>Punto de reposición:</strong> 70 unidades</li>
+                        <li><strong>Lote económico:</strong> 150 unidades</li>
+                        <li><strong>Stock mínimo:</strong> 20 unidades</li>
+                        <li><strong>Stock máximo:</strong> 300 unidades</li>
+                    </ul>
+                    <p><strong>Día 1:</strong> Stock actual = 100 unidades. Estamos por encima del punto de reposición. No hay que hacer nada.</p>
+                    <p><strong>Día 2:</strong> Se consumen 10 unidades. Stock = 90 unidades. Seguimos por encima del punto de reposición.</p>
+                    <p><strong>Día 3:</strong> Se consumen 10 unidades. Stock = 80 unidades. Seguimos por encima del punto de reposición.</p>
+                    <p><strong>Día 4:</strong> Se consumen 10 unidades. Stock = 70 unidades. Llegamos al punto de reposición. Es momento de generar una orden de compra por 150 unidades.</p>
+                    <p><strong>Día 5-9:</strong> Mientras llega la reposición (5 días de lead time), se consumen 50 unidades. Stock baja de 70 a 20 unidades (stock de seguridad).</p>
+                    <p><strong>Día 10:</strong> Llega la reposición de 150 unidades. Stock sube de 20 a 170 unidades.</p>
+                    <p>Y el ciclo vuelve a empezar.</p>
+                </div>
+                
+                <h4>Herramientas para gestionar la reposición</h4>
+                <ul>
+                    <li><strong>Sistemas informáticos (WMS/ERP):</strong> pueden calcular automáticamente el punto de reposición y generar alertas cuando el stock baja del nivel definido.</li>
+                    <li><strong>Reportes de stock:</strong> reportes periódicos que muestran el stock actual, el punto de reposición y las órdenes pendientes.</li>
+                    <li><strong>Tableros de control:</strong> dashboards que muestran visualmente qué productos están por debajo del punto de reposición.</li>
+                    <li><strong>Alertas automáticas:</strong> correos o notificaciones cuando un producto baja del punto de reposición.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La reposición no es una tarea reactiva.</strong> No se trata de comprar cuando ya casi no queda. Se trata de planificar con anticipación, usando datos y parámetros definidos. Eso es lo que diferencia una gestión profesional de una gestión improvisada.
+                </div>
+            </section>
+
+            <section class="section" id="compras">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. La Conexión con Compras y Adquisiciones</h3>
+                
+                <p>Y aquí viene un tema que me parece fundamental, y que muchas veces no se ve con claridad: la conexión entre la provisión y el área de Compras o Adquisiciones.</p>
+                
+                <p>Porque la provisión no termina en la bodega. La provisión es el resultado de decisiones que se toman en Compras: qué comprar, cuánto comprar, a quién comprarle, cuándo comprar.</p>
+                
+                <h4>¿Cómo afecta Compras a la provisión?</h4>
+                <ul>
+                    <li><strong>Cantidad comprada:</strong> si se compra demasiado, se genera sobrestock. Si se compra poco, se genera quiebre.</li>
+                    <li><strong>Frecuencia de compra:</strong> compras frecuentes generan más trabajo administrativo pero menos stock inmovilizado. Compras espaciadas generan menos trabajo pero más stock.</li>
+                    <li><strong>Selección de proveedores:</strong> un proveedor con lead time corto y confiable permite trabajar con menos stock de seguridad. Un proveedor con lead time largo o variable exige más stock de seguridad.</li>
+                    <li><strong>Condiciones de compra:</strong> lotes mínimos, descuentos por volumen, plazos de pago, todo afecta las decisiones de provisión.</li>
+                    <li><strong>Calidad del proveedor:</strong> si el proveedor entrega bien, el inventario es más predecible. Si entrega mal, hay diferencias y problemas.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>El ejemplo clásico: ¿comprar barato o comprar bien?</h5>
+                    <p>Supongamos que tenemos dos opciones para comprar un producto:</p>
+                    <p><strong>Proveedor A:</strong> $10.000 por unidad, entrega en 3 días, sin lote mínimo.</p>
+                    <p><strong>Proveedor B:</strong> $9.000 por unidad, entrega en 30 días, lote mínimo de 1.000 unidades.</p>
+                    <p>A primera vista, el Proveedor B parece mejor porque es más barato. Pero hay que considerar:</p>
+                    <ul>
+                        <li>¿Tengo espacio para almacenar 1.000 unidades?</li>
+                        <li>¿El producto se vence antes de usarlo?</li>
+                        <li>¿Cuánto capital estoy inmovilizando?</li>
+                        <li>¿Cuánto cuesta almacenar esas 1.000 unidades durante un año?</li>
+                        <li>¿Qué pasa si el producto se vuelve obsoleto?</li>
+                        <li>¿Qué pasa si el proveedor se atrasa 30 días más?</li>
+                    </ul>
+                    <p>Si hago el cálculo completo (costo total de adquisición o TCO), puede ser que el Proveedor A, aunque tenga un precio unitario mayor, sea más eficiente para la empresa.</p>
+                </div>
+                
+                <h4>Conceptos clave desde Adquisiciones</h4>
+                <ul>
+                    <li><strong>Costo total de adquisición (TCO):</strong> no solo el precio del producto, sino también transporte, almacenamiento, seguros, costos de gestión, mermas, obsolescencia.</li>
+                    <li><strong>Lead time:</strong> tiempo total desde que se genera la necesidad hasta que el producto está disponible. Afecta directamente cuánto stock de seguridad necesito.</li>
+                    <li><strong>Criticidad del material:</strong> no todos los productos tienen la misma importancia. Un repuesto crítico que detiene la operación merece un tratamiento diferente que un tornillo común.</li>
+                    <li><strong>Clasificación ABC:</strong> no todos los productos deberían controlarse con la misma intensidad. Los productos A (alto impacto) merecen más atención que los productos C (bajo impacto).</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Compras y Bodega no deberían funcionar como áreas separadas.</strong> Las decisiones de compra determinan en gran medida lo que posteriormente ocurre en almacenamiento, inventario y despacho. Por eso la comunicación entre ambas áreas es fundamental.
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿quién es responsable de un quiebre de stock? ¿Bodega porque no tenía el producto? ¿Compras porque no compró a tiempo? ¿El proveedor porque entregó tarde? ¿Planificación porque estimó mal la demanda?</p>
+                
+                <p>La respuesta es: depende. Y para saber de quién es la responsabilidad, necesitamos tener registros claros de todo el proceso. Por eso la trazabilidad es tan importante.</p>
+                
+                <div class="destacado">
+                    El desempeño de la bodega también está condicionado por la calidad del proceso de abastecimiento. Por eso, cuando hablamos de provisión, tenemos que mirar toda la cadena, no solo lo que pasa dentro de las cuatro paredes de la bodega.
+                </div>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Errores Comunes en la Provisión</h3>
+                
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes en la gestión de provisión. Conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: No definir stock mínimo, máximo y punto de reposición</h4>
+                <p>Trabajar sin parámetros definidos. Reponer "cuando se acuerdan" o "cuando ya casi no queda". Resultado: quiebres o sobrestock constante.</p>
+                
+                <h4>Error 2: No considerar el lead time completo</h4>
+                <p>Considerar solo el tiempo de transporte y olvidar todas las otras etapas del proceso de abastecimiento. Resultado: las órdenes de compra se generan tarde y se producen quiebres.</p>
+                
+                <h4>Error 3: No tener stock de seguridad</h4>
+                <p>Asumir que todo va a salir siempre como se planifica. Resultado: cualquier variación en la demanda o en el lead time genera quiebres.</p>
+                
+                <h4>Error 4: Comprar solo por precio unitario</h4>
+                <p>Elegir el proveedor más barato sin considerar el costo total de adquisición. Resultado: sobrestock, vencimientos, obsolescencia, problemas de calidad.</p>
+                
+                <h4>Error 5: No revisar los parámetros periódicamente</h4>
+                <p>Definir el stock mínimo, máximo y punto de reposición una vez y no volver a revisarlos. Resultado: los parámetros quedan desactualizados y no reflejan la realidad.</p>
+                
+                <h4>Error 6: No coordinar Bodega con Compras</h4>
+                <p>Trabajar como áreas separadas, sin comunicación. Resultado: Compras compra cosas que Bodega no puede almacenar, o Bodega no sabe cuándo van a llegar las reposiciones.</p>
+                
+                <h4>Error 7: No medir el desempeño</h4>
+                <p>No tener indicadores de quiebres de stock, sobrestock, cumplimiento de proveedores, etc. Resultado: no se sabe si la gestión está funcionando o no.</p>
+                
+                <div class="destacado">
+                    La provisión no es una tarea que se pueda hacer "más o menos". Requiere datos, análisis, coordinación y seguimiento. Si se hace mal, los problemas aparecen en forma de quiebres, sobrestock, urgencias y pérdidas de dinero.
+                </div>
+                
+                <p>Y quiero cerrar con una idea: la provisión es el puente entre lo que tenemos y lo que necesitamos. Y ese puente se construye con datos, con análisis y con coordinación entre áreas. Si el puente está bien construido, la operación fluye. Si el puente está mal construido, la operación se cae.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>La provisión y reposición son el corazón de la gestión de inventarios. Porque de nada sirve tener una bodega ordenada y un inventario bien controlado, si no sabemos cuándo y cuánto reponer.</p>
+                <p>El stock mínimo nos alerta cuando estamos por debajo de lo necesario. El stock máximo nos limita para no generar sobrestock. El punto de reposición nos indica cuándo comprar. El lead time nos dice cuánto demora el proveedor. El stock de seguridad nos protege contra variaciones. Y el lote económico nos ayuda a decidir cuánto comprar.</p>
+                <p>Todos estos conceptos están conectados. Y todos conectan con Compras, con Planificación, con Finanzas y con la operación completa. Porque la decisión de cuánto y cuándo comprar afecta todo lo que viene después.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"La provisión es el puente entre lo que tenemos y lo que necesitamos.<br>Y ese puente se construye con datos, con análisis y con coordinación."</p>
+                
+                <a href="parte14.html" class="next-module">Siguiente Módulo: Sustancias Peligrosas y Manejo de Derrames →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

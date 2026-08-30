@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 14: Sustancias Peligrosas y Manejo de Derrames</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .peligro-box { background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-left: 5px solid #e74c3c; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .peligro-box strong { color: #c0392b; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .clases-onu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 25px 0; }
+    .clase-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.3s; border-left: 6px solid; }
+    .clase-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .clase-item h5 { font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .clase-item p { font-size: 13px; margin-bottom: 8px; }
+    .clase-item .ejemplo { font-size: 12px; font-style: italic; color: #718096; }
+    .clase-1 { border-left-color: #f39c12; } .clase-1 h5 { color: #d68910; }
+    .clase-2 { border-left-color: #27ae60; } .clase-2 h5 { color: #27ae60; }
+    .clase-3 { border-left-color: #e74c3c; } .clase-3 h5 { color: #c0392b; }
+    .clase-4 { border-left-color: #e74c3c; } .clase-4 h5 { color: #c0392b; }
+    .clase-5 { border-left-color: #f1c40f; } .clase-5 h5 { color: #d68910; }
+    .clase-6 { border-left-color: #9b59b6; } .clase-6 h5 { color: #8e44ad; }
+    .clase-7 { border-left-color: #f1c40f; } .clase-7 h5 { color: #d68910; }
+    .clase-8 { border-left-color: #95a5a6; } .clase-8 h5 { color: #7f8c8d; }
+    .clase-9 { border-left-color: #34495e; } .clase-9 h5 { color: #34495e; }
+    .matriz-segregacion { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+    .matriz-segregacion th { background: #1e3a5f; color: white; padding: 10px; text-align: center; }
+    .matriz-segregacion td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+    .matriz-segregacion .x { background: #e74c3c; color: white; font-weight: bold; }
+    .matriz-segregacion .p { background: #f39c12; color: white; font-weight: bold; }
+    .matriz-segregacion .o { background: #27ae60; color: white; font-weight: bold; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    .protocolo-flujo { display: flex; flex-direction: column; gap: 10px; margin: 25px 0; }
+    .paso-proto { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; }
+    .paso-proto:hover { border-color: #e74c3c; transform: translateX(5px); }
+    .paso-num { background: #e74c3c; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    .hds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 25px 0; }
+    .hds-item { background: #f8f9fa; border-radius: 8px; padding: 15px; text-align: center; font-size: 13px; border-top: 3px solid #2c5282; }
+    .hds-item strong { color: #1e3a5f; display: block; margin-bottom: 5px; font-size: 14px; }
+    .suspel-caract { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin: 25px 0; }
+    .suspel-item { background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center; border-top: 4px solid #e74c3c; }
+    .suspel-item h5 { color: #1e3a5f; font-size: 15px; margin-bottom: 10px; }
+    .suspel-item p { font-size: 13px; color: #4a5568; }
+    @media (max-width: 1024px) { .sidebar { display: none; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } .matriz-segregacion { font-size: 11px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 14: Sustancias Peligrosas</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción</a></li>
+                <li><a href="#clases-onu">2. Las 9 Clases de la ONU</a></li>
+                <li><a href="#segregacion">3. Segregación</a></li>
+                <li><a href="#suspeL">4. Bodega SUSPEL</a></li>
+                <li><a href="#envases">5. Envases y Embalajes</a></li>
+                <li><a href="#hds">6. Hoja de Datos de Seguridad</a></li>
+                <li><a href="#etiquetado">7. Etiquetado y Señalización</a></li>
+                <li><a href="#epp">8. EPP Específico</a></li>
+                <li><a href="#manipulacion">9. Manipulación Segura</a></li>
+                <li><a href="#derrames">10. Protocolo ante Derrames</a></li>
+                <li><a href="#normativa">11. Normativa Aplicable</a></li>
+                <li><a href="#errores">12. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Sustancias Peligrosas y Manejo de Derrames</h2>
+                <p>Este módulo es diferente a los anteriores. Aquí un error no significa solo una pérdida de dinero. Puede significar una explosión, una intoxicación, un incendio o la muerte. Por eso lo vamos a tomar con la máxima seriedad.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1200" alt="Sustancias peligrosas y manejo de derrames" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción a las Sustancias Peligrosas</h3>
+                <p>Hasta ahora hemos hablado de cajas, pallets, guantes, herramientas. Cosas que, si se caen, generan un problema, pero generalmente no ponen en riesgo la vida de manera inmediata.</p>
+                
+                <p>Ahora vamos a hablar de algo diferente: sustancias que pueden explotar, incendiarse, intoxicar, corroer o contaminar. Sustancias que, si se manejan mal, pueden generar una emergencia grave en segundos.</p>
+                
+                <div class="peligro-box">
+                    <strong>Una sustancia peligrosa es aquella que, por sus características físicas, químicas o biológicas, representa un riesgo para la salud, la seguridad, los bienes o el medio ambiente.</strong> No es un producto más. Es un producto que requiere un tratamiento especial desde que se compra hasta que se elimina.
+                </div>
+                
+                <p>Y aquí quiero partir con una idea que me parece fundamental, especialmente para quienes vienen del mundo de las compras:</p>
+                
+                <div class="importante">
+                    <strong>La seguridad con sustancias peligrosas no empieza en la bodega. Empieza en la compra.</strong> Antes de adquirir una sustancia peligrosa, Compras debería saber: qué clase de peligro tiene, con qué productos es incompatible, qué condiciones de almacenamiento necesita, qué EPP se requiere para manipularla y dónde se va a almacenar.
+                </div>
+                
+                <p>Si Compras adquiere una sustancia peligrosa sin haber coordinado con Bodega, puede generar un problema serio: llega el camión, y la bodega no tiene dónde almacenar el producto, no tiene el EPP adecuado, no tiene la HDS, no sabe si es compatible con lo que ya tiene almacenado.</p>
+                
+                <p>Eso no puede pasar. Por eso, cuando hablamos de sustancias peligrosas, la coordinación entre áreas no es opcional: es obligatoria.</p>
+                
+                <div class="destacado">
+                    La prevención con sustancias peligrosas comienza antes de que llegue el producto. Y eso significa que Compras, Bodega, Prevención de Riesgos y el área usuaria deben estar coordinados antes de emitir la orden de compra.
+                </div>
+                
+                <p>En este módulo vamos a ver: cómo se clasifican las sustancias peligrosas, cómo se segregan, cómo se almacenan en una bodega SUSPEL, cómo se leen las HDS, qué EPP usar, cómo manipularlas con seguridad y qué hacer ante un derrame.</p>
+            </section>
+
+            <section class="section" id="clases-onu">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Las 9 Clases de Peligro según la ONU</h3>
+                <p>Para que todo el mundo hable el mismo idioma, las Naciones Unidas creó un sistema de clasificación universal. Son 9 clases, cada una con un pictograma, colores específicos y reglas particulares.</p>
+                
+                <p>Estas clases están en los rombos de seguridad que vemos en los envases, en los camiones de transporte y en las etiquetas de los productos.</p>
+                
+                <div class="clases-onu">
+                    <div class="clase-item clase-1">
+                        <h5>Clase 1: Explosivos</h5>
+                        <p>Sustancias que pueden reaccionar violentamente generando gases y calor.</p>
+                        <p><strong>Pictograma:</strong> Fondo naranja, bomba explotando.</p>
+                        <p class="ejemplo">Ejemplos: dinamita, fuegos artificiales, municiones.</p>
+                    </div>
+                    <div class="clase-item clase-2">
+                        <h5>Clase 2: Gases</h5>
+                        <p>Se divide en: inflamables, no inflamables y tóxicos.</p>
+                        <p><strong>Pictograma:</strong> Cilindro de gas.</p>
+                        <p class="ejemplo">Ejemplos: gas licuado, oxígeno, cloro gas.</p>
+                    </div>
+                    <div class="clase-item clase-3">
+                        <h5>Clase 3: Líquidos Inflamables</h5>
+                        <p>Líquidos que pueden incendiarse fácilmente.</p>
+                        <p><strong>Pictograma:</strong> Fondo rojo, llama.</p>
+                        <p class="ejemplo">Ejemplos: gasolina, alcohol, pintura, solventes.</p>
+                    </div>
+                    <div class="clase-item clase-4">
+                        <h5>Clase 4: Sólidos Inflamables</h5>
+                        <p>Sólidos que arden fácilmente o reaccionan con agua.</p>
+                        <p><strong>Pictograma:</strong> Rayas verticales rojas y blancas.</p>
+                        <p class="ejemplo">Ejemplos: azufre, carbón activado, sodio metálico.</p>
+                    </div>
+                    <div class="clase-item clase-5">
+                        <h5>Clase 5: Comburentes y Peróxidos</h5>
+                        <p>Facilitan la combustión de otros materiales.</p>
+                        <p><strong>Pictograma:</strong> Fondo amarillo, llama sobre círculo.</p>
+                        <p class="ejemplo">Ejemplos: nitrato de amonio, peróxido de hidrógeno.</p>
+                    </div>
+                    <div class="clase-item clase-6">
+                        <h5>Clase 6: Tóxicos e Infecciosos</h5>
+                        <p>Sustancias que pueden causar envenenamiento o infección.</p>
+                        <p><strong>Pictograma:</strong> Fondo blanco, calavera.</p>
+                        <p class="ejemplo">Ejemplos: cianuro, desechos clínicos, pesticidas.</p>
+                    </div>
+                    <div class="clase-item clase-7">
+                        <h5>Clase 7: Material Radiactivo</h5>
+                        <p>Emite radiación ionizante.</p>
+                        <p><strong>Pictograma:</strong> Amarillo arriba, trébol radiactivo.</p>
+                        <p class="ejemplo">Ejemplos: uranio, equipos médicos de rayos X.</p>
+                    </div>
+                    <div class="clase-item clase-8">
+                        <h5>Clase 8: Corrosivos</h5>
+                        <p>Sustancias que dañan tejidos vivos y metales.</p>
+                        <p><strong>Pictograma:</strong> Tubos vertiendo líquido sobre mano y metal.</p>
+                        <p class="ejemplo">Ejemplos: ácido sulfúrico, soda cáustica.</p>
+                    </div>
+                    <div class="clase-item clase-9">
+                        <h5>Clase 9: Misceláneos</h5>
+                        <p>Sustancias peligrosas que no encajan en otras clases.</p>
+                        <p><strong>Pictograma:</strong> Rayas verticales blancas y negras.</p>
+                        <p class="ejemplo">Ejemplos: baterías de litio, hielo seco, amianto.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>Estas 9 clases son universales.</strong> Las mismas que se usan en Chile se usan en Europa, en Estados Unidos, en Asia. Por eso es importante conocerlas: si ven un rombo con una llama sobre fondo rojo, saben que es un líquido inflamable, sin importar el idioma del envase.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben qué clases de sustancias peligrosas se manejan en su bodega? Si no lo saben, tenemos un problema. Porque cada clase tiene reglas específicas de almacenamiento, manipulación y respuesta ante emergencias.</p>
+                
+                <div class="destacado">
+                    No es lo mismo almacenar gasolina (Clase 3) que ácido sulfúrico (Clase 8) que baterías de litio (Clase 9). Cada una tiene sus propias reglas. Y mezclarlas puede ser catastrófico.
+                </div>
+            </section>
+
+            <section class="section" id="segregacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Segregación: Qué No Puede Ir Junto</h3>
+                <p>Segregar significa separar. Y en el contexto de sustancias peligrosas, segregar es una de las medidas de seguridad más importantes que existen.</p>
+                
+                <div class="peligro-box">
+                    <strong>Hay sustancias que, si entran en contacto entre sí, pueden generar reacciones violentas: explosiones, incendios, liberación de gases tóxicos.</strong> Por eso, esas sustancias deben almacenarse separadas, con barreras físicas o en bodegas diferentes.
+                </div>
+                
+                <h4>Reglas de incompatibilidad crítica</h4>
+                <p>Estas son las combinaciones que NUNCA deben ir juntas:</p>
+                <ul>
+                    <li><strong>Líquidos inflamables + Comburentes:</strong> Los comburentes aportan oxígeno masivo. Su mezcla genera fuegos explosivos casi imposibles de apagar.</li>
+                    <li><strong>Ácidos + Bases:</strong> Reaccionan violentamente generando calor extremo y vapores corrosivos. Ejemplo: ácido clorhídrico con soda cáustica.</li>
+                    <li><strong>Sustancias que reaccionan con agua + Cualquier líquido:</strong> Liberan gases inflamables instantáneamente. Ejemplo: sodio metálico con agua.</li>
+                    <li><strong>Explosivos + Cualquier otra clase:</strong> Deben almacenarse completamente aislados.</li>
+                    <li><strong>Cianuros + Ácidos:</strong> Liberan gas cianhídrico, que es mortal.</li>
+                </ul>
+                
+                <h4>Matriz de segregación simplificada</h4>
+                <table class="matriz-segregacion">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>8</th>
+                            <th>9</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td class="x">X</td>
+                            <td class="o">O</td>
+                            <td class="p">P</td>
+                            <td class="p">P</td>
+                            <td class="x">X</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td class="x">X</td>
+                            <td class="p">P</td>
+                            <td class="o">O</td>
+                            <td class="p">P</td>
+                            <td class="x">X</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="x">X</td>
+                            <td class="p">P</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="p">P</td>
+                            <td class="o">O</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8</strong></td>
+                            <td class="x">X</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="p">P</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                            <td class="o">O</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="ejemplo-box">
+                    <h5>Leyenda de la matriz</h5>
+                    <ul>
+                        <li><strong>X (Rojo):</strong> Prohibido. No pueden estar juntos bajo ninguna circunstancia.</li>
+                        <li><strong>P (Amarillo):</strong> Precaución. Separar a distancia mínima (3 a 5 metros) o con barrera.</li>
+                        <li><strong>O (Verde):</strong> Permitido. Pueden almacenarse juntos bajo condiciones normales.</li>
+                    </ul>
+                </div>
+                
+                <div class="importante">
+                    <strong>La segregación no es opcional.</strong> Es una obligación normativa y una medida de seguridad crítica. Si no se respeta, se puede generar una emergencia grave.
+                </div>
+                
+                <h4>¿Cómo se logra la segregación en la práctica?</h4>
+                <ul>
+                    <li><strong>Distancia:</strong> alejar físicamente los productos incompatibles.</li>
+                    <li><strong>Barreras físicas:</strong> muros cortafuego, estanterías separadoras.</li>
+                    <li><strong>Bodegas diferentes:</strong> para productos altamente incompatibles, usar bodegas separadas.</li>
+                    <li><strong>Contención secundaria:</strong> cubetos de retención que contengan derrames.</li>
+                    <li><strong>Señalización clara:</strong> indicar qué productos están en cada zona.</li>
+                </ul>
+                
+                <p>Y aquí viene una conexión importante con Compras: si Compras va a adquirir una sustancia nueva, debe coordinar con Bodega ANTES de emitir la orden de compra. Porque si no hay dónde almacenarla de manera segura, la compra puede convertirse en un problema.</p>
+                
+                <div class="destacado">
+                    La pregunta clave antes de comprar una sustancia peligrosa es: ¿dónde la vamos a almacenar? ¿Es compatible con lo que ya tenemos? ¿Tenemos las condiciones adecuadas? Si no podemos responder esas preguntas, no deberíamos comprar todavía.
+                </div>
+            </section>
+
+            <section class="section" id="suspeL">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Bodega SUSPEL</h3>
+                <p>Cuando una empresa maneja sustancias peligrosas en cantidades significativas, necesita una bodega específica para eso. En Chile, a esa bodega se le llama SUSPEL: Sustancias Peligrosas.</p>
+                
+                <p>Una bodega SUSPEL no es una bodega común con un cartel. Es un recinto diseñado y construido específicamente para almacenar sustancias peligrosas de manera segura.</p>
+                
+                <div class="suspeL-caract">
+                    <div class="suspeL-item">
+                        <h5>Muros Cortafuego</h5>
+                        <p>Resistencia al fuego RF-90 o RF-120 según el volumen almacenado.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Piso Impermeable</h5>
+                        <p>Liso, sin poros, con piletas de contención para derrames.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Ventilación</h5>
+                        <p>Natural o forzada para evitar acumulación de vapores inflamables o gases asfixiantes.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Sin Desagües Directos</h5>
+                        <p>Prohibido tener desagües a la red de alcantarillado público.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Señalización Específica</h5>
+                        <p>Rombos de la ONU, señalética de emergencia, EPP requerido.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Equipos de Emergencia</h5>
+                        <p>Kit antiderrames, extintores específicos, lavaojos, ducha de emergencia.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Control de Acceso</h5>
+                        <p>Solo personal capacitado y autorizado puede ingresar.</p>
+                    </div>
+                    <div class="suspeL-item">
+                        <h5>Racks Antisísmicos</h5>
+                        <p>Calculados según norma sísmica chilena, anclados al piso.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>Una bodega SUSPEL está regulada por el Decreto Supremo 43 del Ministerio de Salud.</strong> Este decreto establece las condiciones mínimas que debe cumplir un recinto que almacena sustancias peligrosas. No cumplir con estas condiciones puede significar multas, clausuras y responsabilidades legales.
+                </div>
+                
+                <h4>¿Qué se debe verificar en una bodega SUSPEL?</h4>
+                <ul>
+                    <li><strong>Capacidad máxima:</strong> no exceder el volumen autorizado.</li>
+                    <li><strong>Segregación:</strong> respetar la matriz de incompatibilidad.</li>
+                    <li><strong>Orden y limpieza:</strong> mantener la bodega limpia y ordenada.</li>
+                    <li><strong>Señalización:</strong> rombos, etiquetas, señalética de emergencia.</li>
+                    <li><strong>HDS disponibles:</strong> las Hojas de Datos de Seguridad deben estar accesibles.</li>
+                    <li><strong>EPP disponible:</strong> los equipos de protección deben estar a la entrada.</li>
+                    <li><strong>Kit antiderrames:</strong> completo y en buen estado.</li>
+                    <li><strong>Extintores:</strong> del tipo correcto para las clases de sustancias almacenadas.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Una bodega SUSPEL bien gestionada es una inversión en seguridad. Una bodega SUSPEL mal gestionada es una bomba de tiempo. La diferencia está en la disciplina, el conocimiento y el compromiso de todos los que trabajan con sustancias peligrosas.
+                </div>
+            </section>
+
+            <section class="section" id="envases">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Envases y Embalajes</h3>
+                <p>Los envases que contienen sustancias peligrosas no son envases comunes. Deben estar certificados, probados y ser compatibles con la sustancia que contienen.</p>
+                
+                <h4>Grupos de embalaje según la ONU</h4>
+                <p>Los envases se clasifican según su nivel de resistencia técnica:</p>
+                
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Grupo I (X):</strong> Materias muy peligrosas. Requieren envases de alta resistencia. Ejemplo: ácidos concentrados, explosivos.</li>
+                        <li><strong>Grupo II (Y):</strong> Materias de peligrosidad media. Envases de resistencia media. Ejemplo: solventes, pinturas.</li>
+                        <li><strong>Grupo III (Z):</strong> Materias de escasa peligrosidad. Envases de resistencia estándar. Ejemplo: productos de limpieza industrial.</li>
+                    </ol>
+                </div>
+                
+                <h4>Requisitos del envase</h4>
+                <ul>
+                    <li><strong>Ser adecuado:</strong> compatible con la sustancia (no reaccionar con ella).</li>
+                    <li><strong>Estar en buen estado:</strong> sin grietas, deformaciones, corrosión.</li>
+                    <li><strong>Permanecer cerrado:</strong> con tapa o sistema de cierre adecuado.</li>
+                    <li><strong>Estar correctamente etiquetado:</strong> con rombos de la ONU, nombre del producto, frases de riesgo.</li>
+                    <li><strong>Resistir manipulación:</strong> soportar el transporte y el almacenamiento.</li>
+                </ul>
+                
+                <div class="peligro-box">
+                    <strong>Nunca se debe trasvasijar una sustancia peligrosa a un envase no adecuado.</strong> Por ejemplo, no se puede poner gasolina en una botella de plástico común. El envase debe ser certificado para ese tipo de sustancia.
+                </div>
+                
+                <h4>¿Qué verificar en la recepción?</h4>
+                <ul>
+                    <li>Que el envase esté en buen estado.</li>
+                    <li>Que no haya fugas ni derrames.</li>
+                    <li>Que la etiqueta esté completa y legible.</li>
+                    <li>Que el rombo de la ONU corresponda a la sustancia.</li>
+                    <li>Que venga con su HDS.</li>
+                    <li>Que el envase sea el adecuado para la sustancia.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Un envase dañado o inadecuado es un riesgo en sí mismo. Si llega un producto con el envase en mal estado, no se recibe. Se rechaza, se registra y se informa al proveedor.
+                </div>
+            </section>
+
+            <section class="section" id="hds">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. La Hoja de Datos de Seguridad (HDS)</h3>
+                <p>La HDS es el documento más importante cuando trabajamos con sustancias peligrosas. Es el "manual de seguridad" del producto químico.</p>
+                
+                <div class="importante">
+                    <strong>Todo producto químico peligroso debe venir con su HDS.</strong> Es una obligación legal. Si llega un producto sin HDS, no se debe recibir. Se solicita al proveedor antes de continuar con la recepción.
+                </div>
+                
+                <h4>Las 16 secciones de la HDS</h4>
+                <p>La HDS tiene un formato internacional estándar de 16 secciones:</p>
+                
+                <div class="hds-grid">
+                    <div class="hds-item"><strong>1</strong> Identificación</div>
+                    <div class="hds-item"><strong>2</strong> Peligros</div>
+                    <div class="hds-item"><strong>3</strong> Composición</div>
+                    <div class="hds-item"><strong>4</strong> Primeros Auxilios</div>
+                    <div class="hds-item"><strong>5</strong> Lucha contra Incendios</div>
+                    <div class="hds-item"><strong>6</strong> Derrames</div>
+                    <div class="hds-item"><strong>7</strong> Manipulación y Almacenamiento</div>
+                    <div class="hds-item"><strong>8</strong> EPP</div>
+                    <div class="hds-item"><strong>9</strong> Propiedades Físicas</div>
+                    <div class="hds-item"><strong>10</strong> Estabilidad y Reactividad</div>
+                    <div class="hds-item"><strong>11</strong> Toxicología</div>
+                    <div class="hds-item"><strong>12</strong> Ecología</div>
+                    <div class="hds-item"><strong>13</strong> Eliminación</div>
+                    <div class="hds-item"><strong>14</strong> Transporte</div>
+                    <div class="hds-item"><strong>15</strong> Normativa</div>
+                    <div class="hds-item"><strong>16</strong> Otra Información</div>
+                </div>
+                
+                <h4>¿Qué información es crítica para el bodeguero?</h4>
+                <ul>
+                    <li><strong>Sección 2 (Peligros):</strong> qué clase de peligro tiene el producto.</li>
+                    <li><strong>Sección 5 (Incendios):</strong> qué extintor usar si se incendia.</li>
+                    <li><strong>Sección 6 (Derrames):</strong> cómo actuar ante un derrame.</li>
+                    <li><strong>Sección 7 (Almacenamiento):</strong> condiciones específicas de almacenamiento, incompatibilidades.</li>
+                    <li><strong>Sección 8 (EPP):</strong> qué equipos de protección usar.</li>
+                    <li><strong>Sección 10 (Reactividad):</strong> con qué productos es incompatible.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Llega un producto nuevo: ácido sulfúrico.</p>
+                    <p>Antes de almacenarlo, reviso la HDS:</p>
+                    <ul>
+                        <li><strong>Sección 2:</strong> Clase 8, corrosivo.</li>
+                        <li><strong>Sección 7:</strong> Almacenar en lugar fresco, seco, ventilado. Incompatible con bases, metales, agua.</li>
+                        <li><strong>Sección 8:</strong> Usar guantes de neopreno, antiparras, delantal resistente a ácidos.</li>
+                        <li><strong>Sección 10:</strong> Reacciona violentamente con agua y con bases.</li>
+                    </ul>
+                    <p>Con esa información, sé que debo almacenar el ácido sulfúrico lejos de las bases, en un área ventilada, con contención de derrames, y que para manipularlo necesito EPP específico.</p>
+                </div>
+                
+                <div class="destacado">
+                    La HDS no es un documento para guardar en un cajón. Es una herramienta de trabajo que debe estar disponible para todos los que manipulan la sustancia. Y todos deben saber leerla.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben dónde están las HDS de los productos que manejan en su bodega? Si no lo saben, tenemos un problema. Porque en una emergencia, no hay tiempo para buscar la HDS. Debe estar a mano, en el lugar donde se manipula el producto.</p>
+            </section>
+
+            <section class="section" id="etiquetado">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Etiquetado y Señalización</h3>
+                <p>El etiquetado es la primera línea de información sobre una sustancia peligrosa. Es lo que vemos antes de abrir el envase, antes de manipularlo, antes de almacenarlo.</p>
+                
+                <h4>¿Qué debe contener la etiqueta?</h4>
+                <ul>
+                    <li><strong>Nombre del producto:</strong> identificación clara de la sustancia.</li>
+                    <li><strong>Rombo de la ONU:</strong> indica la clase de peligro.</li>
+                    <li><strong>Pictogramas de peligro:</strong> según el Sistema Globalmente Armonizado (SGA).</li>
+                    <li><strong>Palabra de advertencia:</strong> "Peligro" o "Atención".</li>
+                    <li><strong>Frases de riesgo (frases H):</strong> describen el peligro. Ejemplo: "H225: Líquido y vapores muy inflamables".</li>
+                    <li><strong>Frases de prudencia (frases P):</strong> indican cómo manipular con seguridad. Ejemplo: "P210: Mantener alejado de calor, chispas y llamas".</li>
+                    <li><strong>Identificación del proveedor:</strong> quién fabricó o importó el producto.</li>
+                </ul>
+                
+                <h4>Señalización en la bodega</h4>
+                <p>Además de las etiquetas de los envases, la bodega misma debe estar señalizada:</p>
+                <ul>
+                    <li><strong>Rombos de la ONU:</strong> en las zonas donde se almacena cada clase.</li>
+                    <li><strong>Señalética de emergencia:</strong> salidas, rutas de evacuación, punto de encuentro.</li>
+                    <li><strong>Señalética de EPP obligatorio:</strong> uso obligatorio de guantes, antiparras, etc.</li>
+                    <li><strong>Señalética de prohibición:</strong> no fumar, no usar celulares, no generar chispas.</li>
+                    <li><strong>Señalética de equipos de emergencia:</strong> extintores, lavaojos, ducha, kit antiderrames.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La señalización debe estar visible, limpia y en buen estado.</strong> Una señal dañada, sucia o tapada no cumple su función. Y una señal que no se entiende es tan inútil como no tener señalización.
+                </div>
+                
+                <p>Y aquí viene una conexión con lo que vimos en el Módulo 3 sobre señalización: las reglas son las mismas, pero en una bodega SUSPEL la señalización es aún más crítica. Porque aquí, una señal mal puesta puede significar una explosión.</p>
+            </section>
+
+            <section class="section" id="epp">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. EPP Específico para Sustancias Peligrosas</h3>
+                <p>Ya hablamos de EPP en el Módulo 2. Pero cuando trabajamos con sustancias peligrosas, el EPP es más específico y más crítico.</p>
+                
+                <h4>EPP básico para sustancias peligrosas</h4>
+                <ul>
+                    <li><strong>Antiparras o protección ocular:</strong> protegen los ojos de salpicaduras.</li>
+                    <li><strong>Guantes específicos:</strong> de nitrilo, neopreno o PVC según la sustancia. No todos los guantes sirven para todo.</li>
+                    <li><strong>Calzado de seguridad:</strong> con punta de acero y suela antideslizante.</li>
+                    <li><strong>Delantal o traje químico:</strong> para proteger el cuerpo de salpicaduras.</li>
+                    <li><strong>Protección respiratoria:</strong> mascarillas con filtros específicos para gases o vapores, según la sustancia.</li>
+                    <li><strong>Casco:</strong> si hay riesgo de caída de objetos.</li>
+                </ul>
+                
+                <div class="peligro-box">
+                    <strong>No todos los guantes sirven para todas las sustancias.</strong> Un guante de cuero protege contra cortes, pero no contra ácidos. Un guante de nitrilo protege contra muchos químicos, pero no contra todos. La HDS indica qué tipo de guante usar para cada sustancia.
+                </div>
+                
+                <h4>¿Cómo saber qué EPP usar?</h4>
+                <p>La respuesta está en la HDS, sección 8. Ahí se especifica:</p>
+                <ul>
+                    <li>Qué tipo de guante usar.</li>
+                    <li>Qué tipo de protección ocular.</li>
+                    <li>Si se necesita protección respiratoria y de qué tipo.</li>
+                    <li>Si se necesita traje completo.</li>
+                    <li>Otras medidas específicas.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El EPP debe estar disponible en el lugar donde se manipula la sustancia.</strong> No sirve de nada tener el EPP perfecto si está en otra bodega o en la oficina del supervisor. Debe estar a mano, en buen estado y en cantidad suficiente.
+                </div>
+                
+                <p>Y aquí viene una conexión con Compras: el EPP específico para sustancias peligrosas también debe ser adquirido por Compras. Y debe ser certificado, no cualquier guante del supermercado. La certificación la entrega el Instituto de Salud Pública (ISP) en Chile.</p>
+            </section>
+
+            <section class="section" id="manipulacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Manipulación Segura</h3>
+                <p>Manipular una sustancia peligrosa no es lo mismo que manipular una caja de guantes. Requiere procedimientos específicos, EPP adecuado y mucho cuidado.</p>
+                
+                <h4>Reglas básicas de manipulación</h4>
+                <ul>
+                    <li><strong>Leer la HDS antes de manipular:</strong> conocer los peligros y las medidas de precaución.</li>
+                    <li><strong>Usar el EPP correcto:</strong> según lo indica la HDS.</li>
+                    <li><strong>Trabajar en área ventilada:</strong> evitar acumulación de vapores.</li>
+                    <li><strong>No fumar ni generar chispas:</strong> especialmente cerca de inflamables.</li>
+                    <li><strong>Usar herramientas anti-chispa:</strong> para inflamables, usar herramientas de bronce o cobre.</li>
+                    <li><strong>No trasvasijar a envases inadecuados:</strong> mantener el producto en su envase original o en uno certificado.</li>
+                    <li><strong>No trabajar solo:</strong> especialmente con sustancias muy peligrosas.</li>
+                    <li><strong>Mantener el kit antiderrames cerca:</strong> en caso de emergencia.</li>
+                    <li><strong>Conocer la ubicación de lavaojos y duchas:</strong> y saber usarlos.</li>
+                    <li><strong>Lavarse las manos después de manipular:</strong> aunque se hayan usado guantes.</li>
+                </ul>
+                
+                <h4>Prohibiciones absolutas</h4>
+                <ul>
+                    <li><strong>No oler directamente:</strong> para identificar una sustancia, usar la mano para llevar los vapores hacia la nariz, no acercarla directamente.</li>
+                    <li><strong>No probar:</strong> nunca, bajo ninguna circunstancia.</li>
+                    <li><strong>No mezclar:</strong> a menos que se tenga conocimiento técnico y autorización.</li>
+                    <li><strong>No almacenar incompatibles juntos:</strong> revisar la matriz de segregación.</li>
+                    <li><strong>No usar envases de alimentos:</strong> nunca trasvasijar una sustancia peligrosa a una botella de bebida o un envase de comida.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La manipulación de sustancias peligrosas no admite improvisación. Cada paso debe estar pensado, cada precaución debe estar tomada. Porque un error aquí no es un error cualquiera: puede ser una emergencia.
+                </div>
+            </section>
+
+            <section class="section" id="derrames">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Protocolo ante Derrames</h3>
+                <p>Ahora viene una situación que todos tememos pero que todos debemos saber manejar: un derrame de sustancia peligrosa.</p>
+                
+                <p>Un derrame puede ocurrir por muchas razones: un envase que se cae, una válvula que falla, una manguera que se rompe, un error de manipulación. Lo importante es saber qué hacer.</p>
+                
+                <div class="peligro-box">
+                    <strong>Lo primero y más importante: no actuar impulsivamente.</strong> Antes de hacer cualquier cosa, hay que identificar qué sustancia se derramó y evaluar el riesgo. Actuar sin saber puede empeorar la situación.
+                </div>
+                
+                <h4>Protocolo paso a paso</h4>
+                <div class="protocolo-flujo">
+                    <div class="paso-proto">
+                        <div class="paso-num">1</div>
+                        <div>
+                            <strong>Identificar</strong>
+                            <p>Consultar la etiqueta o la HDS para saber qué sustancia se derramó. No tocar ni oler directamente.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">2</div>
+                        <div>
+                            <strong>Evaluar el riesgo</strong>
+                            <p>¿Es inflamable? ¿Es tóxico? ¿Es corrosivo? ¿Cuánto se derramó? ¿Hay personas cerca? ¿Hay fuentes de ignición?</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">3</div>
+                        <div>
+                            <strong>Aislar y evacuar</strong>
+                            <p>Despejar el área de personas no esenciales. Si es necesario, evacuar completamente.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">4</div>
+                        <div>
+                            <strong>Ventilar</strong>
+                            <p>Si el derrame ocurre en espacio cerrado, ventilar para evitar acumulación de vapores.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">5</div>
+                        <div>
+                            <strong>Equiparse</strong>
+                            <p>Ponerse el EPP específico según la HDS: antiparras, guantes, protección respiratoria, delantal.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">6</div>
+                        <div>
+                            <strong>Contener</strong>
+                            <p>Usar cordones absorbentes del kit antiderrames para rodear el líquido e impedir que llegue a desagües o suelos descubiertos.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">7</div>
+                        <div>
+                            <strong>Absorber</strong>
+                            <p>Aplicar material absorbente neutro: vermiculita, arena seca o paños absorbentes. Nunca usar aserrín para inflamables o corrosivos.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">8</div>
+                        <div>
+                            <strong>Recoger</strong>
+                            <p>Con palas de plástico (para evitar chispas), depositar los residuos en tambores plásticos etiquetados.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">9</div>
+                        <div>
+                            <strong>Limpiar</strong>
+                            <p>Limpiar el área con productos adecuados según la sustancia.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">10</div>
+                        <div>
+                            <strong>Informar y registrar</strong>
+                            <p>Reportar el incidente al supervisor. Registrar qué sustancia, cuánto, causa, acciones tomadas.</p>
+                        </div>
+                    </div>
+                    <div class="paso-proto">
+                        <div class="paso-num">11</div>
+                        <div>
+                            <strong>Disponer los residuos</strong>
+                            <p>Los residuos contaminados son residuos peligrosos (RESPEL). Deben gestionarse según normativa.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4>El Kit Antiderrames</h4>
+                <p>Toda bodega que maneja sustancias peligrosas debe tener un kit antiderrames. El kit generalmente incluye:</p>
+                <ul>
+                    <li>Cordones absorbentes para contener.</li>
+                    <li>Paños absorbentes.</li>
+                    <li>Vermiculita o material absorbente neutro.</li>
+                    <li>Palas de plástico (anti-chispa).</li>
+                    <li>Tambores plásticos para residuos.</li>
+                    <li>EPP específico: guantes, antiparras, mascarilla.</li>
+                    <li>Instrucciones de uso.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El kit antiderrames debe estar completo, accesible y en buen estado.</strong> De nada sirve tener un kit si está incompleto, vencido o guardado bajo llave en una oficina. Debe estar donde se manipulan las sustancias, listo para usar.
+                </div>
+                
+                <div class="destacado">
+                    Un derrame bien manejado es un susto. Un derrame mal manejado es una emergencia. La diferencia está en la preparación, el conocimiento y la calma para seguir el protocolo.
+                </div>
+            </section>
+
+            <section class="section" id="normativa">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>11. Normativa Aplicable</h3>
+                <p>En Chile, el manejo de sustancias peligrosas está regulado por varias normativas. No vamos a entrar en detalle legal, pero es importante conocer las principales.</p>
+                
+                <h4>Decreto Supremo 43 (MINSAL)</h4>
+                <p>Regula el almacenamiento de sustancias peligrosas. Establece las condiciones que deben cumplir las bodegas SUSPEL: construcción, ventilación, contención de derrames, señalización, etc.</p>
+                
+                <h4>Decreto Supremo 298 (Transporte)</h4>
+                <p>Regula el transporte de sustancias peligrosas en calles y caminos. Establece requisitos para vehículos, conductores, documentación y señalización.</p>
+                
+                <h4>Decreto Supremo 148 (Residuos Peligrosos)</h4>
+                <p>Regula el manejo de residuos peligrosos. Establece cómo deben ser generados, almacenados, transportados y eliminados.</p>
+                
+                <h4>Decreto Supremo 594</h4>
+                <p>Condiciones sanitarias y ambientales básicas en los lugares de trabajo. Incluye disposiciones sobre protección de trabajadores expuestos a agentes químicos.</p>
+                
+                <h4>Ley 16.744</h4>
+                <p>Seguro social contra accidentes del trabajo y enfermedades profesionales. Protege a los trabajadores en caso de accidente o enfermedad derivada de la exposición a sustancias peligrosas.</p>
+                
+                <div class="importante">
+                    <strong>No necesitas memorizar artículos de leyes.</strong> Lo importante es entender que existen normativas que establecen requisitos mínimos de seguridad, y que esas normativas están diseñadas para proteger tu vida y la de tus compañeros.
+                </div>
+                
+                <p>Y aquí viene una idea importante: las normas internas de la empresa pueden ser más estrictas que la ley, pero nunca más permisivas. Es decir, si la ley permite algo, la empresa puede restringirlo. Pero si la ley prohíbe algo, la empresa no puede permitirlo.</p>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>12. Errores Comunes</h3>
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes en el manejo de sustancias peligrosas. Conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: Recibir sin verificar</h4>
+                <p>Aceptar un producto sin revisar que venga con su HDS, sin verificar el estado del envase, sin comprobar que la etiqueta esté completa.</p>
+                
+                <h4>Error 2: Almacenar incompatibles juntos</h4>
+                <p>No respetar la matriz de segregación. Resultado: riesgo de reacción química peligrosa.</p>
+                
+                <h4>Error 3: No leer la HDS</h4>
+                <p>Manipular una sustancia sin conocer sus peligros y las medidas de precaución.</p>
+                
+                <h4>Error 4: No usar el EPP correcto</h4>
+                <p>Usar guantes de cuero para manipular ácidos, o no usar protección respiratoria cuando corresponde.</p>
+                
+                <h4>Error 5: Trasvasijar a envases inadecuados</h4>
+                <p>Poner gasolina en una botella de plástico común, o ácido en un envase de vidrio no resistente.</p>
+                
+                <h4>Error 6: No tener kit antiderrames</h4>
+                <p>O tenerlo incompleto, vencido o inaccesible.</p>
+                
+                <h4>Error 7: No capacitar al personal</h4>
+                <p>Dejar que alguien maneje sustancias peligrosas sin saber qué hacer.</p>
+                
+                <h4>Error 8: No registrar incidentes</h4>
+                <p>Si ocurre un derrame pequeño y no se registra, no se puede analizar la causa y evitar que vuelva a ocurrir.</p>
+                
+                <h4>Error 9: Comprar sin coordinar</h4>
+                <p>Compras adquiere una sustancia peligrosa sin haber coordinado con Bodega si hay dónde almacenarla, si es compatible con lo que ya hay, si se tiene el EPP adecuado.</p>
+                
+                <div class="destacado">
+                    En el manejo de sustancias peligrosas, los errores no se perdonan. Porque las consecuencias pueden ser inmediatas y graves. Por eso la prevención, la capacitación y la disciplina no son opcionales: son obligatorias.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>Las sustancias peligrosas son parte del trabajo en muchas bodegas. Y no vamos a dejar de usarlas porque sean peligrosas. Lo que vamos a hacer es manejarlas con conocimiento, con respeto y con disciplina.</p>
+                <p>Cada clase de sustancia tiene sus propias reglas. Cada producto tiene su HDS. Cada bodega tiene su procedimiento. Y cada persona tiene la responsabilidad de conocer y respetar esas reglas.</p>
+                <p>Porque un error con una caja puede costar un producto. Un error con una sustancia peligrosa puede costar una vida.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Con sustancias peligrosas,<br>la improvisación no es una opción.<br>El conocimiento sí."</p>
+                
+                <a href="parte15.html" class="next-module">Siguiente Módulo: Tecnología en Bodega →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

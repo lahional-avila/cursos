@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 6: Introducción a la Bodega y su Organización</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .flujo-box { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; padding: 25px; margin: 25px 0; text-align: center; }
+    .flujo-box .flecha { color: #f39c12; font-size: 20px; margin: 10px 0; }
+    .flujo-item { display: inline-block; background: #1e3a5f; color: white; padding: 10px 20px; border-radius: 8px; margin: 5px; font-size: 14px; font-weight: 600; }
+    .tipo-bodega { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .bodega-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.3s; border-left: 6px solid #f39c12; }
+    .bodega-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .bodega-item h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 8px; }
+    .zona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
+    .zona-item { background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center; border-top: 4px solid; }
+    .zona-item.recepcion { border-top-color: #27ae60; }
+    .zona-item.almacenamiento { border-top-color: #3498db; }
+    .zona-item.picking { border-top-color: #f39c12; }
+    .zona-item.despacho { border-top-color: #e74c3c; }
+    .zona-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 10px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 6: Introducción a la Bodega y su Organización</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#que-es">1. ¿Qué es una Bodega?</a></li>
+                <li><a href="#funciones">2. Funciones de una Bodega</a></li>
+                <li><a href="#tipos">3. Tipos de Bodega</a></li>
+                <li><a href="#flujo">4. El Flujo de Materiales</a></li>
+                <li><a href="#zonas">5. Zonas de la Bodega</a></li>
+                <li><a href="#almacenamiento">6. Métodos de Almacenamiento</a></li>
+                <li><a href="#cadena">7. La Bodega en la Cadena Logística</a></li>
+                <li><a href="#roles">8. Roles y Responsabilidades</a></li>
+                <li><a href="#documentos">9. Documentación Básica</a></li>
+                <li><a href="#conceptos">10. Conceptos Fundamentales</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Introducción a la Bodega y su Organización</h2>
+                <p>Ya sabemos cómo trabajar de manera segura. Ahora vamos a entender qué es una bodega, cómo se organiza, qué tipos existen y cómo fluye el material desde que entra hasta que sale.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200" alt="Bodega industrial moderna" class="banner-image">
+
+            <section class="section" id="que-es">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. ¿Qué es una Bodega?</h3>
+                <p>Buenos días. Ya avanzamos bastante en seguridad, EPP, señalización y orden. Ahora viene una pregunta que parece obvia, pero que es fundamental que todos entendamos de la misma manera:</p>
+                
+                <p>¿Qué es una bodega?</p>
+                
+                <p>Muchos dirían: "un lugar donde se guardan cosas". Y no están equivocados, pero esa definición es incompleta. Si una bodega fuera solo un lugar donde se amontonan cajas, no necesitaríamos un curso completo para aprender a gestionarla.</p>
+                
+                <div class="importante">
+                    <strong>Una bodega es un sistema.</strong> Un lugar destinado a recibir, almacenar, controlar, preparar y despachar productos de manera ordenada, segura y eficiente. Es el corazón logístico de cualquier empresa que maneja materiales, insumos o mercadería.
+                </div>
+                
+                <p>Pensemos en la diferencia:</p>
+                
+                <ul>
+                    <li><strong>Un lugar donde se amontonan cosas:</strong> no sabes qué tienes, no sabes cuánto tienes, no sabes dónde está, pierdes tiempo buscando, se dañan los productos.</li>
+                    <li><strong>Una bodega bien gestionada:</strong> sabes exactamente qué tienes, cuánto tienes, dónde está, en qué condición está y cuándo necesitas reponerlo.</li>
+                </ul>
+                
+                <p>Esa es la diferencia. Y el objetivo de todo este curso es que ustedes aprendan a hacer esa segunda cosa: gestionar una bodega de manera profesional.</p>
+                
+                <div class="destacado">
+                    Una bodega bien gestionada debe poder responder cuatro preguntas en cualquier momento: Qué tengo, cuánto tengo, dónde está y en qué condición está. Si no puedes responder esas cuatro preguntas, no tienes una bodega: tienes un depósito desordenado.
+                </div>
+                
+                <p>Y aquí quiero que entiendan algo importante: ustedes como bodegueros no son "los que guardan cajas". Ustedes son los responsables de que la empresa tenga lo que necesita, cuando lo necesita, en las condiciones correctas y sin generar pérdidas. Eso es control operacional.</p>
+            </section>
+
+            <section class="section" id="funciones">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Funciones de una Bodega</h3>
+                <p>Ahora que sabemos qué es una bodega, vamos a ver cuáles son sus funciones principales. Toda bodega, sin importar si es pequeña o enorme, cumple cinco funciones básicas:</p>
+                
+                <div class="flujo-box">
+                    <span class="flujo-item">RECEPCIÓN</span>
+                    <div class="flecha">→</div>
+                    <span class="flujo-item">ALMACENAMIENTO</span>
+                    <div class="flecha">→</div>
+                    <span class="flujo-item">CONTROL</span>
+                    <div class="flecha">→</div>
+                    <span class="flujo-item">PREPARACIÓN</span>
+                    <div class="flecha">→</div>
+                    <span class="flujo-item">DESPACHO</span>
+                </div>
+                
+                <h4>1. Recepción</h4>
+                <p>Es el proceso de recibir la mercadería que llega. Pero ojo: recibir no es simplemente "bajar las cajas del camión". La recepción incluye verificar cantidades, revisar el estado de los productos, comparar con la orden de compra y registrar la información en el sistema. Eso lo veremos en detalle más adelante.</p>
+                
+                <h4>2. Almacenamiento</h4>
+                <p>Una vez recibida la mercadería, hay que ubicarla correctamente. No en cualquier lugar vacío que encontremos, sino en la ubicación que corresponde según el tipo de producto, su peso, su rotación y sus condiciones de conservación.</p>
+                
+                <h4>3. Control</h4>
+                <p>El control es lo que mantiene la bodega "cuadrada". Es llevar el registro de qué entra, qué sale, qué se daña, qué se pierde. Es comparar el stock físico con lo que dice el sistema. Es detectar diferencias antes de que se conviertan en problemas.</p>
+                
+                <h4>4. Preparación (Picking)</h4>
+                <p>Cuando alguien necesita productos, hay que buscarlos, seleccionarlos y prepararlos para entregarlos. Eso se llama picking. No es simplemente "sacar cosas": es seleccionar el producto correcto, en la cantidad correcta, del lote correcto, en la ubicación correcta.</p>
+                
+                <h4>5. Despacho</h4>
+                <p>Finalmente, los productos salen de la bodega hacia su destino. El despacho incluye verificar una última vez que todo esté correcto, embalar si es necesario, generar la documentación y entregar al transporte o al usuario.</p>
+                
+                <div class="importante">
+                    <strong>Estas cinco funciones son un ciclo que nunca se detiene.</strong> Todos los días entran productos, se almacenan, se controlan, se preparan y se despachan. Y luego vuelve a entrar mercadería. Es un flujo continuo que debemos mantener funcionando sin interrupciones.
+                </div>
+            </section>
+
+            <section class="section" id="tipos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Tipos de Bodega</h3>
+                <p>Ahora viene una pregunta interesante: ¿todas las bodegas son iguales? No. Dependiendo de qué almacenan, para qué lo almacenan y cómo funciona la operación, existen diferentes tipos de bodega.</p>
+                
+                <div class="tipo-bodega">
+                    <div class="bodega-item">
+                        <h5>Bodega de Materias Primas</h5>
+                        <p>Almacena los insumos básicos que serán transformados en el proceso de producción. Por ejemplo: acero para una fábrica, harina para una panadería industrial, telas para una textil.</p>
+                    </div>
+                    <div class="bodega-item">
+                        <h5>Bodega de Productos Terminados</h5>
+                        <p>Almacena el producto final listo para la venta. Por ejemplo: los muebles terminados de una fábrica antes de ser enviados a las tiendas.</p>
+                    </div>
+                    <div class="bodega-item">
+                        <h5>Bodega de Distribución (Centro de Distribución)</h5>
+                        <p>Diseñada para despachar rápidamente hacia clientes o sucursales. Tiene alta rotación de productos. No almacena por mucho tiempo: recibe y despacha con velocidad.</p>
+                    </div>
+                    <div class="bodega-item">
+                        <h5>Bodega de Tránsito o Cross-Docking</h5>
+                        <p>Almacenamiento temporal, generalmente menos de 24 a 48 horas. La carga llega, se clasifica y se vuelve a subir a camiones de reparto sin pasar a estanterías fijas.</p>
+                    </div>
+                    <div class="bodega-item">
+                        <h5>Bodega SUSPEL (Sustancias Peligrosas)</h5>
+                        <p>Recinto especial con medidas de seguridad extremas para sustancias peligrosas. En Chile está regulada por el Decreto Supremo 43. Cuenta con muros cortafuego, retención de derrames y ventilación forzada.</p>
+                    </div>
+                    <div class="bodega-item">
+                        <h5>Bodega de Insumos y Materiales (Pañol)</h5>
+                        <p>Almacena herramientas, repuestos, EPP y materiales de uso interno. A diferencia de una bodega de productos, aquí los materiales se prestan y se devuelven. El flujo es bidireccional.</p>
+                    </div>
+                </div>
+                
+                <div class="destacado">
+                    El tipo de bodega determina cómo se organiza, qué equipos necesita, qué medidas de seguridad requiere y cómo se controla el inventario. No es lo mismo gestionar una bodega de productos químicos que una bodega de repuestos.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes en qué tipo de bodega trabajan o les gustaría trabajar? Porque dependiendo del tipo, las prioridades cambian. En una bodega de distribución la velocidad es clave. En una SUSPEL la seguridad es clave. En un pañol el control de devoluciones es clave.</p>
+            </section>
+
+            <section class="section" id="flujo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. El Flujo de Materiales</h3>
+                <p>Ahora vamos a entender algo que es fundamental: cómo fluye el material dentro de una bodega. Porque si no entendemos el flujo, no podemos organizar correctamente el espacio ni los procesos.</p>
+                
+                <p>El flujo completo de una bodega es así:</p>
+                
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Necesidad:</strong> Alguien necesita un producto o material.</li>
+                        <li><strong>Planificación:</strong> Se determina cuánto se necesita y cuándo.</li>
+                        <li><strong>Adquisición:</strong> Se genera una orden de compra al proveedor.</li>
+                        <li><strong>Transporte:</strong> El proveedor despacha la mercadería.</li>
+                        <li><strong>Recepción:</strong> La bodega recibe y verifica la carga.</li>
+                        <li><strong>Registro:</strong> Se ingresa la información al sistema.</li>
+                        <li><strong>Almacenamiento:</strong> Se ubica el producto en el lugar correcto.</li>
+                        <li><strong>Control:</strong> Se mantiene actualizado el inventario.</li>
+                        <li><strong>Solicitud:</strong> Un usuario o área necesita el producto.</li>
+                        <li><strong>Picking:</strong> Se selecciona el producto de la estantería.</li>
+                        <li><strong>Verificación:</strong> Se comprueba que es lo correcto.</li>
+                        <li><strong>Despacho:</strong> Se entrega al usuario o se envía al cliente.</li>
+                        <li><strong>Actualización:</strong> Se registra la salida en el sistema.</li>
+                        <li><strong>Reposición:</strong> Si el stock baja del mínimo, se genera una nueva compra.</li>
+                    </ol>
+                </div>
+                
+                <p>Y ahí el ciclo vuelve a empezar. Es un círculo que nunca se detiene.</p>
+                
+                <div class="importante">
+                    <strong>Entender este flujo es lo que separa a un bodeguero que solo mueve cajas de un bodeguero que gestiona la operación.</strong> Porque cuando entiendes el flujo completo, puedes detectar dónde se generan los problemas: ¿la recepción llega tarde? ¿el picking es lento? ¿el sistema no se actualiza? ¿la reposición no se activa a tiempo?
+                </div>
+                
+                <p>Y algo muy importante que vamos a desarrollar más adelante: cada paso de este flujo debe quedar registrado. Si un movimiento no se registra, el inventario se descuadra. Y si el inventario se descuadra, todo lo demás falla: no sabes qué tienes, no sabes cuándo reponer, no sabes qué despachar.</p>
+            </section>
+
+            <section class="section" id="zonas">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Zonas de la Bodega</h3>
+                <p>Una bodega bien organizada tiene zonas claramente definidas. No es un espacio donde todo está mezclado. Cada área tiene una función específica.</p>
+                
+                <div class="zona-grid">
+                    <div class="zona-item recepcion">
+                        <h5>Zona de Recepción</h5>
+                        <p>Donde se descarga, verifica e inspecciona la mercadería entrante.</p>
+                    </div>
+                    <div class="zona-item almacenamiento">
+                        <h5>Zona de Almacenamiento</h5>
+                        <p>Donde se guardan los productos en racks, estanterías o en el piso.</p>
+                    </div>
+                    <div class="zona-item picking">
+                        <h5>Zona de Picking</h5>
+                        <p>Donde se seleccionan y preparan los pedidos.</p>
+                    </div>
+                    <div class="zona-item despacho">
+                        <h5>Zona de Despacho</h5>
+                        <p>Donde se consolida, embala y entrega la carga para su salida.</p>
+                    </div>
+                </div>
+                
+                <h4>Otras zonas importantes</h4>
+                <ul>
+                    <li><strong>Zona de cuarentena o rechazo:</strong> donde se ubica la mercadería dañada o que no corresponde, mientras se decide qué hacer con ella.</li>
+                    <li><strong>Zona de tránsito:</strong> pasillos y áreas de circulación de personas y equipos.</li>
+                    <li><strong>Zona de residuos:</strong> donde se depositan pallets dañados, cartón, plástico y otros desechos.</li>
+                    <li><strong>Zona de equipos de emergencia:</strong> extintores, botiquines, duchas de seguridad.</li>
+                    <li><strong>Zona de carga de equipos:</strong> donde se cargan las baterías de las grúas horquilla eléctricas.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La organización de las zonas se llama layout. Un buen layout permite que el flujo de materiales sea lógico, que no haya cruces peligrosos entre personas y equipos, y que los productos más movidos estén más cerca de las zonas de despacho.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se graben: los pasillos no son zonas de almacenamiento. Son zonas de circulación. Si un pasillo está lleno de cajas, no es que "estamos aprovechando el espacio". Estamos generando un riesgo, dificultando la evacuación y entorpeciendo la operación.</p>
+            </section>
+
+            <section class="section" id="almacenamiento">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Métodos de Almacenamiento</h3>
+                <p>No todos los productos se almacenan de la misma manera. Dependiendo del tipo de producto, su peso, su tamaño, su rotación y sus características, se usan diferentes métodos de almacenamiento.</p>
+                
+                <h4>Almacenamiento en racks (estanterías)</h4>
+                <p>Es el método más común en bodegas organizadas. Los productos se colocan en estructuras metálicas de varios niveles. Permite aprovechar la altura de la bodega y mantener cada producto en una ubicación específica.</p>
+                <ul>
+                    <li>Los productos pesados van en los niveles bajos.</li>
+                    <li>Los productos livianos van en los niveles altos.</li>
+                    <li>Los productos de alta rotación van en los niveles medios, de fácil acceso.</li>
+                    <li>Siempre se debe respetar la capacidad máxima de carga del rack.</li>
+                </ul>
+                
+                <h4>Almacenamiento en piso (Block Stacking)</h4>
+                <p>Los pallets se colocan directamente en el suelo. Se puede apilar un pallet sobre otro solo si el producto de abajo puede soportar el peso.</p>
+                <ul>
+                    <li>Solo para productos rígidos y resistentes.</li>
+                    <li>Generalmente no más de 3 niveles de altura por seguridad.</li>
+                    <li>Prohibido para productos frágiles o deformables.</li>
+                </ul>
+                
+                <h4>Almacenamiento en casilleros o gavetas</h4>
+                <p>Para productos pequeños, sueltos o de baja rotación: tornillos, tuercas, repuestos pequeños, EPP.</p>
+                <ul>
+                    <li>Se usan estanterías con subdivisiones.</li>
+                    <li>Cada casillero debe estar claramente identificado.</li>
+                    <li>Ideal para pañoles y bodegas de repuestos.</li>
+                </ul>
+                
+                <h4>Almacenamiento especial</h4>
+                <ul>
+                    <li><strong>Cadena de frío:</strong> para productos que requieren refrigeración o congelación.</li>
+                    <li><strong>Bodega SUSPEL:</strong> para sustancias peligrosas con condiciones especiales.</li>
+                    <li><strong>Zona de alto valor:</strong> para productos costosos que requieren seguridad adicional.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El método de almacenamiento se elige según el producto, no al revés.</strong> No podemos meter cualquier cosa en cualquier lugar. Hay que considerar peso, volumen, fragilidad, condiciones de conservación, rotación y seguridad.
+                </div>
+            </section>
+
+            <section class="section" id="cadena">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. La Bodega en la Cadena Logística</h3>
+                <p>Ahora vamos a ampliar la mirada. La bodega no funciona sola. Es parte de una cadena más grande que se llama cadena de suministro o cadena logística.</p>
+                
+                <p>Desde que una empresa necesita un producto hasta que ese producto llega al usuario final, pasa por varias etapas. Y dependiendo del tamaño de la empresa y de sus decisiones estratégicas, puede hacer toda la logística ella misma o puede externalizarla.</p>
+                
+                <h4>Los niveles de externalización logística (PL)</h4>
+                <p>PL significa Party Logistics, y el número indica cuánto de la logística la empresa hace ella misma y cuánto la delega a terceros:</p>
+                
+                <ul>
+                    <li><strong>1PL - Logística Propia:</strong> La empresa tiene sus propios camiones, sus propias bodegas y su propio personal. Hace todo internamente. Ejemplo: una panadería que reparte en sus propios furgones.</li>
+                    <li><strong>2PL - Transporte o Bodega Básica:</strong> La empresa subcontrata solo el transporte o solo el espacio de bodega, pero ella coordina todo. Ejemplo: una tienda que arrienda un camión externo pero ella define las rutas.</li>
+                    <li><strong>3PL - Operador Logístico:</strong> Es el más común. Un operador externo se encarga del almacenamiento y el transporte. Ejemplo: empresas como Starken o Blue Express que almacenan y despachan por ti.</li>
+                    <li><strong>4PL - Consultoría Logística:</strong> Un socio estratégico que diseña y supervisa toda la cadena, pero no tiene activos físicos. Contrata y coordina a varios 3PL.</li>
+                    <li><strong>5PL - Gestión Global:</strong> El nivel máximo. Usa Big Data, inteligencia artificial y automatización para gestionar redes logísticas globales.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Ustedes como bodegueros pueden trabajar en una empresa 1PL (donde la empresa hace todo internamente) o en un operador 3PL (donde gestionan la bodega de varios clientes). Entender dónde están parados les ayuda a comprender la lógica de la operación.
+                </div>
+                
+                <p>Y algo importante: sin importar si la logística es propia o externalizada, los principios que estamos aprendiendo son los mismos: recepción, almacenamiento, control, picking y despacho. La estructura puede cambiar, pero la lógica de la bodega es universal.</p>
+            </section>
+
+            <section class="section" id="roles">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Roles y Responsabilidades</h3>
+                <p>En una bodega organizada, cada persona tiene un rol definido. No es que "todos hacen todo". Hay una estructura, y cada rol tiene responsabilidades específicas.</p>
+                
+                <h4>Jefe de Logística o Gerente</h4>
+                <p>Planifica la estrategia, controla los costos, define los indicadores de gestión (KPI) y toma las decisiones importantes sobre la operación.</p>
+                
+                <h4>Supervisor de Bodega</h4>
+                <p>Coordina los turnos, asigna las tareas diarias, controla que los inventarios cuadren y supervisa al equipo operativo.</p>
+                
+                <h4>Administrativo de Bodega</h4>
+                <p>Digita las guías de despacho, ingresa las recepciones al sistema, actualiza el WMS o ERP y mantiene los registros al día.</p>
+                
+                <h4>Bodeguero u Operario de Bodega</h4>
+                <p>Ejecuta la recepción física, el almacenamiento, el orden, las tareas de picking y packing. Es la persona que está en el día a día moviendo los productos.</p>
+                
+                <h4>Operador de Grúa Horquilla</h4>
+                <p>Conductor certificado con Licencia Clase D que mueve pallets y opera equipos de elevación. Requiere capacitación específica.</p>
+                
+                <h4>Encargado de Inventario</h4>
+                <p>Realiza los conteos cíclicos, busca diferencias de stock y reporta las inconsistencias.</p>
+                
+                <div class="importante">
+                    <strong>Cada rol depende del otro.</strong> Si el bodeguero no registra correctamente lo que recibe, el administrativo no puede actualizar el sistema. Si el sistema no se actualiza, el supervisor no puede tomar decisiones. Si el supervisor no coordina, el operador de grúa no sabe qué mover. Todo está conectado.
+                </div>
+                
+                <p>Y algo muy importante: las responsabilidades de cada cargo deben estar claramente definidas en el contrato de trabajo y en los manuales de procedimiento. Así no hay confusiones sobre quién hace qué.</p>
+            </section>
+
+            <section class="section" id="documentos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Documentación Básica</h3>
+                <p>En una bodega, todo se mueve con documentos. No basta con decir "llegaron las cajas". Tiene que haber un respaldo escrito que diga qué llegó, cuánto llegó, quién lo trajo y quién lo recibió.</p>
+                
+                <p>Los documentos más importantes que van a ver en su trabajo diario son estos:</p>
+                
+                <h4>Orden de Compra (OC)</h4>
+                <p>Es el documento que la empresa envía al proveedor diciendo qué le va a comprar, en qué cantidad y bajo qué condiciones. Cuando llega un camión, lo primero que hacemos es comparar lo que trae con la orden de compra.</p>
+                
+                <h4>Guía de Despacho</h4>
+                <p>Es el documento tributario que acompaña la carga en el camión. Certifica que la mercadería fue entregada. En Chile se maneja de forma electrónica (DTE). Sin guía de despacho, técnicamente la mercadería no existe legalmente.</p>
+                
+                <h4>Factura</h4>
+                <p>Es el documento comercial que detalla el cobro final de los productos. Incluye los montos, los impuestos (IVA del 19% en Chile) y las condiciones de pago.</p>
+                
+                <h4>Packing List (Lista de Empaque)</h4>
+                <p>Es una lista detallada de todo lo que viene dentro de un despacho: cuántas cajas, qué contiene cada una, pesos, dimensiones. Muy común en importaciones.</p>
+                
+                <h4>Hoja de Datos de Seguridad (HDS)</h4>
+                <p>Obligatoria para todo producto químico. Detalla qué es el producto, cómo manipularlo, qué EPP usar, cómo actuar ante un derrame y cómo apagarlo si se incendia. Ya la vimos en módulos anteriores.</p>
+                
+                <div class="destacado">
+                    Un bodeguero que no revisa la documentación es un bodeguero que está recibiendo a ciegas. Los documentos son nuestra protección: si algo llega mal, si algo falta, si algo está dañado, el documento es nuestra evidencia para reclamar.
+                </div>
+            </section>
+
+            <section class="section" id="conceptos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Conceptos Fundamentales</h3>
+                <p>Para cerrar esta introducción, vamos a definir algunos conceptos que vamos a usar durante todo el curso. Es importante que todos los entendamos de la misma manera.</p>
+                
+                <h4>Stock</h4>
+                <p>Es la cantidad de producto disponible en un momento determinado. Ejemplo: si tengo 50 unidades y despacho 15, mi stock actual es 35 unidades.</p>
+                
+                <h4>Inventario</h4>
+                <p>Es el registro y control de todos los productos que existen en la bodega. Incluye qué productos hay, cuántos hay, dónde están y en qué condición están.</p>
+                
+                <h4>SKU (Stock Keeping Unit)</h4>
+                <p>Es el código único que identifica a cada producto. Es como el "nombre completo" del producto en el sistema. Dos productos diferentes no pueden tener el mismo SKU.</p>
+                
+                <h4>Ubicación</h4>
+                <p>Son las coordenadas exactas donde se guarda un producto dentro de la bodega. Por ejemplo: Pasillo A, Rack 4, Nivel 2, Posición 3. Con esa información, cualquier persona puede encontrar el producto sin preguntar.</p>
+                
+                <h4>Rotación</h4>
+                <p>Es la velocidad con que un producto entra y sale de la bodega. Un producto de alta rotación se mueve mucho (entra y sale frecuentemente). Un producto de baja rotación se mueve poco.</p>
+                
+                <h4>Merma</h4>
+                <p>Es la pérdida o disminución de productos por daño, vencimiento, robo o deterioro. La merma es un costo para la empresa y debe registrarse.</p>
+                
+                <h4>Picking</h4>
+                <p>Es el proceso de seleccionar productos de las estanterías para completar un pedido. Es una de las tareas más frecuentes del bodeguero.</p>
+                
+                <h4>Packing</h4>
+                <p>Es el proceso de embalar o empaquetar los productos seleccionados para su despacho o transporte.</p>
+                
+                <div class="importante">
+                    <strong>Estos conceptos los vamos a usar constantemente de aquí en adelante.</strong> Si alguno no les queda claro ahora, no se preocupen. Los vamos a ir desarrollando con ejemplos prácticos en los próximos módulos. Lo importante es que se vayan familiarizando con el lenguaje de la bodega.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>Ya dimos el primer gran paso: entendimos qué es una bodega, qué funciones cumple, cómo se organiza, qué tipos existen y cómo fluye el material.</p>
+                <p>Ahora viene lo operativo: vamos a aprender en detalle cómo se recibe la mercadería, cómo se verifica, cómo se almacena correctamente y cómo se prepara un pedido. Todo eso con las medidas de seguridad que ya aprendimos en los módulos anteriores.</p>
+                <p>Recuerden: una bodega no es un lugar donde se amontonan cosas. Es un sistema. Y ustedes son quienes hacen que ese sistema funcione correctamente todos los días.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Una bodega bien gestionada responde cuatro preguntas:<br>Qué tengo, cuánto tengo, dónde está y en qué condición está."</p>
+                
+                <a href="parte7.html" class="next-module">Siguiente Módulo: Recepción de Mercaderías →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            
+            // ELIMINAR CONTROLES TTS
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            
+            // ELIMINAR VIDEOS E IMÁGENES
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            
+            currentUtterance.onend = () => { resetSection(section); };
+            
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

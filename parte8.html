@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 8: Almacenamiento y Ubicación de Productos</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.correcto { border-top: 5px solid #27ae60; }
+    .caja.incorrecto { border-top: 5px solid #e74c3c; }
+    .caja.correcto h5 { color: #27ae60; }
+    .caja.incorrecto h5 { color: #c0392b; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .ubicacion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 25px 0; }
+    .ubicacion-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; transition: all 0.3s; }
+    .ubicacion-item:hover { border-color: #f39c12; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .ubicacion-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 8px; }
+    .ubicacion-item .coord { font-family: 'Courier New', monospace; font-size: 20px; font-weight: bold; color: #f39c12; margin: 10px 0; }
+    .rack-types { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .rack-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; border-left: 6px solid #2c5282; }
+    .rack-item h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 10px; }
+    .abc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 25px 0; }
+    .abc-item { padding: 25px; border-radius: 10px; color: white; text-align: center; }
+    .abc-a { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+    .abc-b { background: linear-gradient(135deg, #f39c12, #d68910); }
+    .abc-c { background: linear-gradient(135deg, #3498db, #2874a6); }
+    .abc-item h5 { font-size: 28px; margin-bottom: 10px; font-weight: bold; }
+    .abc-item p { font-size: 14px; line-height: 1.5; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 8: Almacenamiento y Ubicación de Productos</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción al Almacenamiento</a></li>
+                <li><a href="#criterios">2. Criterios de Ubicación</a></li>
+                <li><a href="#codificacion">3. Codificación de Ubicaciones</a></li>
+                <li><a href="#tipos-racks">4. Tipos de Estanterías (Racks)</a></li>
+                <li><a href="#capacidad">5. Capacidad y Cargas Máximas</a></li>
+                <li><a href="#clasificacion-abc">6. Clasificación ABC</a></li>
+                <li><a href="#rotacion">7. Rotación de Productos</a></li>
+                <li><a href="#condiciones">8. Condiciones de Conservación</a></li>
+                <li><a href="#incompatibles">9. Productos Incompatibles</a></li>
+                <li><a href="#errores">10. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Almacenamiento y Ubicación de Productos</h2>
+                <p>Recibir bien la mercadería es solo el primer paso. Ahora viene la pregunta clave: ¿dónde la pongo? Una buena ubicación no es casualidad: es criterio, lógica y control.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1553413077-190dd342872f?w=1200" alt="Almacenamiento en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción al Almacenamiento</h3>
+                <p>Ya sabemos recibir mercadería correctamente. Ahora viene la siguiente pregunta: ¿dónde la ponemos?</p>
+                
+                <p>Y aquí tengo que partir con una idea que quiero que se les grabe: el almacenamiento no es "buscar un hueco vacío y meter la caja ahí". Eso no es almacenamiento. Eso es amontonar.</p>
+                
+                <div class="importante">
+                    <strong>Almacenar es ubicar cada producto en un lugar específico, definido, identificado y registrado.</strong> Donde cualquier persona pueda encontrarlo sin preguntar. Donde el sistema sepa exactamente dónde está. Donde se pueda controlar, contar y despachar sin errores.
+                </div>
+                
+                <p>Piénsenlo así: si yo almaceno mal, ¿qué pasa después?</p>
+                <ul>
+                    <li>Alguien tiene que ir a buscar el producto y no lo encuentra. Pierde tiempo.</li>
+                    <li>El sistema dice que tengo stock, pero nadie sabe dónde está. Es un "stock fantasma".</li>
+                    <li>El producto se vence porque quedó escondido detrás de otros más nuevos.</li>
+                    <li>Se mezcla con productos incompatibles y se produce una reacción peligrosa.</li>
+                    <li>Se daña porque se puso en un lugar donde no correspondía.</li>
+                </ul>
+                
+                <p>Todos estos problemas nacen de una misma causa: no tener criterio al almacenar.</p>
+                
+                <div class="destacado">
+                    Una buena ubicación no se improvisa. Se decide con criterio, se registra en el sistema y se mantiene en el tiempo. Por eso el almacenamiento es una de las tareas más importantes del bodeguero.
+                </div>
+                
+                <p>Y aquí quiero que entiendan algo: el almacenamiento no es una tarea física solamente. Es una tarea de gestión. Porque cuando ustedes ubican un producto, están tomando decisiones que afectan al picking, al inventario, al control, al despacho y al cliente final.</p>
+            </section>
+
+            <section class="section" id="criterios">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Criterios de Ubicación</h3>
+                <p>Antes de mover una caja, tenemos que hacernos una serie de preguntas. Estas preguntas son las que determinan dónde va cada producto.</p>
+                
+                <h4>Los criterios fundamentales son:</h4>
+                
+                <h5>1. Rotación del producto</h5>
+                <p>Los productos que más se mueven deben estar más cerca de la zona de despacho y en ubicaciones de fácil acceso. Los productos de baja rotación pueden ir en zonas más lejanas o en niveles superiores.</p>
+                <ul>
+                    <li><strong>Alta rotación:</strong> cerca del despacho, niveles medios (a la altura de los ojos).</li>
+                    <li><strong>Media rotación:</strong> zonas intermedias, niveles medios y bajos.</li>
+                    <li><strong>Baja rotación:</strong> zonas lejanas, niveles superiores.</li>
+                </ul>
+                
+                <h5>2. Peso del producto</h5>
+                <p>Los productos pesados deben ir en niveles bajos. Los livianos, en niveles superiores. Esto es por seguridad y por eficiencia.</p>
+                <ul>
+                    <li>Nivel bajo: productos pesados y de gran volumen.</li>
+                    <li>Nivel medio: productos de peso y volumen medio, de alta rotación.</li>
+                    <li>Nivel alto: productos livianos y de baja rotación.</li>
+                </ul>
+                
+                <h5>3. Volumen del producto</h5>
+                <p>Los productos voluminosos requieren ubicaciones especiales. No caben en estanterías estándar y pueden necesitar zonas de piso demarcadas.</p>
+                
+                <h5>4. Fragilidad del producto</h5>
+                <p>Los productos frágiles no pueden ir debajo de productos pesados. Deben ir en zonas protegidas, sin riesgo de caída o aplastamiento.</p>
+                
+                <h5>5. Condiciones de conservación</h5>
+                <p>Algunos productos requieren temperatura controlada, humedad controlada o protección contra la luz. Estos van a zonas especiales (cadena de frío, bodegas climatizadas).</p>
+                
+                <h5>6. Peligrosidad del producto</h5>
+                <p>Las sustancias peligrosas van a bodegas específicas, segregadas del resto, con condiciones especiales de ventilación, contención y señalización.</p>
+                
+                <h5>7. Valor del producto</h5>
+                <p>Los productos de alto valor suelen ir en zonas con mayor seguridad: jaulas, cámaras, áreas con control de acceso.</p>
+                
+                <h5>8. Compatibilidad entre productos</h5>
+                <p>No se pueden almacenar juntos productos incompatibles. Un químico oxidante no puede estar al lado de un producto inflamable.</p>
+                
+                <div class="importante">
+                    <strong>Estos criterios no son opcionales.</strong> Cada producto tiene sus características y su lugar en la bodega se decide en función de esas características. No se guarda donde hay espacio: se guarda donde corresponde.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben cuánto tiempo tarda encontrar un producto en su bodega actual? Si tardan más de dos minutos en encontrar algo, tenemos un problema de ubicación o de identificación.</p>
+            </section>
+
+            <section class="section" id="codificacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Codificación de Ubicaciones</h3>
+                <p>Para que cualquier persona pueda encontrar un producto, las ubicaciones deben estar codificadas. Es decir, cada espacio de la bodega debe tener una dirección única.</p>
+                
+                <p>Piénsenlo como la dirección de una casa: Calle, Número, Departamento. En la bodega tenemos algo parecido.</p>
+                
+                <h4>Estructura típica de una ubicación</h4>
+                <p>La ubicación se compone generalmente de estos elementos:</p>
+                
+                <div class="ubicacion-grid">
+                    <div class="ubicacion-item">
+                        <h5>Zona</h5>
+                        <div class="coord">A</div>
+                        <p>Área general de la bodega</p>
+                    </div>
+                    <div class="ubicacion-item">
+                        <h5>Pasillo</h5>
+                        <div class="coord">03</div>
+                        <p>Número del pasillo</p>
+                    </div>
+                    <div class="ubicacion-item">
+                        <h5>Rack</h5>
+                        <div class="coord">12</div>
+                        <p>Número de estantería</p>
+                    </div>
+                    <div class="ubicacion-item">
+                        <h5>Nivel</h5>
+                        <div class="coord">02</div>
+                        <p>Altura en el rack</p>
+                    </div>
+                    <div class="ubicacion-item">
+                        <h5>Posición</h5>
+                        <div class="coord">04</div>
+                        <p>Posición horizontal</p>
+                    </div>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Una ubicación como <strong>A-03-12-02-04</strong> significa:</p>
+                    <ul>
+                        <li><strong>A:</strong> Zona A de la bodega</li>
+                        <li><strong>03:</strong> Pasillo 3</li>
+                        <li><strong>12:</strong> Rack número 12</li>
+                        <li><strong>02:</strong> Segundo nivel de altura</li>
+                        <li><strong>04:</strong> Cuarta posición horizontal</li>
+                    </ul>
+                    <p>Con esa información, cualquier persona puede ir directo al lugar sin preguntar. Y el sistema sabe exactamente dónde está cada producto.</p>
+                </div>
+                
+                <h4>Señalización de ubicaciones</h4>
+                <p>Cada rack y cada posición debe estar claramente señalizado. Puede ser con carteles, etiquetas, códigos de barras o RFID. Lo importante es que sea visible, legible y coherente con lo que dice el sistema.</p>
+                
+                <div class="destacado">
+                    Una bodega sin codificación de ubicaciones es como una ciudad sin calles ni números. Se puede vivir, pero cualquier trámite se vuelve un problema.
+                </div>
+                
+                <p>Y aquí viene una idea importante: la codificación de ubicaciones es lo que permite que un trabajador nuevo pueda encontrar un producto sin preguntar. Es lo que hace que el picking sea rápido. Es lo que permite que los conteos de inventario sean precisos.</p>
+            </section>
+
+            <section class="section" id="tipos-racks">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Tipos de Estanterías (Racks)</h3>
+                <p>No todas las estanterías son iguales. Dependiendo del tipo de producto y del tipo de operación, se usan diferentes sistemas de almacenamiento.</p>
+                
+                <div class="rack-types">
+                    <div class="rack-item">
+                        <h5>Rack Selectivo</h5>
+                        <p>Es el más común. Permite acceder directamente a cada pallet o posición. Es ideal cuando hay muchos productos diferentes y se necesita acceso individual a cada uno.</p>
+                        <p><strong>Ventaja:</strong> acceso directo a todos los productos.</p>
+                        <p><strong>Desventaja:</strong> no aprovecha tan bien el espacio vertical.</p>
+                    </div>
+                    <div class="rack-item">
+                        <h5>Rack Drive-In</h5>
+                        <p>La grúa horquilla entra dentro del rack para dejar o retirar pallets. Se usa para almacenar gran cantidad de pallets del mismo producto.</p>
+                        <p><strong>Ventaja:</strong> aprovecha muy bien el espacio.</p>
+                        <p><strong>Desventaja:</strong> no permite acceso directo a todos los pallets (sistema LIFO).</p>
+                    </div>
+                    <div class="rack-item">
+                        <h5>Rack Dinámico (Flow Rack)</h5>
+                        <p>Los productos entran por un extremo y salen por el otro, aprovechando la gravedad. Permite aplicar FIFO automáticamente.</p>
+                        <p><strong>Ventaja:</strong> rotación automática, ideal para productos con vencimiento.</p>
+                        <p><strong>Desventaja:</strong> inversión inicial más alta.</p>
+                    </div>
+                    <div class="rack-item">
+                        <h5>Rack Push-Back</h5>
+                        <p>Los pallets se empujan hacia atrás y el último en entrar es el primero en salir. Útil para productos de media rotación.</p>
+                        <p><strong>Ventaja:</strong> mayor densidad que el selectivo.</p>
+                        <p><strong>Desventaja:</strong> funciona como LIFO.</p>
+                    </div>
+                    <div class="rack-item">
+                        <h5>Estanterías Livianas (Shelving)</h5>
+                        <p>Para productos pequeños, cajas, piezas sueltas. Se usan en pañoles, zonas de picking manual y áreas de repuestos.</p>
+                        <p><strong>Ventaja:</strong> ideal para picking manual y productos de bajo volumen.</p>
+                        <p><strong>Desventaja:</strong> no soportan pallets ni grandes cargas.</p>
+                    </div>
+                    <div class="rack-item">
+                        <h5>Rack Cantilever</h5>
+                        <p>Diseñado para productos largos o de formas irregulares: tubos, perfiles, maderas, barras.</p>
+                        <p><strong>Ventaja:</strong> permite almacenar cargas largas sin obstáculos frontales.</p>
+                        <p><strong>Desventaja:</strong> uso específico, no sirve para pallets estándar.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>El tipo de rack se elige según el producto, no al revés.</strong> No podemos obligar a un producto a entrar en un rack que no corresponde. Hay que pensar en su peso, volumen, rotación y condiciones especiales.
+                </div>
+                
+                <p>Y algo muy importante: los racks tienen una capacidad máxima de carga que debe estar claramente señalizada. Nunca se debe exceder esa capacidad. Un rack sobrecargado puede colapsar y provocar un accidente grave.</p>
+            </section>
+
+            <section class="section" id="capacidad">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Capacidad y Cargas Máximas</h3>
+                <p>Cada rack tiene una capacidad máxima de carga. Esa capacidad debe estar señalizada en cada estructura, generalmente con una placa metálica que indica cuánto peso soporta cada nivel y cuánto soporta la estructura completa.</p>
+                
+                <h4>¿Por qué es tan importante respetar la capacidad?</h4>
+                <ul>
+                    <li><strong>Seguridad:</strong> un rack sobrecargado puede deformarse, pandearse o colapsar.</li>
+                    <li><strong>Integridad del producto:</strong> el peso excesivo puede dañar la mercadería almacenada.</li>
+                    <li><strong>Vida útil del rack:</strong> el sobrepeso acorta la vida útil de la estructura.</li>
+                    <li><strong>Riesgo de accidente grave:</strong> un colapso de rack puede causar lesiones serias o fatales.</li>
+                </ul>
+                
+                <h4>Reglas básicas</h4>
+                <ul>
+                    <li>Los productos más pesados siempre van en los niveles bajos.</li>
+                    <li>Los productos livianos van en los niveles superiores.</li>
+                    <li>La carga debe distribuirse de manera uniforme en cada nivel.</li>
+                    <li>No se deben apoyar pallets dañados en los racks.</li>
+                    <li>Los pallets deben respetar las dimensiones del rack (no sobresalir).</li>
+                    <li>Los racks deben estar anclados al piso para evitar vuelcos.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Un rack no es un lugar donde meter cualquier cosa. Es una estructura diseñada para soportar una carga específica. Respetar esa carga es respetar la vida de las personas que trabajan cerca.
+                </div>
+                
+                <p>Y algo muy importante: los racks deben ser inspeccionados periódicamente. Si se detecta una viga deformada, un perno suelto, una base dañada, hay que reportarlo inmediatamente. Un rack dañado puede colapsar sin previo aviso.</p>
+            </section>
+
+            <section class="section" id="clasificacion-abc">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Clasificación ABC</h3>
+                <p>Ahora viene un concepto muy útil que se usa en la gestión de inventarios y que también aplica al almacenamiento: la clasificación ABC. Se basa en el principio de Pareto: no todos los productos tienen la misma importancia.</p>
+                
+                <div class="abc-grid">
+                    <div class="abc-item abc-a">
+                        <h5>A</h5>
+                        <p><strong>20% de los productos</strong> que generan el 80% del movimiento o valor.</p>
+                        <p>Alta prioridad. Se controlan estrictamente.</p>
+                    </div>
+                    <div class="abc-item abc-b">
+                        <h5>B</h5>
+                        <p><strong>30% de los productos</strong> con importancia intermedia.</p>
+                        <p>Control moderado.</p>
+                    </div>
+                    <div class="abc-item abc-c">
+                        <h5>C</h5>
+                        <p><strong>50% de los productos</strong> que generan poco movimiento o valor.</p>
+                        <p>Control relajado.</p>
+                    </div>
+                </div>
+                
+                <h4>¿Cómo se aplica al almacenamiento?</h4>
+                <ul>
+                    <li><strong>Productos A:</strong> ubicaciones de fácil acceso, cerca del despacho, en niveles medios. Son los que más se mueven, así que cada minuto que ahorramos en ir a buscarlos, suma mucho.</li>
+                    <li><strong>Productos B:</strong> ubicaciones intermedias, niveles medios y bajos.</li>
+                    <li><strong>Productos C:</strong> zonas lejanas, niveles altos o áreas menos accesibles.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Imaginen una bodega con 1000 productos diferentes.</p>
+                    <ul>
+                        <li>200 productos (A) representan el 80% de los despachos. Estos van en las mejores ubicaciones.</li>
+                        <li>300 productos (B) son los de movimiento medio. Van en zonas intermedias.</li>
+                        <li>500 productos (C) casi no se mueven. Van en zonas lejanas o niveles altos.</li>
+                    </ul>
+                    <p>Si ubicamos los productos A en las mejores zonas, el picking es mucho más rápido. Si no hacemos esta clasificación, estamos tratando a todos los productos igual, y eso no tiene sentido.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>La clasificación ABC no es fija.</strong> Un producto que hoy es A puede mañana ser C si cambia la demanda. Por eso se debe revisar periódicamente, idealmente cada 3 a 6 meses.
+                </div>
+                
+                <p>Y aquí viene una conexión con Compras: los productos A son los que más se compran, los que más se mueven, los que generan más trabajo. Si Compras compra demasiado de un producto A, genera sobrestock. Si compra poco, genera quiebre. La gestión de la categoría A debe ser muy ajustada.</p>
+            </section>
+
+            <section class="section" id="rotacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Rotación de Productos</h3>
+                <p>La rotación es la velocidad con que un producto entra y sale de la bodega. Y entender la rotación es clave para evitar que los productos se venzan, se deterioren o queden obsoletos.</p>
+                
+                <h4>Los sistemas de rotación más usados</h4>
+                
+                <h5>FIFO - First In, First Out (Primero en Entrar, Primero en Salir)</h5>
+                <p>El producto que llegó primero, sale primero. Se aplica a la mayoría de los productos, especialmente los que tienen vencimiento o pueden deteriorarse con el tiempo.</p>
+                <ul>
+                    <li><strong>Cuándo se usa:</strong> productos con vencimiento, productos perecibles, alimentos, químicos.</li>
+                    <li><strong>Cómo se logra:</strong> colocando lo nuevo detrás de lo viejo, usando racks dinámicos, identificando fechas.</li>
+                </ul>
+                
+                <h5>FEFO - First Expired, First Out (Primero en Vencer, Primero en Salir)</h5>
+                <p>El producto que vence primero, sale primero. Es una variante del FIFO más precisa para productos con vencimiento.</p>
+                <ul>
+                    <li><strong>Cuándo se usa:</strong> productos con diferentes fechas de vencimiento, incluso si llegaron en lotes diferentes.</li>
+                    <li><strong>Ejemplo:</strong> si tengo un producto A que vence en diciembre y un producto B que vence en octubre, sale primero B aunque haya llegado después.</li>
+                </ul>
+                
+                <h5>LIFO - Last In, Last Out (Último en Entrar, Último en Salir)</h5>
+                <p>El producto que llegó último, sale primero. Se usa poco en bodega, pero puede aplicarse a productos que no se deterioran con el tiempo.</p>
+                <ul>
+                    <li><strong>Cuándo se usa:</strong> productos sin vencimiento, materiales de construcción, metales.</li>
+                    <li><strong>Desventaja:</strong> puede generar obsolescencia en productos que sí se deterioran.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>En la mayoría de las bodegas se usa FIFO o FEFO.</strong> Porque la mayoría de los productos tienen algún tipo de deterioro: vencimiento, oxidación, degradación, obsolescencia. Y dejar un producto viejo atrás es condenarlo a convertirse en merma.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes saben qué productos en su bodega están próximos a vencer? Si no lo saben, tenemos un problema de control. Porque el producto que vence en bodega es un costo directo para la empresa.</p>
+                
+                <div class="destacado">
+                    La rotación no es un tema del futuro, cuando lleguemos al módulo específico. Es un criterio que se aplica desde el primer día en que almacenamos un producto. Si no rotamos bien, generamos mermas.
+                </div>
+            </section>
+
+            <section class="section" id="condiciones">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Condiciones de Conservación</h3>
+                <p>No todos los productos pueden almacenarse en las mismas condiciones. Algunos requieren cuidados especiales para mantener su calidad y seguridad.</p>
+                
+                <h4>Condiciones ambientales</h4>
+                <ul>
+                    <li><strong>Temperatura:</strong> algunos productos requieren cadena de frío (refrigerados o congelados), otros no soportan el calor excesivo.</li>
+                    <li><strong>Humedad:</strong> productos como papel, cartón, electrónicos pueden dañarse con humedad alta.</li>
+                    <li><strong>Luz:</strong> algunos productos se degradan con la luz solar directa.</li>
+                    <li><strong>Ventilación:</strong> zonas con productos químicos requieren ventilación forzada para evitar acumulación de vapores.</li>
+                </ul>
+                
+                <h4>Condiciones físicas</h4>
+                <ul>
+                    <li><strong>Protección contra golpes:</strong> productos frágiles deben ir en zonas protegidas.</li>
+                    <li><strong>Protección contra polvo:</strong> productos sensibles al polvo requieren envoltorio o zonas cerradas.</li>
+                    <li><strong>Aislamiento:</strong> productos de alto valor pueden requerir zonas con control de acceso.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>¿Cómo sé qué condiciones requiere cada producto?</h5>
+                    <p>La información está en:</p>
+                    <ul>
+                        <li><strong>Etiqueta del producto:</strong> generalmente indica temperatura de almacenamiento, humedad máxima, etc.</li>
+                        <li><strong>Hoja de Datos de Seguridad (HDS):</strong> para productos químicos, detalla condiciones específicas de almacenamiento.</li>
+                        <li><strong>Ficha técnica del producto:</strong> el proveedor entrega esta información.</li>
+                        <li><strong>Normativa específica:</strong> para ciertos productos (alimentos, medicamentos) hay regulaciones que indican las condiciones.</li>
+                    </ul>
+                </div>
+                
+                <div class="importante">
+                    <strong>Si no conocemos las condiciones de conservación de un producto, no podemos almacenarlo correctamente.</strong> Por eso la información técnica es tan importante. Y por eso Compras debe asegurar que el proveedor entregue toda la documentación necesaria al momento de la compra.
+                </div>
+                
+                <p>Y algo que quiero destacar: si un producto se almacena en condiciones incorrectas, se convierte en merma. Y esa merma es un costo que se pudo haber evitado con una buena decisión de ubicación.</p>
+            </section>
+
+            <section class="section" id="incompatibles">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Productos Incompatibles</h3>
+                <p>Ahora viene un tema crítico, especialmente si en la bodega manejamos productos químicos o sustancias peligrosas: la incompatibilidad.</p>
+                
+                <p>Hay productos que, si se mezclan o si entran en contacto por un derrame, pueden reaccionar de manera peligrosa. Por eso, deben almacenarse segregados.</p>
+                
+                <h4>Ejemplos de incompatibilidades</h4>
+                <ul>
+                    <li><strong>Oxidantes con inflamables:</strong> pueden provocar incendios o explosiones.</li>
+                    <li><strong>Ácidos con bases:</strong> reacción química violenta.</li>
+                    <li><strong>Cianuros con ácidos:</strong> liberan gases altamente tóxicos.</li>
+                    <li><strong>Productos alimenticios con químicos:</strong> riesgo de contaminación.</li>
+                    <li><strong>Productos inflamables con fuentes de calor:</strong> riesgo de incendio.</li>
+                </ul>
+                
+                <h4>¿Cómo sé qué productos son incompatibles?</h4>
+                <ul>
+                    <li><strong>Hoja de Datos de Seguridad (HDS):</strong> sección de incompatibilidades.</li>
+                    <li><strong>Matriz de compatibilidad:</strong> tabla que muestra qué productos pueden o no almacenarse juntos.</li>
+                    <li><strong>Normativa específica (DS 43 en Chile):</strong> regula el almacenamiento de sustancias peligrosas.</li>
+                </ul>
+                
+                <h4>¿Cómo se logra la segregación?</h4>
+                <ul>
+                    <li><strong>Distancia:</strong> alejar físicamente los productos incompatibles.</li>
+                    <li><strong>Barreras físicas:</strong> muros, muros cortafuego, estanterías separadoras.</li>
+                    <li><strong>Bodegas diferentes:</strong> para productos altamente incompatibles, usar bodegas separadas.</li>
+                    <li><strong>Contención secundaria:</strong> cubetos de retención que contengan derrames.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Antes de almacenar un producto químico nuevo, debemos revisar su HDS y verificar si es compatible con lo que ya tenemos en bodega.</strong> Si no lo es, hay que buscar una ubicación segregada o evaluar si realmente es viable recibir ese producto.
+                </div>
+                
+                <p>Y aquí viene una conexión con Compras: si Compras va a adquirir un producto químico nuevo, debe coordinar con Bodega antes de emitir la orden de compra. Porque si no hay dónde almacenarlo de manera segura, la compra puede convertirse en un problema.</p>
+                
+                <div class="destacado">
+                    La incompatibilidad no es un tema menor. Un error de segregación puede generar un incendio, una explosión, una fuga tóxica o la contaminación de productos alimenticios. Es uno de los temas donde la prevención debe ser absoluta.
+                </div>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Errores Comunes en el Almacenamiento</h3>
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes que se cometen al almacenar. Conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: Almacenar donde hay espacio, no donde corresponde</h4>
+                <p>Esto es el error más común. Llega mercadería, veo un espacio vacío y la pongo ahí. Pero ese espacio puede no ser el adecuado para ese producto.</p>
+                
+                <h4>Error 2: No registrar la ubicación en el sistema</h4>
+                <p>Almaceno físicamente pero no actualizo el sistema. El producto está en la bodega pero nadie sabe dónde.</p>
+                
+                <h4>Error 3: Mezclar productos incompatibles</h4>
+                <p>Poner un químico al lado de un alimento, o un oxidante al lado de un inflamable. Peligroso.</p>
+                
+                <h4>Error 4: Sobrepasar la capacidad del rack</h4>
+                <p>Cargar más peso del permitido. Riesgo de colapso.</p>
+                
+                <h4>Error 5: No respetar la rotación (FIFO/FEFO)</h4>
+                <p>Poner lo nuevo delante de lo viejo. El producto viejo queda atrás y puede vencerse.</p>
+                
+                <h4>Error 6: Bloquear accesos</h4>
+                <p>Almacenar en pasillos, frente a extintores, frente a salidas de emergencia. Grave riesgo de seguridad.</p>
+                
+                <h4>Error 7: No identificar el producto</h4>
+                <p>Dejar productos sin etiqueta, sin código, sin información. Después nadie sabe qué es.</p>
+                
+                <h4>Error 8: Dejar productos en la zona de recepción</h4>
+                <p>La zona de recepción es de tránsito. Si no se lleva el producto a su ubicación definitiva, se genera desorden.</p>
+                
+                <div class="comparacion">
+                    <div class="caja correcto">
+                        <h5>Almacenamiento correcto</h5>
+                        <ul>
+                            <li>Ubicación definida por criterio.</li>
+                            <li>Registro inmediato en el sistema.</li>
+                            <li>Respeto de capacidad del rack.</li>
+                            <li>Rotación FIFO/FEFO aplicada.</li>
+                            <li>Productos incompatibles segregados.</li>
+                            <li>Señalización clara.</li>
+                        </ul>
+                    </div>
+                    <div class="caja incorrecto">
+                        <h5>Almacenamiento incorrecto</h5>
+                        <ul>
+                            <li>Ubicación improvisada.</li>
+                            <li>Sin registro en el sistema.</li>
+                            <li>Rack sobrecargado.</li>
+                            <li>Sin rotación, productos viejos atrás.</li>
+                            <li>Productos incompatibles mezclados.</li>
+                            <li>Sin señalización.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="destacado">
+                    Un buen almacenamiento no se nota. Cuando todo está bien ubicado, identificado y registrado, la operación fluye sin problemas. Cuando algo falla, el problema se ve inmediatamente: productos perdidos, demoras en el picking, mermas, accidentes.
+                </div>
+                
+                <p>Y quiero cerrar con una idea: el almacenamiento no es una tarea que termina cuando dejo la caja en el rack. El almacenamiento es una decisión que afecta toda la cadena: picking, inventario, control, despacho, clientes. Por eso debe hacerse con criterio, con calma y con responsabilidad.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>Almacenar correctamente es mucho más que "poner una caja en un estante". Es aplicar criterio, respetar las características del producto, conocer las reglas de seguridad y registrar cada movimiento en el sistema.</p>
+                <p>Una bodega con buen almacenamiento es una bodega donde todo el mundo encuentra lo que busca, donde los inventarios cuadran, donde los productos no se vencen y donde los accidentes son mínimos. Una bodega con mal almacenamiento es un caos permanente.</p>
+                <p>Y recuerden: el criterio de ubicación no es un capricho. Es el resultado de analizar la rotación, el peso, el volumen, la fragilidad, la peligrosidad y las condiciones de conservación de cada producto. Ese análisis es lo que hace la diferencia entre un bodeguero profesional y un simple movidos de cajas.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Un producto bien ubicado se encuentra rápido, se conserva bien y se despacha sin errores.<br>Un producto mal ubicado es un problema que apenas comienza."</p>
+                
+                <a href="parte9.html" class="next-module">Siguiente Módulo: Manipulación Manual y Mecanizada de Cargas →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            
+            // ELIMINAR CONTROLES TTS
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            
+            // ELIMINAR VIDEOS E IMÁGENES
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            
+            currentUtterance.onend = () => { resetSection(section); };
+            
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 4: Orden, Aseo y Metodología 5S</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.mala { border-top: 5px solid #e74c3c; }
+    .caja.buena { border-top: 5px solid #27ae60; }
+    .caja.mala h5 { color: #c0392b; }
+    .caja.buena h5 { color: #27ae60; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .cinco-s { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .s-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.3s; }
+    .s-item:hover { border-color: #f39c12; transform: translateX(5px); }
+    .s-item .s-numero { display: inline-block; background: #f39c12; color: white; width: 35px; height: 35px; border-radius: 50%; text-align: center; line-height: 35px; font-weight: bold; margin-right: 10px; }
+    .s-item h5 { display: inline; color: #1e3a5f; font-size: 18px; }
+    .s-item .s-japones { color: #718096; font-size: 13px; font-style: italic; margin-left: 10px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 4: Orden, Aseo y Metodología 5S</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción al Orden y Aseo</a></li>
+                <li><a href="#orden-seguridad">2. Orden = Seguridad</a></li>
+                <li><a href="#que-son-5s">3. ¿Qué son las 5S?</a></li>
+                <li><a href="#seiri">4. Primera S: Seiri (Clasificar)</a></li>
+                <li><a href="#seiton">5. Segunda S: Seiton (Ordenar)</a></li>
+                <li><a href="#seiso">6. Tercera S: Seiso (Limpiar)</a></li>
+                <li><a href="#seiketsu">7. Cuarta S: Seiketsu (Estandarizar)</a></li>
+                <li><a href="#shitsuke">8. Quinta S: Shitsuke (Disciplina)</a></li>
+                <li><a href="#implementacion">9. Implementación en Bodega</a></li>
+                <li><a href="#beneficios">10. Beneficios y Resultados</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Orden, Aseo y Metodología 5S</h2>
+                <p>Una bodega desordenada no solo es poco eficiente: es peligrosa. Aprende cómo la metodología 5S transforma el espacio de trabajo, mejora la seguridad y hace que todo funcione mejor.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1565793298595-6a879b1d94b8?w=1200" alt="Bodega ordenada" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción al Orden y Aseo</h3>
+                <p>Antes de hablar de metodología, de nombres en japonés o de sistemas complicados, quiero que pensemos en algo muy simple.</p>
+                
+                <p>¿Alguna vez han entrado a una bodega donde las cajas están apiladas sin criterio, los pasillos están bloqueados, hay herramientas tiradas en el suelo y nadie encuentra nada? Esa bodega no solo es un desorden visual. Es un problema de seguridad, de eficiencia y de control.</p>
+                
+                <p>Y lo más curioso: muchas veces ese desorden no es culpa de nadie en particular. Es el resultado de no tener un sistema. De ir dejando cosas "por ahora", "después lo ordeno", "total, yo sé dónde está".</p>
+                
+                <p>Pero cuando el "yo sé dónde está" se va de vacaciones, o cuando llega un trabajador nuevo, el problema aparece completo.</p>
+                
+                <div class="importante">
+                    <strong>El orden y el aseo no son tareas secundarias.</strong> Son la base de una bodega que funciona bien, que es segura y que permite encontrar lo que se necesita cuando se necesita.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se les grabe: una bodega ordenada es una bodega más segura. Porque cuando todo tiene su lugar, cuando los pasillos están despejados, cuando no hay cosas tiradas en el suelo, los accidentes disminuyen drásticamente.</p>
+                
+                <p>Por eso, antes de aprender a recibir mercadería, a manejar inventarios o a operar equipos, tenemos que aprender a mantener el orden. Y para eso, existe una metodología probada en todo el mundo: las 5S.</p>
+            </section>
+
+            <section class="section" id="orden-seguridad">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Orden = Seguridad</h3>
+                <p>Esta es una ecuación muy simple pero muy poderosa: orden es igual a seguridad.</p>
+                
+                <p>Pensemos en situaciones reales de bodega:</p>
+                
+                <ul>
+                    <li>Un pasillo bloqueado con cajas puede provocar un atropello si pasa una grúa horquilla.</li>
+                    <li>Una herramienta tirada en el suelo puede provocar una caída.</li>
+                    <li>Un producto químico sin identificar, perdido entre otras cajas, puede provocar una reacción peligrosa.</li>
+                    <li>Una estantería sobrecargada con productos que no corresponden puede colapsar.</li>
+                    <li>Un extintor tapado por mercadería no sirve en una emergencia.</li>
+                </ul>
+                
+                <p>Todos estos problemas tienen algo en común: son consecuencia del desorden.</p>
+                
+                <div class="comparacion">
+                    <div class="caja mala">
+                        <h5>Bodega desordenada</h5>
+                        <p>Pasillos bloqueados, productos sin identificar, herramientas perdidas, estanterías sobrecargadas, extintores tapados, accidentes frecuentes, pérdida de tiempo buscando cosas.</p>
+                    </div>
+                    <div class="caja buena">
+                        <h5>Bodega ordenada</h5>
+                        <p>Pasillos despejados, productos identificados y ubicados, herramientas en su lugar, estanterías con carga adecuada, equipos de emergencia accesibles, menos accidentes, eficiencia.</p>
+                    </div>
+                </div>
+                
+                <p>Y hay algo más: el desorden genera estrés. Trabajar en un lugar donde no encuentras lo que necesitas, donde tienes que esquivar obstáculos, donde todo está tirado, cansa mentalmente. Y un trabajador cansado o estresado comete más errores.</p>
+                
+                <div class="destacado">
+                    El orden no es una cuestión estética. Es una cuestión de seguridad, eficiencia y salud mental.
+                </div>
+                
+                <p>Por eso, cuando hablemos de las 5S, no lo hagan como una tarea más que hay que cumplir. Háganlo entendiendo que están cuidando su propia seguridad y la de sus compañeros.</p>
+            </section>
+
+            <section class="section" id="que-son-5s">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. ¿Qué son las 5S?</h3>
+                <p>Las 5S son una metodología japonesa de organización del lugar de trabajo. Nacieron en Toyota, después de la Segunda Guerra Mundial, cuando la empresa necesitaba reconstruirse y ser eficiente con pocos recursos.</p>
+                
+                <p>El nombre viene de cinco palabras japonesas que comienzan con la letra S. Cada una representa una etapa del proceso de orden y limpieza.</p>
+                
+                <div class="cinco-s">
+                    <div class="s-item">
+                        <span class="s-numero">1</span>
+                        <h5>Seiri</h5>
+                        <span class="s-japones">Clasificar</span>
+                        <p>Separar lo necesario de lo innecesario. Eliminar lo que no sirve.</p>
+                    </div>
+                    <div class="s-item">
+                        <span class="s-numero">2</span>
+                        <h5>Seiton</h5>
+                        <span class="s-japones">Ordenar</span>
+                        <p>Un lugar para cada cosa y cada cosa en su lugar.</p>
+                    </div>
+                    <div class="s-item">
+                        <span class="s-numero">3</span>
+                        <h5>Seiso</h5>
+                        <span class="s-japones">Limpiar</span>
+                        <p>Mantener el espacio limpio y detectar anomalías durante la limpieza.</p>
+                    </div>
+                    <div class="s-item">
+                        <span class="s-numero">4</span>
+                        <h5>Seiketsu</h5>
+                        <span class="s-japones">Estandarizar</span>
+                        <p>Crear procedimientos para mantener las tres primeras S.</p>
+                    </div>
+                    <div class="s-item">
+                        <span class="s-numero">5</span>
+                        <h5>Shitsuke</h5>
+                        <span class="s-japones">Disciplina</span>
+                        <p>Hacer de las 5S un hábito, una forma de trabajar.</p>
+                    </div>
+                </div>
+                
+                <p>No se asusten por los nombres en japonés. Lo importante es la lógica que hay detrás. Cada S construye sobre la anterior, y juntas forman un sistema completo de organización.</p>
+                
+                <div class="importante">
+                    <strong>Las 5S no son una limpieza de un día.</strong> Son una forma de trabajar todos los días. Si se aplican solo una vez y después se olvidan, no sirven de nada.
+                </div>
+                
+                <p>Y algo muy importante: las 5S no son solo para bodegas grandes. Se pueden aplicar en cualquier espacio de trabajo: una oficina, un taller, una cocina, un taller mecánico. Donde haya personas trabajando, las 5S pueden ayudar.</p>
+                
+                <p>Ahora vamos a ver cada una en detalle, con ejemplos aplicados a nuestra bodega.</p>
+            </section>
+
+            <section class="section" id="seiri">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Primera S: Seiri (Clasificar)</h3>
+                <p>La primera S es la más sencilla de entender, pero también la más difícil de aplicar: clasificar.</p>
+                
+                <p>Se trata de separar lo necesario de lo innecesario. Y ojo: "innecesario" no significa "que algún día podría servir". Significa que en este momento, en este lugar, no se necesita.</p>
+                
+                <h4>¿Qué debemos clasificar en una bodega?</h4>
+                <ul>
+                    <li><strong>Productos:</strong> ¿hay productos obsoletos, vencidos, dañados o que hace meses no se mueven?</li>
+                    <li><strong>Herramientas:</strong> ¿hay herramientas rotas, duplicadas o que nadie usa?</li>
+                    <li><strong>Equipos:</strong> ¿hay equipos en desuso, pallets rotos, cajas vacías acumuladas?</li>
+                    <li><strong>Documentación:</strong> ¿hay papeles viejos, guías antiguas, registros que ya no sirven?</li>
+                    <li><strong>Elementos personales:</strong> ¿hay cosas de trabajadores que ya no están?</li>
+                </ul>
+                
+                <h4>¿Cómo aplicamos Seiri?</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Recorrer el espacio:</strong> caminar por toda la bodega y mirar con ojos críticos.</li>
+                        <li><strong>Identificar lo innecesario:</strong> preguntar "¿esto se usa? ¿cuándo fue la última vez? ¿seguimos necesitándolo?"</li>
+                        <li><strong>Separar:</strong> lo innecesario se retira del área de trabajo.</li>
+                        <li><strong>Decidir qué hacer:</strong> ¿se devuelve al proveedor? ¿se dona? ¿se bota? ¿se lleva a otra bodega?</li>
+                        <li><strong>Registrar:</strong> dejar constancia de lo que se retiró y por qué.</li>
+                    </ol>
+                </div>
+                
+                <div class="destacado">
+                    Un error común es pensar "por si acaso lo guardo". Eso es exactamente lo que genera el desorden. Si algo no se usa, debe salir del área de trabajo.
+                </div>
+                
+                <p>Y aquí viene una pregunta importante: ¿quién decide qué es necesario y qué no? Idealmente, el responsable del área, junto con su supervisor. No es una decisión que se tome a la ligera, porque puede haber implicancias de inventario, contables o legales.</p>
+                
+                <p>Pero lo que sí es claro: si hay algo que lleva seis meses en el mismo lugar sin moverse, hay que preguntarse qué está haciendo ahí.</p>
+            </section>
+
+            <section class="section" id="seiton">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Segunda S: Seiton (Ordenar)</h3>
+                <p>Una vez que eliminamos lo innecesario, viene la segunda S: ordenar. Y aquí hay una frase que resume todo: "un lugar para cada cosa y cada cosa en su lugar".</p>
+                
+                <p>Se trata de definir dónde va cada cosa, de manera que cualquier persona pueda encontrarla y devolverla sin preguntar.</p>
+                
+                <h4>Principios del orden</h4>
+                <ul>
+                    <li><strong>Productos de alta rotación:</strong> cerca de la zona de despacho, en lugares de fácil acceso.</li>
+                    <li><strong>Productos pesados:</strong> en niveles bajos, para reducir el riesgo de caídas y sobreesfuerzos.</li>
+                    <li><strong>Productos livianos o de baja rotación:</strong> en niveles superiores.</li>
+                    <li><strong>Sustancias peligrosas:</strong> en zonas segregadas, identificadas y con condiciones específicas.</li>
+                    <li><strong>Herramientas de uso frecuente:</strong> en lugares visibles y accesibles, idealmente con sombra o silueta para saber si faltan.</li>
+                    <li><strong>Equipos de emergencia:</strong> siempre accesibles, nunca bloqueados.</li>
+                </ul>
+                
+                <h4>¿Cómo logramos el orden?</h4>
+                <ul>
+                    <li><strong>Identificación clara:</strong> cada ubicación debe tener un código (pasillo, rack, nivel, posición).</li>
+                    <li><strong>Señalización:</strong> carteles, demarcación de pisos, códigos de colores.</li>
+                    <li><strong>Mapa de bodega:</strong> un plano que muestre dónde está cada cosa.</li>
+                    <li><strong>Límites definidos:</strong> zonas demarcadas para cada tipo de producto o actividad.</li>
+                    <li><strong>Sistema FIFO/FEFO:</strong> para que los productos roten correctamente.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El orden no es solo estética.</strong> Es eficiencia. Si un trabajador tarda 10 minutos en encontrar un producto porque no está bien ubicado, en un día puede perder una hora. En un mes, muchas horas. En un año, una cantidad enorme de tiempo y dinero.
+                </div>
+                
+                <p>Y algo muy importante: el orden debe ser lógico, no caprichoso. No se trata de poner las cosas "bonitas", sino de ponerlas donde tengan sentido según su uso, su rotación, su peso y sus características.</p>
+                
+                <div class="destacado">
+                    Si alguien nuevo llega a la bodega y puede encontrar lo que necesita sin preguntar, es que el orden está bien hecho.
+                </div>
+            </section>
+
+            <section class="section" id="seiso">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Tercera S: Seiso (Limpiar)</h3>
+                <p>La tercera S es limpiar. Pero ojo: no se trata solo de barrer el piso. Seiso significa limpiar e inspeccionar al mismo tiempo.</p>
+                
+                <p>Cuando limpiamos algo, lo estamos mirando de cerca. Y en esa mirada podemos detectar cosas que de otra manera pasarían desapercibidas: una grieta en un rack, una fuga pequeña, un cable pelado, un pallet dañado, un producto vencido escondido.</p>
+                
+                <h4>¿Qué debemos limpiar en una bodega?</h4>
+                <ul>
+                    <li><strong>Pisos:</strong> libres de polvo, manchas, residuos, líquidos derramados.</li>
+                    <li><strong>Estanterías:</strong> sin polvo acumulado, sin productos vencidos olvidados.</li>
+                    <li><strong>Equipos:</strong> grúas horquilla, transpaletas, scanners, limpios y en buen estado.</li>
+                    <li><strong>Zonas de trabajo:</strong> mesas, mostradores, áreas de picking.</li>
+                    <li><strong>Baños y zonas comunes:</strong> higiene básica para la salud de todos.</li>
+                    <li><strong>Productos:</strong> revisar que no tengan polvo, humedad o daños.</li>
+                </ul>
+                
+                <h4>La limpieza como inspección</h4>
+                <p>Aquí está la clave de Seiso: mientras limpiamos, inspeccionamos. Por ejemplo:</p>
+                <ul>
+                    <li>Al barrer el piso, podemos detectar manchas de aceite que indican una fuga en un equipo.</li>
+                    <li>Al limpiar un rack, podemos ver que un perno está suelto o que una viga está deformada.</li>
+                    <li>Al limpiar una herramienta, podemos ver que está desgastada o dañada.</li>
+                    <li>Al limpiar un producto, podemos ver que tiene la fecha vencida o el envase dañado.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Limpiar no es tarea de alguien más.</strong> Cada trabajador es responsable de mantener limpia su área de trabajo. No es tarea exclusiva del personal de aseo.
+                </div>
+                
+                <p>Y algo muy importante: la limpieza también es prevención. Un piso sucio puede ser resbaladizo. Un equipo sucio puede fallar. Un producto sucio puede estar contaminado. La limpieza es salud y seguridad.</p>
+                
+                <div class="destacado">
+                    La limpieza no es una pérdida de tiempo. Es una inversión en seguridad, calidad y eficiencia.
+                </div>
+            </section>
+
+            <section class="section" id="seiketsu">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Cuarta S: Seiketsu (Estandarizar)</h3>
+                <p>Ya clasificamos, ordenamos y limpiamos. Pero, ¿cómo hacemos para que esto se mantenga en el tiempo? Ahí entra la cuarta S: estandarizar.</p>
+                
+                <p>Seiketsu significa crear procedimientos, reglas y estándares para mantener las tres primeras S. Porque si no hay un sistema, cada persona hará las cosas a su manera, y en poco tiempo volvemos al desorden inicial.</p>
+                
+                <h4>¿Qué debemos estandarizar?</h4>
+                <ul>
+                    <li><strong>Procedimientos de clasificación:</strong> cada cuánto se revisa si hay productos innecesarios, quién lo hace, cómo se registra.</li>
+                    <li><strong>Reglas de ubicación:</strong> dónde va cada tipo de producto, cómo se identifican las ubicaciones.</li>
+                    <li><strong>Programa de limpieza:</strong> qué se limpia, cuándo, quién es el responsable, cómo se registra.</li>
+                    <li><strong>Inspecciones visuales:</strong> checklist para detectar rápidamente si algo está fuera de lugar.</li>
+                    <li><strong>Códigos de colores:</strong> un sistema visual que todos entiendan.</li>
+                </ul>
+                
+                <h4>Ejemplos de estandarización</h4>
+                <ul>
+                    <li>Todas las ubicaciones tienen el mismo formato de etiqueta: pasillo-rack-nivel-posición.</li>
+                    <li>Los productos de alta rotación siempre van en la zona A, cerca del despacho.</li>
+                    <li>Los extintores se revisan mensualmente según un calendario fijo.</li>
+                    <li>Al final de cada turno, cada trabajador deja su área limpia y ordenada.</li>
+                    <li>Los pallets dañados se llevan inmediatamente a la zona de disposición final.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La estandarización permite que cualquier persona pueda hacer el trabajo de la misma manera.</strong> Si alguien se ausenta, otro puede reemplazarlo sin que el orden se pierda.
+                </div>
+                
+                <p>Y aquí viene algo importante: los estándares deben estar escritos. No basta con decirlo verbalmente. Debe haber procedimientos, instrucciones, checklists. Porque la memoria falla, pero los documentos quedan.</p>
+                
+                <div class="destacado">
+                    Sin estandarización, las 5S se convierten en un esfuerzo de un día que se olvida a la semana siguiente.
+                </div>
+            </section>
+
+            <section class="section" id="shitsuke">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Quinta S: Shitsuke (Disciplina)</h3>
+                <p>Y llegamos a la quinta S, que es quizás la más difícil de todas: la disciplina. Porque de nada sirve clasificar, ordenar, limpiar y estandarizar si después no mantenemos el sistema.</p>
+                
+                <p>Shitsuke significa convertir las 5S en un hábito. Que sea parte de la forma de trabajar, no una tarea adicional que se hace cuando hay tiempo.</p>
+                
+                <h4>¿Cómo se logra la disciplina?</h4>
+                <ul>
+                    <li><strong>Compromiso de todos:</strong> desde el jefe hasta el último trabajador, todos deben participar.</li>
+                    <li><strong>Ejemplo de los líderes:</strong> si el supervisor no cumple, ¿por qué lo harían los demás?</li>
+                    <li><strong>Capacitación continua:</strong> recordar por qué hacemos las cosas, no solo cómo.</li>
+                    <li><strong>Auditorías periódicas:</strong> revisar si se están cumpliendo los estándares.</li>
+                    <li><strong>Reconocimiento:</strong> premiar los buenos resultados, no solo castigar los malos.</li>
+                    <li><strong>Comunicación:</strong> mantener a todos informados sobre los avances y problemas.</li>
+                </ul>
+                
+                <h4>Señales de que la disciplina funciona</h4>
+                <ul>
+                    <li>Los trabajadores mantienen el orden sin que se les recuerde.</li>
+                    <li>Los nuevos se adaptan rápidamente porque ven cómo trabajan los demás.</li>
+                    <li>Los problemas se detectan y corrigen rápidamente.</li>
+                    <li>Hay orgullo por el lugar de trabajo.</li>
+                    <li>Los accidentes disminuyen.</li>
+                    <li>La eficiencia mejora.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>La disciplina no es castigo.</strong> Es compromiso. Es entender que el orden y la limpieza benefician a todos, y que cada uno es responsable de su parte.
+                </div>
+                
+                <p>Y aquí viene una verdad incómoda: la disciplina es lo que separa a las bodegas que funcionan bien de las que son un caos. Porque implementar las 5S una vez es fácil. Mantenerlas en el tiempo es lo difícil.</p>
+                
+                <div class="destacado">
+                    Las 5S no son un proyecto con fecha de término. Son una forma de trabajar para siempre.
+                </div>
+            </section>
+
+            <section class="section" id="implementacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Implementación de las 5S en Bodega</h3>
+                <p>Ahora que conocemos las 5S, la pregunta es: ¿cómo las implementamos en nuestra bodega?</p>
+                
+                <p>No se trata de hacer todo de una vez. Eso sería abrumador y probablemente fracasaría. Lo correcto es ir paso a paso, zona por zona.</p>
+                
+                <h4>Pasos para implementar las 5S</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Diagnóstico inicial:</strong> recorrer la bodega completa, tomar fotografías, identificar las áreas críticas.</li>
+                        <li><strong>Definir un área piloto:</strong> empezar por una zona pequeña y manejable. Puede ser un pasillo, una sección de racks, el área de recepción.</li>
+                        <li><strong>Aplicar las 5S en el área piloto:</strong> clasificar, ordenar, limpiar, estandarizar y crear disciplina.</li>
+                        <li><strong>Documentar el antes y el después:</strong> tomar fotografías para mostrar el cambio.</li>
+                        <li><strong>Capacitar al equipo:</strong> explicar qué son las 5S, por qué se hacen y cómo se aplican.</li>
+                        <li><strong>Expandir gradualmente:</strong> una vez que el área piloto funciona, pasar a la siguiente zona.</li>
+                        <li><strong>Auditar periódicamente:</strong> revisar que se mantengan los estándares.</li>
+                        <li><strong>Mejorar continuamente:</strong> siempre hay algo que se puede hacer mejor.</li>
+                    </ol>
+                </div>
+                
+                <h4>Errores comunes en la implementación</h4>
+                <ul>
+                    <li><strong>Querer hacer todo de una vez:</strong> mejor ir paso a paso, pero bien hecho.</li>
+                    <li><strong>No involucrar a los trabajadores:</strong> las 5S no se imponen, se construyen con todos.</li>
+                    <li><strong>No dar ejemplo:</strong> si los líderes no cumplen, nadie lo hará.</li>
+                    <li><strong>Abandonar después del entusiasmo inicial:</strong> las 5S son para siempre, no para un mes.</li>
+                    <li><strong>No medir resultados:</strong> hay que saber si está funcionando o no.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Las 5S no son una moda.</strong> Son una metodología probada durante décadas en empresas de todo el mundo. Si se aplican correctamente, los resultados son reales y medibles.
+                </div>
+                
+                <p>Y algo muy importante: las 5S no son solo responsabilidad del bodeguero. Son responsabilidad de todos los que trabajan en la bodega: supervisores, administrativos, operarios, conductores. Todos deben participar.</p>
+                
+                <div class="destacado">
+                    Una bodega con 5S bien implementadas es más segura, más eficiente y más agradable para trabajar.
+                </div>
+            </section>
+
+            <section class="section" id="beneficios">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Beneficios y Resultados</h3>
+                <p>¿Qué ganamos con las 5S? Mucho más de lo que parece a primera vista.</p>
+                
+                <h4>Beneficios en seguridad</h4>
+                <ul>
+                    <li>Menos accidentes por caídas, tropiezos y golpes.</li>
+                    <li>Pasillos despejados para circulación segura.</li>
+                    <li>Equipos de emergencia siempre accesibles.</li>
+                    <li>Detección temprana de condiciones peligrosas.</li>
+                    <li>Menos riesgos de incendio por acumulación de materiales.</li>
+                </ul>
+                
+                <h4>Beneficios en eficiencia</h4>
+                <ul>
+                    <li>Menos tiempo buscando productos o herramientas.</li>
+                    <li>Mayor productividad.</li>
+                    <li>Menos errores en picking y despacho.</li>
+                    <li>Mejor uso del espacio disponible.</li>
+                    <li>Reducción de mermas y productos vencidos.</li>
+                </ul>
+                
+                <h4>Beneficios en calidad</h4>
+                <ul>
+                    <li>Productos mejor conservados.</li>
+                    <li>Menos daños por manipulación.</li>
+                    <li>Mejor presentación al cliente.</li>
+                    <li>Trazabilidad más clara.</li>
+                </ul>
+                
+                <h4>Beneficios en el ambiente laboral</h4>
+                <ul>
+                    <li>Mayor satisfacción de los trabajadores.</li>
+                    <li>Menos estrés.</li>
+                    <li>Mejor clima laboral.</li>
+                    <li>Sentido de pertenencia y orgullo por el lugar de trabajo.</li>
+                </ul>
+                
+                <h4>Beneficios económicos</h4>
+                <ul>
+                    <li>Reducción de costos por mermas y daños.</li>
+                    <li>Mejor uso del inventario.</li>
+                    <li>Menos tiempo perdido.</li>
+                    <li>Mayor competitividad.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Las 5S no son un gasto. Son una inversión.</strong> Y de las más rentables que puede hacer una empresa.
+                </div>
+                
+                <p>Y hay un beneficio que a veces no se menciona: la imagen. Una bodega ordenada y limpia da confianza. Los clientes, los auditores, los proveedores, todos notan cuando una bodega está bien gestionada.</p>
+                
+                <div class="destacado">
+                    Las 5S no solo mejoran la bodega. Mejoran a las personas que trabajan en ella.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>El orden y el aseo no son tareas menores. Son la base de una bodega segura, eficiente y bien gestionada. Y las 5S nos dan el camino para lograrlo: clasificar, ordenar, limpiar, estandarizar y mantener la disciplina.</p>
+                <p>No se trata de hacer una limpieza de un día y olvidarse. Se trata de construir un hábito, una forma de trabajar que nos beneficia a todos: a nosotros, a nuestros compañeros, a la empresa y a los clientes.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Una bodega ordenada es una bodega segura.<br>Una bodega limpia es una bodega eficiente.<br>Las 5S son el camino."</p>
+                
+                <a href="parte5.html" class="next-module">Siguiente Módulo: Prevención y Combate de Incendios →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES NI EMOJIS
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX') || v.lang.startsWith('es-US')));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX')));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

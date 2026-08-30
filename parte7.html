@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 7: Recepción de Mercaderías</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.correcto { border-top: 5px solid #27ae60; }
+    .caja.incorrecto { border-top: 5px solid #e74c3c; }
+    .caja.correcto h5 { color: #27ae60; }
+    .caja.incorrecto h5 { color: #c0392b; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .flujo-recepcion { display: flex; flex-direction: column; gap: 10px; margin: 25px 0; }
+    .paso-flujo { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; }
+    .paso-flujo:hover { border-color: #f39c12; transform: translateX(5px); }
+    .paso-numero { background: #f39c12; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0; }
+    .doc-card { background: #f8f9fa; border-radius: 10px; padding: 25px; border-left: 4px solid #2c5282; }
+    .doc-card h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 12px; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 7: Recepción de Mercaderías</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción a la Recepción</a></li>
+                <li><a href="#preparacion">2. Preparación antes de la Recepción</a></li>
+                <li><a href="#descarga">3. El Proceso de Descarga</a></li>
+                <li><a href="#verificacion">4. Verificación de Cantidades</a></li>
+                <li><a href="#inspeccion">5. Inspección de Daños</a></li>
+                <li><a href="#documentacion">6. Documentación de Recepción</a></li>
+                <li><a href="#registro">7. Registro en el Sistema</a></li>
+                <li><a href="#diferencias">8. Mercadería con Diferencias</a></li>
+                <li><a href="#conexion">9. La Conexión Compras-Bodega</a></li>
+                <li><a href="#errores">10. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Recepción de Mercaderías</h2>
+                <p>La recepción no es simplemente descargar cajas. Es el primer punto de control entre lo que se compró, lo que dice el documento y lo que realmente llegó. Un error aquí se arrastra por toda la operación.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1578575437130-523eed1e171a?w=1200" alt="Recepción de mercaderías en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción a la Recepción</h3>
+                <p>Ahora vamos a entrar en una de las tareas más importantes del trabajo diario en bodega: la recepción de mercaderías.</p>
+                
+                <p>Y quiero partir con una idea que puede parecer obvia, pero que no lo es tanto: recibir mercadería no es simplemente bajar cajas de un camión. Eso es descargar. La recepción es otra cosa.</p>
+                
+                <div class="importante">
+                    <strong>Descarga no es lo mismo que recepción.</strong> La descarga es una etapa física: mover la carga del camión al andén o al piso de la bodega. La recepción es un proceso de control: verificar que lo que llegó es lo que se compró, en la cantidad correcta, en las condiciones correctas y con la documentación correcta.
+                </div>
+                
+                <p>Piénsenlo así: si yo recibo una mercadería sin verificar, estoy aceptando a ciegas lo que el proveedor me entregó. Y si hay un problema, si falta algo, si está dañado, si no es lo que pedí, ya es tarde. El camión se fue, el proveedor dice que entregó todo, y yo me quedo con el problema.</p>
+                
+                <p>Por eso la recepción es un punto de control. Es el momento donde la empresa verifica que lo que compró realmente llegó. Y eso conecta directamente con Compras, con Finanzas, con Inventario y con la operación completa.</p>
+                
+                <div class="destacado">
+                    Una recepción correcta es también un mecanismo de control de compras, porque permite detectar diferencias entre lo solicitado, lo documentado y lo físicamente recibido.
+                </div>
+                
+                <p>Y aquí quiero que se queden con una idea: la recepción no es responsabilidad de una sola persona. Es un proceso donde participan el transportista, el bodeguero, el administrativo que registra, y eventualmente el área de Compras si hay problemas. Todos deben estar coordinados.</p>
+            </section>
+
+            <section class="section" id="preparacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Preparación antes de la Recepción</h3>
+                <p>Antes de que llegue el camión, ya debería haber un trabajo previo. Porque una recepción improvisada es una recepción con problemas.</p>
+                
+                <h4>¿Qué debo tener listo antes de recibir?</h4>
+                <ul>
+                    <li><strong>La Orden de Compra:</strong> necesito saber qué se compró, en qué cantidad, a qué proveedor y bajo qué condiciones. Sin la OC, estoy recibiendo a ciegas.</li>
+                    <li><strong>Espacio disponible:</strong> si voy a recibir 50 pallets, necesito tener dónde ponerlos. No puedo recibir y después pensar dónde los meto.</li>
+                    <li><strong>Equipos de descarga:</strong> transpaletas, grúa horquilla si corresponde, carros de transporte.</li>
+                    <li><strong>Personal disponible:</strong> si la descarga requiere varias personas, debo coordinar con anticipación.</li>
+                    <li><strong>Zona de recepción despejada:</strong> el andén o área de recepción debe estar libre para trabajar con seguridad.</li>
+                    <li><strong>Documentación preparada:</strong> formularios de recepción, sistema informático listo para registrar.</li>
+                </ul>
+                
+                <h4>¿Qué pasa si no me preparo?</h4>
+                <ul>
+                    <li>El camión llega y no hay dónde descargar. El transportista espera, se genera costo de espera.</li>
+                    <li>No tengo la OC a mano, así que no puedo verificar correctamente.</li>
+                    <li>Descargo la mercadería en cualquier parte y después no la encuentro.</li>
+                    <li>No tengo equipos y debo improvisar, generando riesgos de seguridad.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La preparación es la diferencia entre una recepción ordenada y un caos. Cinco minutos de preparación antes de que llegue el camión pueden ahorrar horas de problemas después.
+                </div>
+                
+                <p>Y algo muy importante: si sé que va a llegar una sustancia peligrosa, la preparación es aún más crítica. Necesito saber de antemano qué producto es, qué EPP necesito, dónde lo voy a almacenar y si es compatible con lo que ya tengo en bodega. Eso lo vimos en los módulos de seguridad.</p>
+            </section>
+
+            <section class="section" id="descarga">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. El Proceso de Descarga</h3>
+                <p>La descarga es la primera etapa física de la recepción. Es cuando la mercadería pasa del camión a la bodega. Y aunque parece simple, tiene sus reglas.</p>
+                
+                <h4>Reglas básicas de la descarga</h4>
+                <ul>
+                    <li><strong>Seguridad primero:</strong> el camión debe estar detenido, con freno de mano y cuñas en las ruedas antes de comenzar la descarga.</li>
+                    <li><strong>Verificar el estado del camión:</strong> antes de abrir, revisar que no haya derrames, olores extraños o condiciones inseguras.</li>
+                    <li><strong>Usar los equipos correctos:</strong> transpaleta para pallets, carros para cajas sueltas, grúa horquilla si corresponde.</li>
+                    <li><strong>No sobrecargar los equipos:</strong> respetar la capacidad de carga de cada equipo.</li>
+                    <li><strong>Mantener el orden:</strong> descargar de manera ordenada, no amontonar todo en un solo lugar.</li>
+                    <li><strong>Separar por tipo:</strong> si vienen productos diferentes, ir separándolos desde la descarga.</li>
+                </ul>
+                
+                <h4>¿Dónde descargo?</h4>
+                <p>La mercadería se descarga en la zona de recepción, que debe ser un área específicamente designada para eso. No se descarga en cualquier pasillo ni en cualquier rincón disponible.</p>
+                
+                <div class="importante">
+                    <strong>La zona de recepción es un área de tránsito, no de almacenamiento.</strong> La mercadería que llega debe ser verificada, registrada y luego trasladada a su ubicación definitiva. No puede quedarse días en el andén de recepción.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿qué pasa si el camión llega y la zona de recepción está ocupada con mercadería de ayer que todavía no se ha procesado? Eso significa que tenemos un problema de flujo. La recepción de hoy no puede esperar a que se procese la de ayer. Hay que resolver ese cuello de botella.</p>
+            </section>
+
+            <section class="section" id="verificacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Verificación de Cantidades y Productos</h3>
+                <p>Aquí viene el corazón de la recepción. La verificación es donde comprobamos que lo que llegó es lo que se esperaba.</p>
+                
+                <h4>¿Qué verificamos?</h4>
+                <ul>
+                    <li><strong>Cantidad:</strong> ¿llegaron las unidades que dice la orden de compra y la guía de despacho?</li>
+                    <li><strong>Producto correcto:</strong> ¿es el producto que se pidió, con el código correcto?</li>
+                    <li><strong>Descripción:</strong> ¿coincide la descripción del producto con lo que físicamente tengo?</li>
+                    <li><strong>Características:</strong> ¿tamaño, color, modelo, especificaciones técnicas?</li>
+                    <li><strong>Lote:</strong> cuando corresponde, verificar el número de lote.</li>
+                    <li><strong>Fecha de vencimiento:</strong> si el producto tiene vencimiento, verificar que no esté vencido o próximo a vencer.</li>
+                    <li><strong>Estado:</strong> ¿está en buenas condiciones o tiene daños visibles?</li>
+                    <li><strong>Documentación:</strong> ¿viene con la guía de despacho, factura, packing list, HDS si corresponde?</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Supongamos que la Orden de Compra dice: 100 unidades de guantes de nitrilo talla L.</p>
+                    <p>Llega el camión. La Guía de Despacho dice: 100 unidades de guantes de nitrilo talla L.</p>
+                    <p>Pero al contar físicamente, encuentro 96 unidades.</p>
+                    <p>¿Qué hago? No registro 100 porque eso dice el papel. Registro lo que realmente recibí: 96 unidades. Y dejo constancia de la diferencia de 4 unidades.</p>
+                    <p>Si registro 100, estoy generando un problema de inventario que va a aparecer después, y además estoy pagando por algo que no recibí.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>Lo que dice el papel no necesariamente es lo que físicamente llegó.</strong> Por eso existe la verificación. El bodeguero no es un simple receptor de documentos: es quien comprueba que la realidad coincide con lo documentado.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se graben: la recepción es un punto de control entre adquisiciones, proveedor, documentación, inventario y finanzas. Si yo verifico mal, el problema se arrastra por toda la cadena.</p>
+            </section>
+
+            <section class="section" id="inspeccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Inspección de Daños</h3>
+                <p>Además de verificar cantidades y productos, tenemos que revisar el estado de la mercadería. Porque puede que llegue todo lo que se pidió, pero en malas condiciones.</p>
+                
+                <h4>¿Qué busco en la inspección?</h4>
+                <ul>
+                    <li><strong>Cajas dañadas:</strong> rotas, aplastadas, mojadas, con perforaciones.</li>
+                    <li><strong>Productos con daños visibles:</strong> rayaduras, golpes, deformaciones.</li>
+                    <li><strong>Envases comprometidos:</strong> botellas con fugas, sacos rotos, latas abolladas.</li>
+                    <li><strong>Signos de humedad:</strong> manchas de agua, moho, olores extraños.</li>
+                    <li><strong>Productos vencidos:</strong> revisar fechas de vencimiento cuando corresponda.</li>
+                    <li><strong>Embalaje inadecuado:</strong> productos que llegaron sin la protección necesaria.</li>
+                </ul>
+                
+                <h4>¿Qué hago si encuentro mercadería dañada?</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>No la mezclo con la mercadería buena.</strong> La separo inmediatamente.</li>
+                        <li><strong>La identifico claramente.</strong> Le pongo una etiqueta o marca que indique que está dañada.</li>
+                        <li><strong>La llevo a la zona de cuarentena o rechazo.</strong> No la dejo en el área de recepción ni la mezclo con el stock disponible.</li>
+                        <li><strong>Informo a mi supervisor.</strong> No tomo decisiones solo sobre qué hacer con el producto dañado.</li>
+                        <li><strong>Registro el daño.</strong> Dejo constancia escrita: qué producto, cuánto, qué tipo de daño, fecha.</li>
+                        <li><strong>Tomo fotografías si es posible.</strong> Las fotos son evidencia para el reclamo al proveedor o al transportista.</li>
+                        <li><strong>Estampo el reclamo en la Guía de Despacho.</strong> Antes de que el transportista se retire, dejo constancia del daño en el documento.</li>
+                    </ol>
+                </div>
+                
+                <div class="destacado">
+                    La mercadería dañada no se esconde, no se mezcla con la buena y no se despacha. Se identifica, se separa, se informa y se registra. Esa es la única forma correcta de manejarla.
+                </div>
+                
+                <p>Y algo muy importante: si el transportista se va y yo no dejé constancia del daño en ese momento, después es mucho más difícil reclamar. El momento de dejar constancia es cuando el transportista todavía está presente.</p>
+            </section>
+
+            <section class="section" id="documentacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Documentación de Recepción</h3>
+                <p>En una bodega, todo se mueve con documentos. No basta con decir "llegaron las cajas". Tiene que haber un respaldo escrito que diga qué llegó, cuánto llegó, quién lo trajo y quién lo recibió.</p>
+                
+                <div class="doc-grid">
+                    <div class="doc-card">
+                        <h5>Orden de Compra (OC)</h5>
+                        <p>Documento que la empresa envió al proveedor indicando qué se va a comprar, en qué cantidad y bajo qué condiciones. Es mi referencia principal para verificar.</p>
+                    </div>
+                    <div class="doc-card">
+                        <h5>Guía de Despacho</h5>
+                        <p>Documento tributario que acompaña la carga en el camión. Certifica la entrega de la mercadería. En Chile se maneja de forma electrónica (DTE).</p>
+                    </div>
+                    <div class="doc-card">
+                        <h5>Factura</h5>
+                        <p>Documento comercial que detalla el cobro final de los productos. Incluye montos, impuestos (IVA del 19% en Chile) y condiciones de pago.</p>
+                    </div>
+                    <div class="doc-card">
+                        <h5>Packing List</h5>
+                        <p>Lista detallada de todo lo que viene dentro del despacho: cuántas cajas, qué contiene cada una, pesos, dimensiones. Muy común en importaciones.</p>
+                    </div>
+                    <div class="doc-card">
+                        <h5>Hoja de Datos de Seguridad (HDS)</h5>
+                        <p>Obligatoria para todo producto químico. Detalla qué es, cómo manipularlo, qué EPP usar y cómo actuar ante un derrame o emergencia.</p>
+                    </div>
+                </div>
+                
+                <h4>El flujo documental correcto</h4>
+                <p>El orden en que deben aparecer los documentos es este:</p>
+                <ul>
+                    <li><strong>1. Cotización:</strong> el proveedor me dice cuánto cuesta.</li>
+                    <li><strong>2. Orden de Compra:</strong> yo le digo "cómprote esto, en esta cantidad, bajo estas condiciones".</li>
+                    <li><strong>3. Guía de Despacho:</strong> el proveedor entrega la mercadería y certifica qué entregó.</li>
+                    <li><strong>4. Factura:</strong> el proveedor me cobra lo entregado.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Si falta un documento, la recepción queda incompleta.</strong> No puedo registrar correctamente una mercadería si no tengo la guía de despacho. No puedo verificar si no tengo la orden de compra. Los documentos son mi respaldo y mi protección.
+                </div>
+                
+                <p>Y una pregunta que me gusta hacer en clase: ¿qué pasa si llega un camión con mercadería pero sin guía de despacho? ¿La recibo? La respuesta es: depende del procedimiento de la empresa, pero en general, no debería recibir mercadería sin documentación. Porque sin documento, esa mercadería no existe legalmente.</p>
+            </section>
+
+            <section class="section" id="registro">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Registro en el Sistema</h3>
+                <p>Una vez que verifiqué la mercadería y está todo correcto, viene el registro. Y esto es fundamental porque si no se registra, es como si la mercadería no hubiera llegado.</p>
+                
+                <h4>¿Qué registro?</h4>
+                <ul>
+                    <li><strong>Fecha de recepción:</strong> cuándo llegó la mercadería.</li>
+                    <li><strong>Proveedor:</strong> quién la entregó.</li>
+                    <li><strong>Número de OC:</strong> contra qué orden de compra se recibe.</li>
+                    <li><strong>Número de Guía de Despacho:</strong> para trazabilidad documental.</li>
+                    <li><strong>Productos recibidos:</strong> código, descripción, cantidad.</li>
+                    <li><strong>Lote y vencimiento:</strong> cuando corresponda.</li>
+                    <li><strong>Ubicación asignada:</strong> dónde se va a almacenar.</li>
+                    <li><strong>Observaciones:</strong> cualquier diferencia, daño o comentario.</li>
+                </ul>
+                
+                <h4>¿Por qué es tan importante el registro?</h4>
+                <p>Porque el registro es lo que actualiza el inventario. Si yo recibo 100 unidades pero no las registro, el sistema va a decir que tengo 0. Y cuando alguien necesite ese producto, el sistema va a decir que no hay, aunque físicamente esté en la bodega.</p>
+                
+                <div class="destacado">
+                    Un movimiento que no se registra es un movimiento que no existe para el sistema. Y si el sistema no sabe que tengo algo, es como si no lo tuviera.
+                </div>
+                
+                <p>Y aquí viene una conexión importante con lo que vimos en módulos anteriores: el registro de recepción alimenta el WMS o el ERP. El WMS va a saber dónde está el producto y en qué cantidad. El ERP va a actualizar el inventario y va a informar a Finanzas que hay una cuenta por pagar al proveedor.</p>
+                
+                <p>Por eso el registro no es "tarea del administrativo nomás". Es una tarea crítica que afecta a toda la operación. Si el registro está mal, todo lo que viene después va a estar mal.</p>
+            </section>
+
+            <section class="section" id="diferencias">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Mercadería con Diferencias</h3>
+                <p>Ahora viene una situación que va a pasar más de una vez en su carrera: la mercadería llega con diferencias. Puede faltar producto, puede sobrar, puede llegar algo que no se pidió, o puede llegar dañado.</p>
+                
+                <h4>Tipos de diferencias</h4>
+                <ul>
+                    <li><strong>Faltante:</strong> la OC dice 100, la guía dice 100, pero físicamente hay 96.</li>
+                    <li><strong>Sobrante:</strong> la OC dice 100, pero llegaron 105.</li>
+                    <li><strong>Producto incorrecto:</strong> pedí guantes talla L y llegaron talla M.</li>
+                    <li><strong>Producto dañado:</strong> llegó la cantidad correcta pero con daños.</li>
+                    <li><strong>Producto vencido:</strong> llegó pero con fecha de vencimiento pasada o muy próxima.</li>
+                    <li><strong>Sin documentación:</strong> llegó la mercadería pero sin guía de despacho.</li>
+                </ul>
+                
+                <h4>¿Qué hago en cada caso?</h4>
+                
+                <div class="comparacion">
+                    <div class="caja correcto">
+                        <h5>Lo que SÍ debo hacer</h5>
+                        <ul>
+                            <li>Registrar la diferencia en el documento de recepción.</li>
+                            <li>Informar inmediatamente a mi supervisor.</li>
+                            <li>Separar la mercadería con problema.</li>
+                            <li>Tomar fotografías como evidencia.</li>
+                            <li>Dejar constancia en la guía de despacho antes de que se vaya el transportista.</li>
+                            <li>Esperar instrucciones sobre qué hacer con el producto.</li>
+                        </ul>
+                    </div>
+                    <div class="caja incorrecto">
+                        <h5>Lo que NO debo hacer</h5>
+                        <ul>
+                            <li>Registrar la cantidad que dice el papel aunque no coincida con lo físico.</li>
+                            <li>Mezclar la mercadería dañada con la buena.</li>
+                            <li>Despachar mercadería con problemas.</li>
+                            <li>Ocultar la diferencia.</li>
+                            <li>Tomar decisiones solo sobre devoluciones sin autorización.</li>
+                            <li>Dejar pasar el problema "para no hacer olas".</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>Las diferencias no se ocultan, se reportan.</strong> Porque una diferencia no reportada hoy se convierte en un problema de inventario mañana, en un problema de pago pasado mañana, y en un problema operativo la próxima semana.
+                </div>
+                
+                <p>Y aquí quiero que entiendan algo: reportar una diferencia no es "hacer problema". Es hacer mi trabajo correctamente. El que hace problema es el que recibe sin verificar y después el inventario no cuadra y nadie sabe por qué.</p>
+            </section>
+
+            <section class="section" id="conexion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. La Conexión Compras-Bodega</h3>
+                <p>Aquí quiero hacer una pausa y hablar de algo que muchas veces no se ve claramente: la conexión entre el área de Compras y la Bodega.</p>
+                
+                <p>Porque la recepción no empieza cuando llega el camión. Empieza mucho antes, cuando alguien decidió qué comprar, cuánto comprar, a quién comprarle y cuándo comprarlo.</p>
+                
+                <h4>¿Cómo afecta Compras a la recepción?</h4>
+                <ul>
+                    <li><strong>Si Compras compra demasiado:</strong> llega más mercadería de la que puedo almacenar. Tengo sobrestock, ocupo espacio innecesariamente y aumento el riesgo de deterioro.</li>
+                    <li><strong>Si Compras compra poco:</strong> tengo quiebres de stock, la operación se detiene y hay que hacer compras urgentes a mayor costo.</li>
+                    <li><strong>Si Compras compra tarde:</strong> la mercadería llega cuando ya la necesitaba. Hay urgencia y presión.</li>
+                    <li><strong>Si el proveedor entrega tarde:</strong> el lead time se alarga y la planificación falla.</li>
+                    <li><strong>Si el proveedor entrega incompleto:</strong> tengo diferencias en recepción y problemas de inventario.</li>
+                    <li><strong>Si el proveedor entrega producto incorrecto:</strong> tengo que devolver, reprocesar y esperar una nueva entrega.</li>
+                </ul>
+                
+                <div class="destacado">
+                    El desempeño de la bodega también está condicionado por la calidad del proceso de abastecimiento. Bodega y Compras no deberían funcionar como áreas separadas. Las decisiones de compra determinan en gran medida lo que posteriormente ocurre en almacenamiento, inventario y despacho.
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿quién es responsable cuando hay un quiebre de stock? ¿Bodega porque no tenía el producto? ¿Compras porque no lo compró a tiempo? ¿El proveedor porque entregó tarde? ¿Planificación porque no estimó bien la demanda?</p>
+                
+                <p>La respuesta correcta es: depende. Y para saber de quién es la responsabilidad, necesito tener registros claros de todo el proceso. Por eso la trazabilidad es tan importante.</p>
+                
+                <div class="importante">
+                    <strong>Una recepción correcta es también un mecanismo de retroalimentación para Compras.</strong> Si yo registro que un proveedor siempre entrega tarde, o siempre entrega incompleto, esa información sirve para que Compras evalúe si conviene seguir trabajando con ese proveedor.
+                </div>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Errores Comunes en la Recepción</h3>
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes que se cometen en la recepción. Porque conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: Recibir sin verificar</h4>
+                <p>Firmar la guía de despacho sin contar la mercadería, sin revisar el estado, sin comparar con la OC. Esto es recibir a ciegas.</p>
+                
+                <h4>Error 2: Registrar lo que dice el papel, no lo que llegó</h4>
+                <p>Si la guía dice 100 pero llegaron 96, y yo registro 100, generé un problema de inventario que va a aparecer después.</p>
+                
+                <h4>Error 3: No dejar constancia de daños</h4>
+                <p>Si el transportista se va y yo no dejé constancia del daño en ese momento, después es muy difícil reclamar.</p>
+                
+                <h4>Error 4: Mezclar mercadería dañada con la buena</h4>
+                <p>Si mezclo un producto dañado con el stock disponible, en algún momento alguien va a despachar ese producto dañado y vamos a tener un problema con el cliente o usuario.</p>
+                
+                <h4>Error 5: No registrar la recepción en el sistema</h4>
+                <p>Recibir físicamente pero no actualizar el sistema. El producto está en la bodega pero para el sistema no existe.</p>
+                
+                <h4>Error 6: Dejar la mercadería en la zona de recepción</h4>
+                <p>La zona de recepción es de tránsito, no de almacenamiento. Si la mercadería se queda ahí, bloquea la próxima recepción.</p>
+                
+                <h4>Error 7: No verificar fechas de vencimiento</h4>
+                <p>Si recibo un producto con vencimiento próximo sin registrarlo, ese producto va a vencer en bodega y se va a convertir en merma.</p>
+                
+                <h4>Error 8: No informar las diferencias</h4>
+                <p>Ocultar una diferencia "para no hacer problema" es generar un problema mayor después.</p>
+                
+                <div class="destacado">
+                    La recepción es el primer eslabón de la cadena. Si ese eslabón está débil, toda la cadena se ve afectada. Por eso la recepción debe hacerse con calma, con atención y con criterio. No con apuro.
+                </div>
+                
+                <p>Y quiero cerrar con una idea: un buen bodeguero no es el que recibe rápido. Es el que recibe bien. Porque recibir rápido pero mal genera problemas que después toman mucho más tiempo resolver.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>La recepción de mercaderías es mucho más que descargar cajas. Es el primer punto de control de toda la operación. Es donde verificamos que lo que se compró realmente llegó, en las condiciones correctas y con la documentación correcta.</p>
+                <p>Un error en la recepción se arrastra por toda la cadena: afecta el inventario, afecta el almacenamiento, afecta el picking, afecta el despacho y afecta al usuario final. Por eso la recepción debe hacerse con criterio, con calma y con responsabilidad.</p>
+                <p>Y recuerden: la recepción no es solo tarea del bodeguero. Es un proceso donde participan Compras, el proveedor, el transportista, el administrativo y el supervisor. Todos deben estar coordinados.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Lo que dice el papel no necesariamente es lo que físicamente llegó.<br>Por eso existe la verificación."</p>
+                
+                <a href="parte8.html" class="next-module">Siguiente Módulo: Almacenamiento y Ubicación de Productos →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            
+            // ELIMINAR CONTROLES TTS
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            
+            // ELIMINAR VIDEOS E IMÁGENES
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            
+            currentUtterance.onend = () => { resetSection(section); };
+            
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

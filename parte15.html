@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 15: Tecnología en Bodega (WMS, ERP y Trazabilidad)</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .final-banner { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 20px 40px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+    .final-banner h3 { font-size: 22px; margin-bottom: 5px; }
+    .final-banner p { font-size: 15px; opacity: 0.95; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.wms { border-top: 5px solid #3498db; }
+    .caja.erp { border-top: 5px solid #27ae60; }
+    .caja.wms h5 { color: #2980b9; }
+    .caja.erp h5 { color: #27ae60; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .back-home { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .back-home:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0; }
+    .tech-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 25px; transition: all 0.3s; border-top: 5px solid; }
+    .tech-item:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .tech-item h5 { color: #1e3a5f; font-size: 18px; margin-bottom: 12px; }
+    .tech-item p { font-size: 14px; margin-bottom: 10px; }
+    .tech-item.barras { border-top-color: #3498db; }
+    .tech-item.rfid { border-top-color: #9b59b6; }
+    .tech-item.wms { border-top-color: #27ae60; }
+    .tech-item.erp { border-top-color: #f39c12; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 25px 0; }
+    .kpi-item { background: #f8f9fa; border-radius: 10px; padding: 25px; text-align: center; border-top: 4px solid #27ae60; }
+    .kpi-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 10px; }
+    .kpi-item .formula { font-family: 'Courier New', monospace; font-size: 13px; color: #2c5282; background: #e8f4f8; padding: 8px; border-radius: 5px; margin-top: 10px; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    .flujo-integrado { display: flex; flex-direction: column; gap: 8px; margin: 25px 0; }
+    .paso-flujo { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: all 0.3s; }
+    .paso-flujo:hover { border-color: #f39c12; transform: translateX(5px); }
+    .paso-num { background: #f39c12; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; flex-shrink: 0; }
+    .recorrido-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
+    .recorrido-item { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 10px; padding: 20px; text-align: center; border-left: 4px solid #f39c12; }
+    .recorrido-item h5 { color: #1e3a5f; font-size: 14px; margin-bottom: 8px; }
+    .recorrido-item p { font-size: 12px; color: #4a5568; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 15: Tecnología en Bodega</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción a la Tecnología</a></li>
+                <li><a href="#por-que">2. ¿Por Qué Necesitamos Tecnología?</a></li>
+                <li><a href="#codigo-barras">3. Código de Barras</a></li>
+                <li><a href="#rfid">4. RFID y Otras Tecnologías</a></li>
+                <li><a href="#wms">5. WMS: Sistema de Gestión de Bodega</a></li>
+                <li><a href="#erp">6. ERP: Planificación de Recursos</a></li>
+                <li><a href="#trazabilidad">7. Trazabilidad</a></li>
+                <li><a href="#kpis">8. KPIs de Bodega</a></li>
+                <li><a href="#compras">9. La Conexión con Compras</a></li>
+                <li><a href="#futuro">10. El Futuro de la Bodega</a></li>
+                <li><a href="#errores">11. Errores Comunes</a></li>
+                <li><a href="#cierre">Cierre del Curso Completo</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="final-banner">
+                <h3>MÓDULO FINAL DEL CURSO</h3>
+                <p>Tecnología, integración y cierre del recorrido completo por la gestión de bodega</p>
+            </div>
+
+            <div class="content-header">
+                <h2>Tecnología en Bodega (WMS, ERP y Trazabilidad)</h2>
+                <p>Llegamos al último módulo. Y lo cerramos con un tema que atraviesa todo lo que hemos aprendido: la tecnología. Porque hoy en día, una bodega sin tecnología es una bodega que trabaja a ciegas.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200" alt="Tecnología en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción a la Tecnología en Bodega</h3>
+                <p>Llegamos al último módulo del curso. Y quiero cerrarlo con un tema que conecta todo lo que hemos aprendido: la tecnología.</p>
+                
+                <p>Porque si miramos hacia atrás, hemos hablado de seguridad, de EPP, de señalización, de orden, de incendios, de cómo funciona una bodega, de recepción, de almacenamiento, de manipulación de cargas, de picking y despacho, de inventarios, de rotación, de provisión y de sustancias peligrosas.</p>
+                
+                <p>Y en todos esos procesos, hay un hilo conductor: la información. Porque sin información, no sabemos qué tenemos, dónde está, cuánto queda, cuándo reponer, qué rotar. Y sin información confiable, la bodega se convierte en un caos.</p>
+                
+                <div class="importante">
+                    <strong>La tecnología en bodega no es un lujo. Es una necesidad.</strong> Porque una bodega que maneja su información en papel, en planillas manuales o en la memoria de las personas, es una bodega que pierde tiempo, comete errores y no puede crecer.
+                </div>
+                
+                <p>Y aquí quiero que entiendan algo importante: la tecnología no reemplaza al bodeguero. Lo potencia. Porque un buen sistema informático no piensa por ti, pero te da la información que necesitas para tomar buenas decisiones.</p>
+                
+                <p>El bodeguero que sabe usar la tecnología tiene una ventaja enorme sobre el que no. Porque puede trabajar más rápido, con menos errores, con mejor control y con mejor trazabilidad.</p>
+                
+                <div class="destacado">
+                    La tecnología no es el futuro de la bodega. Es el presente. Y quien no la entienda, va a quedar atrás. Por eso, este módulo es una invitación a conocer las herramientas que ya están cambiando la forma de trabajar en logística.
+                </div>
+                
+                <p>En este módulo vamos a ver: código de barras, RFID, WMS, ERP, trazabilidad, KPIs y cómo todo esto se conecta con Compras y Adquisiciones. Y al final, vamos a hacer un recorrido por todo lo que aprendimos en los 15 módulos del curso.</p>
+            </section>
+
+            <section class="section" id="por-que">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. ¿Por Qué Necesitamos Tecnología?</h3>
+                <p>Antes de hablar de sistemas específicos, quiero que entendamos por qué la tecnología es tan importante en la bodega moderna.</p>
+                
+                <h4>Los problemas de una bodega sin tecnología</h4>
+                <ul>
+                    <li><strong>Errores de registro:</strong> si todo se anota a mano, hay errores de digitación, de lectura, de interpretación.</li>
+                    <li><strong>Información desactualizada:</strong> si el registro es manual, el stock no se actualiza en tiempo real.</li>
+                    <li><strong>Pérdida de tiempo:</strong> buscar un producto sin sistema puede tomar horas.</li>
+                    <li><strong>Diferencias de inventario:</strong> sin control automático, las diferencias se acumulan.</li>
+                    <li><strong>Falta de trazabilidad:</strong> no se sabe de dónde vino un producto ni a quién se le entregó.</li>
+                    <li><strong>Dificultad para tomar decisiones:</strong> sin datos confiables, las decisiones se toman "al ojo".</li>
+                </ul>
+                
+                <h4>Los beneficios de una bodega con tecnología</h4>
+                <ul>
+                    <li><strong>Registro automático:</strong> cada movimiento queda registrado en el sistema.</li>
+                    <li><strong>Información en tiempo real:</strong> el stock se actualiza al instante.</li>
+                    <li><strong>Búsqueda rápida:</strong> con un código se encuentra cualquier producto.</li>
+                    <li><strong>Control de inventario:</strong> las diferencias se detectan rápido.</li>
+                    <li><strong>Trazabilidad completa:</strong> se sabe el historial de cada producto.</li>
+                    <li><strong>Reportes y análisis:</strong> se pueden generar KPIs, informes y proyecciones.</li>
+                    <li><strong>Integración con otras áreas:</strong> Compras, Finanzas, Planificación y Logística trabajan con la misma información.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico: bodega sin tecnología vs con tecnología</h5>
+                    <p><strong>Bodega sin tecnología:</strong></p>
+                    <ul>
+                        <li>El bodeguero recibe una caja y anota en un cuaderno: "Llegaron 50 guantes".</li>
+                        <li>Tres días después, alguien necesita guantes y pregunta: "¿Hay guantes?"</li>
+                        <li>El bodeguero revisa el cuaderno: "Sí, deberían haber 50".</li>
+                        <li>Va al estante y cuenta: hay 47.</li>
+                        <li>No sabe qué pasó con los 3 que faltan.</li>
+                        <li>No sabe a quién se le entregaron ni cuándo.</li>
+                    </ul>
+                    <p><strong>Bodega con tecnología:</strong></p>
+                    <ul>
+                        <li>El bodeguero recibe la caja y escanea el código de barras. El sistema registra automáticamente: "Ingreso: 50 guantes, lote 2026-001, ubicación Rack B-03-N2, fecha 30/08/2026".</li>
+                        <li>Tres días después, alguien necesita guantes. El bodeguero consulta el sistema: "Hay 47 guantes disponibles. Último despacho: 3 unidades a Juan Pérez, 28/08/2026".</li>
+                        <li>La información es exacta, trazable y está disponible en segundos.</li>
+                    </ul>
+                    <p>La diferencia es enorme. Y no es porque el segundo bodeguero sea más inteligente. Es porque tiene herramientas que le permiten trabajar mejor.</p>
+                </div>
+                
+                <div class="destacado">
+                    La tecnología no hace que el bodeguero sea innecesario. Hace que el bodeguero sea más eficiente. Porque el bodeguero que tiene información confiable puede tomar mejores decisiones, detectar problemas a tiempo y trabajar con mayor precisión.
+                </div>
+            </section>
+
+            <section class="section" id="codigo-barras">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Código de Barras</h3>
+                <p>El código de barras es probablemente la tecnología más conocida en logística. Lo vemos todos los días: en los productos del supermercado, en las cajas, en los pallets, en las etiquetas de despacho.</p>
+                
+                <h4>¿Qué es un código de barras?</h4>
+                <p>Es un patrón de líneas paralelas de diferentes grosores que representa información codificada. Esa información generalmente incluye el código del producto (SKU), y a veces también el lote, la fecha de vencimiento o la cantidad.</p>
+                
+                <h4>¿Cómo funciona?</h4>
+                <p>Un lector de código de barras emite un haz de luz que rebota en las líneas. El lector interpreta el patrón de líneas y lo convierte en información digital que se envía al sistema.</p>
+                
+                <h4>Tipos de etiquetas en bodega</h4>
+                <ul>
+                    <li><strong>Etiqueta de SKU (producto):</strong> se pega directamente en el envase individual del artículo.</li>
+                    <li><strong>Etiqueta de caja máster:</strong> identifica una caja que agrupa varias unidades del mismo producto.</li>
+                    <li><strong>Etiqueta de pallet o lote:</strong> se pega en el film plástico del pallet. Identifica toda la estructura unificada.</li>
+                    <li><strong>Etiqueta de ubicación:</strong> pegada en el rack para indicar las coordenadas (Pasillo, Rack, Nivel, Posición).</li>
+                    <li><strong>Etiqueta de despacho:</strong> lleva los datos del cliente, dirección y tracking de transporte.</li>
+                </ul>
+                
+                <h4>Ventajas del código de barras</h4>
+                <ul>
+                    <li><strong>Rápido:</strong> escanear toma un segundo.</li>
+                    <li><strong>Preciso:</strong> elimina errores de digitación manual.</li>
+                    <li><strong>Barato:</strong> los lectores y las impresoras de etiquetas son económicos.</li>
+                    <li><strong>Universal:</strong> es un estándar reconocido mundialmente.</li>
+                    <li><strong>Trazable:</strong> permite registrar cada movimiento del producto.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El código de barras no es solo para productos grandes.</strong> En una bodega de insumos y materiales, cada ítem debería tener su código: desde un tornillo hasta un repuesto de maquinaria. Si no tiene código, no existe para el sistema.
+                </div>
+                
+                <h4>Limitaciones del código de barras</h4>
+                <ul>
+                    <li>Requiere línea de visión directa (hay que apuntar el lector al código).</li>
+                    <li>Si el código está sucio, rayado o dañado, no se puede leer.</li>
+                    <li>Solo se puede leer un código a la vez.</li>
+                </ul>
+            </section>
+
+            <section class="section" id="rfid">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. RFID y Otras Tecnologías</h3>
+                <p>Además del código de barras, existen otras tecnologías que se están usando cada vez más en bodegas y logística.</p>
+                
+                <h4>RFID (Identificación por Radiofrecuencia)</h4>
+                <p>El RFID es una tecnología que usa ondas de radio para identificar productos. A diferencia del código de barras, no requiere línea de visión directa.</p>
+                
+                <h4>¿Cómo funciona el RFID?</h4>
+                <ul>
+                    <li>Se coloca un pequeño chip (tag RFID) en el producto o pallet.</li>
+                    <li>El chip contiene información codificada (SKU, lote, etc.).</li>
+                    <li>Un lector RFID emite ondas de radio que activan el chip.</li>
+                    <li>El chip responde enviando su información al lector.</li>
+                    <li>El lector registra la información en el sistema.</li>
+                </ul>
+                
+                <h4>Ventajas del RFID sobre el código de barras</h4>
+                <ul>
+                    <li><strong>No requiere línea de visión:</strong> se puede leer a distancia.</li>
+                    <li><strong>Lectura múltiple:</strong> se pueden leer varios tags simultáneamente.</li>
+                    <li><strong>Más resistente:</strong> no se daña con suciedad o humedad.</li>
+                    <li><strong>Mayor capacidad de datos:</strong> puede almacenar más información.</li>
+                </ul>
+                
+                <h4>Desventajas del RFID</h4>
+                <ul>
+                    <li><strong>Más caro:</strong> los tags RFID cuestan más que las etiquetas de código de barras.</li>
+                    <li><strong>Interferencias:</strong> metales y líquidos pueden afectar la lectura.</li>
+                    <li><strong>Menos universal:</strong> no todos los proveedores lo usan.</li>
+                </ul>
+                
+                <h4>Otras tecnologías en bodega</h4>
+                <ul>
+                    <li><strong>Códigos QR:</strong> similares al código de barras pero con más capacidad de datos.</li>
+                    <li><strong>Escáneres móviles (PDA):</strong> dispositivos portátiles que permiten escanear y registrar en cualquier lugar de la bodega.</li>
+                    <li><strong>Terminales de voz (voice picking):</strong> el operario recibe instrucciones por audífono y confirma por voz.</li>
+                    <li><strong>Picking por luz (pick-to-light):</strong> luces LED en los racks indican qué producto tomar.</li>
+                    <li><strong>Drones de inventario:</strong> vuelan por la bodega escaneando códigos de barras en altura.</li>
+                    <li><strong>Robots de picking:</strong> seleccionan productos automáticamente.</li>
+                </ul>
+                
+                <div class="destacado">
+                    No todas las bodegas necesitan RFID o robots. La tecnología correcta depende del tamaño de la operación, del tipo de productos y del presupuesto. Pero conocer las opciones nos permite evaluar qué conviene implementar.
+                </div>
+            </section>
+
+            <section class="section" id="wms">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. WMS: Sistema de Gestión de Bodega</h3>
+                
+                <div class="caja wms">
+                    <h5>WMS - Warehouse Management System</h5>
+                    <p><strong>Traducción:</strong> Sistema de Gestión de Bodega</p>
+                    <p><strong>Función:</strong> Gestiona las operaciones específicas de la bodega: ubicaciones, movimientos, recepción, almacenamiento, picking y despacho.</p>
+                </div>
+                
+                <h4>¿Qué hace un WMS?</h4>
+                <ul>
+                    <li><strong>Gestión de ubicaciones:</strong> define dónde va cada producto y registra dónde está.</li>
+                    <li><strong>Recepción:</strong> registra la llegada de mercadería, verifica contra la orden de compra.</li>
+                    <li><strong>Almacenamiento:</strong> asigna la ubicación óptima según criterios definidos.</li>
+                    <li><strong>Movimientos internos:</strong> registra traslados entre ubicaciones.</li>
+                    <li><strong>Picking:</strong> genera la lista de productos a seleccionar y guía al operario.</li>
+                    <li><strong>Despacho:</strong> verifica que lo que se entrega sea correcto.</li>
+                    <li><strong>Inventario:</strong> mantiene el stock actualizado en tiempo real.</li>
+                    <li><strong>Reportes:</strong> genera informes de stock, movimientos, KPIs.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de un WMS en acción</h5>
+                    <p>Llega un camión con 10 pallets de guantes.</p>
+                    <ol>
+                        <li>El bodeguero escanea la guía de despacho.</li>
+                        <li>El WMS compara con la orden de compra.</li>
+                        <li>Si coincide, el WMS registra la recepción.</li>
+                        <li>El WMS asigna ubicaciones: "Rack B-03-N2, Nivel 2, Posiciones 1-4".</li>
+                        <li>El bodeguero lleva los pallets a esas ubicaciones.</li>
+                        <li>Escanea las etiquetas de ubicación para confirmar.</li>
+                        <li>El WMS actualiza el stock: "150 unidades disponibles en Rack B-03-N2".</li>
+                        <li>Al día siguiente, alguien pide 30 guantes. El WMS genera la orden de picking.</li>
+                        <li>El operario va a Rack B-03-N2, escanea, selecciona 30 unidades.</li>
+                        <li>El WMS descuenta: "120 unidades disponibles".</li>
+                    </ol>
+                    <p>Todo queda registrado. Todo es trazable. Todo está actualizado en tiempo real.</p>
+                </div>
+                
+                <h4>Beneficios del WMS</h4>
+                <ul>
+                    <li><strong>Exactitud:</strong> el stock es siempre actualizado.</li>
+                    <li><strong>Velocidad:</strong> el picking es más rápido porque el sistema guía al operario.</li>
+                    <li><strong>Trazabilidad:</strong> se sabe el historial de cada producto.</li>
+                    <li><strong>Control:</strong> las diferencias se detectan rápido.</li>
+                    <li><strong>Optimización:</strong> el sistema sugiere las mejores ubicaciones.</li>
+                    <li><strong>Integración:</strong> se conecta con el ERP y con otros sistemas.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Un WMS no es solo para bodegas grandes.</strong> Hoy en día existen WMS en la nube, con costos accesibles, que pueden ser usados por bodegas de todos los tamaños. La pregunta no es "si necesito un WMS", sino "cuál WMS necesito".
+                </div>
+            </section>
+
+            <section class="section" id="erp">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. ERP: Planificación de Recursos Empresariales</h3>
+                
+                <div class="caja erp">
+                    <h5>ERP - Enterprise Resource Planning</h5>
+                    <p><strong>Traducción:</strong> Planificación de Recursos Empresariales</p>
+                    <p><strong>Función:</strong> Integra información de diferentes áreas de la empresa: compras, ventas, inventario, finanzas, logística, recursos humanos.</p>
+                </div>
+                
+                <h4>¿Qué hace un ERP?</h4>
+                <p>Mientras el WMS gestiona la operación de la bodega, el ERP gestiona la empresa completa. Es un sistema más amplio que integra todos los departamentos.</p>
+                
+                <h4>Módulos típicos de un ERP</h4>
+                <ul>
+                    <li><strong>Módulo de compras:</strong> órdenes de compra, cotizaciones, proveedores.</li>
+                    <li><strong>Módulo de ventas:</strong> órdenes de venta, facturación, clientes.</li>
+                    <li><strong>Módulo de inventario:</strong> stock, movimientos, valorización.</li>
+                    <li><strong>Módulo de finanzas:</strong> contabilidad, cuentas por pagar, cuentas por cobrar.</li>
+                    <li><strong>Módulo de logística:</strong> transporte, distribución.</li>
+                    <li><strong>Módulo de recursos humanos:</strong> nómina, personal.</li>
+                    <li><strong>Módulo de producción:</strong> planificación de la fabricación.</li>
+                </ul>
+                
+                <h4>¿Cómo se conectan WMS y ERP?</h4>
+                <div class="flujo-integrado">
+                    <div class="paso-flujo">
+                        <div class="paso-num">1</div>
+                        <div><strong>Compras</strong> genera una Orden de Compra en el ERP.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">2</div>
+                        <div><strong>Proveedor</strong> entrega la mercadería.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">3</div>
+                        <div><strong>Bodega</strong> recibe y registra en el WMS.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">4</div>
+                        <div><strong>WMS</strong> envía la información al ERP: "Ingreso confirmado".</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">5</div>
+                        <div><strong>ERP</strong> actualiza inventario y cuentas por pagar.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">6</div>
+                        <div><strong>Usuario</strong> solicita material. El WMS genera el picking.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">7</div>
+                        <div><strong>Bodega</strong> despacha y registra en el WMS.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">8</div>
+                        <div><strong>WMS</strong> envía al ERP: "Salida confirmada".</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">9</div>
+                        <div><strong>ERP</strong> actualiza inventario y costos.</div>
+                    </div>
+                    <div class="paso-flujo">
+                        <div class="paso-num">10</div>
+                        <div>El ciclo se repite con cada movimiento.</div>
+                    </div>
+                </div>
+                
+                <div class="destacado">
+                    El verdadero valor aparece cuando la información de Compras, ERP y WMS está integrada. Porque cuando Compras genera una orden, Bodega ya sabe que va a llegar. Cuando Bodega recibe, Finanzas ya sabe que hay una cuenta por pagar. Cuando Bodega despacha, Planificación ya sabe que el stock bajó. Todo está conectado.
+                </div>
+            </section>
+
+            <section class="section" id="trazabilidad">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Trazabilidad</h3>
+                <p>La trazabilidad es la capacidad de seguir el rastro de un producto desde que entra a la bodega hasta que sale. Es el "historial clínico" de cada ítem.</p>
+                
+                <h4>¿Qué información incluye la trazabilidad?</h4>
+                <ul>
+                    <li><strong>Origen:</strong> quién es el proveedor, cuándo se compró, bajo qué orden de compra.</li>
+                    <li><strong>Recepción:</strong> cuándo llegó, quién lo recibió, en qué condiciones.</li>
+                    <li><strong>Almacenamiento:</strong> en qué ubicación estuvo, cuánto tiempo.</li>
+                    <li><strong>Movimientos:</strong> si se trasladó, cuándo, a dónde.</li>
+                    <li><strong>Despacho:</strong> a quién se le entregó, cuándo, bajo qué documento.</li>
+                    <li><strong>Lote y vencimiento:</strong> información del fabricante.</li>
+                    <li><strong>Estado:</strong> si hubo mermas, daños, devoluciones.</li>
+                </ul>
+                
+                <h4>¿Por qué es importante la trazabilidad?</h4>
+                <ul>
+                    <li><strong>Control de calidad:</strong> si un producto sale defectuoso, se puede rastrear el lote y retirar el resto.</li>
+                    <li><strong>Seguridad alimentaria:</strong> en alimentos, permite rastrear el origen de una contaminación.</li>
+                    <li><strong>Cumplimiento normativo:</strong> muchas industrias exigen trazabilidad por ley.</li>
+                    <li><strong>Investigación de problemas:</strong> si hay una diferencia de inventario, la trazabilidad permite saber qué pasó.</li>
+                    <li><strong>Atención al cliente:</strong> si un cliente reclama, se puede verificar qué se le entregó.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico de trazabilidad</h5>
+                    <p>Un usuario reporta que los guantes que recibió están dañados.</p>
+                    <p>Sin trazabilidad: no sabemos de qué lote vinieron, cuándo llegaron, quién los despachó. Es un problema sin solución.</p>
+                    <p>Con trazabilidad: consultamos el sistema y vemos que los guantes son del lote 2026-003, que llegaron el 15 de agosto, que fueron recepcionados por Juan Pérez, que estuvieron en Rack C-02-N1, y que fueron despachados a María González el 25 de agosto.</p>
+                    <p>Con esa información, podemos investigar qué pasó, identificar si hay más productos del mismo lote, y tomar acciones correctivas.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>La trazabilidad no es un lujo. Es una necesidad operativa.</strong> Porque cuando algo sale mal, la trazabilidad es lo que nos permite encontrar la causa y corregirla. Sin trazabilidad, estamos trabajando a ciegas.
+                </div>
+            </section>
+
+            <section class="section" id="kpis">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. KPIs de Bodega</h3>
+                <p>Los KPIs (Key Performance Indicators o Indicadores Clave de Desempeño) son medidas que nos permiten saber cómo está funcionando la bodega. Sin indicadores, estamos trabajando a ciegas.</p>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <h5>Exactitud de Inventario</h5>
+                        <p>Mide qué tan coincide el sistema con lo físico</p>
+                        <div class="formula">(Coincidencias / Total conteo) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Rotación de Inventario</h5>
+                        <p>Cuántas veces se renueva el stock en un período</p>
+                        <div class="formula">Consumo anual / Stock promedio</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Días de Inventario</h5>
+                        <p>Cuántos días alcanza el stock con el consumo actual</p>
+                        <div class="formula">365 / Índice de rotación</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Tasa de Merma</h5>
+                        <p>Porcentaje del inventario que se pierde</p>
+                        <div class="formula">(Valor mermas / Valor inventario) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Quiebres de Stock</h5>
+                        <p>Veces que no hubo stock cuando se necesitó</p>
+                        <div class="formula">(Solicitudes sin stock / Total solicitudes) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Cumplimiento de Pedidos</h5>
+                        <p>Porcentaje de pedidos atendidos correctamente</p>
+                        <div class="formula">(Pedidos perfectos / Total pedidos) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Productividad de Picking</h5>
+                        <p>Líneas de pedido por hora</p>
+                        <div class="formula">Líneas despachadas / Horas trabajadas</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Tiempo de Recepción</h5>
+                        <p>Desde que llega el camión hasta que está disponible</p>
+                        <div class="formula">Tiempo total de recepción / Nº recepciones</div>
+                    </div>
+                </div>
+                
+                <h4>¿Por qué son importantes los KPIs?</h4>
+                <ul>
+                    <li>Permiten detectar problemas antes de que se conviertan en crisis.</li>
+                    <li>Permiten tomar decisiones basadas en datos, no en suposiciones.</li>
+                    <li>Permiten comparar el desempeño en el tiempo.</li>
+                    <li>Permiten establecer metas y evaluar el cumplimiento.</li>
+                    <li>Permiten identificar oportunidades de mejora.</li>
+                    <li>Permiten justificar inversiones en tecnología o personal.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Los KPIs no son números para guardar en un cajón. Son herramientas de gestión que deben revisarse periódicamente y usarse para tomar decisiones. Un KPI que no genera acción es solo un número.
+                </div>
+            </section>
+
+            <section class="section" id="compras">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. La Conexión con Compras y Adquisiciones</h3>
+                <p>Y aquí viene un tema que me parece fundamental, y que conecta directamente con el mundo de Adquisiciones: cómo la tecnología integra a Compras con Bodega.</p>
+                
+                <p>Porque la tecnología no es solo para Bodega. Es para toda la cadena de abastecimiento. Y cuando Compras y Bodega trabajan con la misma información, los resultados son mucho mejores.</p>
+                
+                <h4>¿Cómo se integran Compras y Bodega a través de la tecnología?</h4>
+                <ul>
+                    <li><strong>Compras genera la OC en el ERP:</strong> Bodega ve automáticamente que va a llegar una recepción.</li>
+                    <li><strong>Bodega recibe y registra en el WMS:</strong> Compras ve que la recepción se confirmó.</li>
+                    <li><strong>El ERP actualiza inventario y finanzas:</strong> Compras ve el costo real, Bodega ve el stock disponible.</li>
+                    <li><strong>Los KPIs se comparten:</strong> Compras puede ver los quiebres de stock, Bodega puede ver los lead times de los proveedores.</li>
+                    <li><strong>Las alertas se generan automáticamente:</strong> si un producto baja del punto de reposición, el sistema puede sugerir una orden de compra.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de integración Compras-Bodega</h5>
+                    <p>Supongamos que tenemos un producto con estos parámetros:</p>
+                    <ul>
+                        <li>Stock mínimo: 20 unidades</li>
+                        <li>Punto de reposición: 70 unidades</li>
+                        <li>Lead time del proveedor: 5 días</li>
+                        <li>Consumo diario: 10 unidades</li>
+                    </ul>
+                    <p>El WMS monitorea el stock todos los días. Cuando el stock baja a 70 unidades, el sistema genera una alerta.</p>
+                    <p>Compras recibe la alerta en el ERP. Verifica la información: proveedor, precio, lead time. Genera la orden de compra.</p>
+                    <p>El proveedor entrega en 5 días. Bodega recibe, registra en el WMS. El ERP actualiza el inventario y las cuentas por pagar.</p>
+                    <p>Todo el ciclo queda registrado. Todo es trazable. Todos trabajan con la misma información.</p>
+                </div>
+                
+                <h4>Conceptos clave desde Adquisiciones que la tecnología ayuda a gestionar</h4>
+                <ul>
+                    <li><strong>Lead time:</strong> el sistema puede medir automáticamente cuánto demora cada proveedor.</li>
+                    <li><strong>Cumplimiento de proveedores:</strong> el sistema registra si el proveedor entregó a tiempo, completo y en buenas condiciones.</li>
+                    <li><strong>Costo total de adquisición (TCO):</strong> el sistema puede calcular no solo el precio del producto, sino también transporte, almacenamiento, mermas.</li>
+                    <li><strong>Criticidad del material:</strong> el sistema puede clasificar los productos por criticidad y aplicar diferentes políticas de reposición.</li>
+                    <li><strong>Lote económico de compra:</strong> el sistema puede calcular la cantidad óptima a comprar.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Compras y Bodega no deberían funcionar como áreas separadas.</strong> Las decisiones de compra determinan en gran medida lo que posteriormente ocurre en almacenamiento, inventario y despacho. La tecnología es el puente que conecta esas áreas y permite que trabajen como un solo sistema.
+                </div>
+                
+                <div class="destacado">
+                    El desempeño de la bodega también está condicionado por la calidad del proceso de abastecimiento. Y la tecnología es la herramienta que permite que esa conexión sea visible, medible y mejorable.
+                </div>
+            </section>
+
+            <section class="section" id="futuro">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. El Futuro de la Bodega</h3>
+                <p>La tecnología en bodega avanza rápido. Lo que hoy parece ciencia ficción, mañana será estándar. Vamos a ver algunas tendencias que ya están cambiando la logística.</p>
+                
+                <h4>Automatización</h4>
+                <p>Los robots ya están trabajando en bodegas. Hay robots que mueven pallets, robots que hacen picking, robots que clasifican productos. En algunos centros de distribución, la operación es casi completamente automatizada.</p>
+                
+                <h4>Inteligencia Artificial</h4>
+                <p>La IA se usa para predecir la demanda, optimizar ubicaciones, planificar rutas de picking y detectar anomalías en el inventario.</p>
+                
+                <h4>Internet de las Cosas (IoT)</h4>
+                <p>Sensores conectados a internet permiten monitorear la temperatura de cámaras frigoríficas, la humedad de la bodega, el estado de los equipos y el nivel de stock en tiempo real.</p>
+                
+                <h4>Blockchain</h4>
+                <p>Se usa para trazabilidad avanzada, especialmente en cadenas de suministro globales. Permite verificar el origen y el recorrido de un producto sin posibilidad de alteración.</p>
+                
+                <h4>Realidad Aumentada</h4>
+                <p>Gafas de realidad aumentada que guían al operario durante el picking, mostrándole la ubicación exacta y la cantidad a seleccionar.</p>
+                
+                <div class="importante">
+                    <strong>La tecnología no elimina al bodeguero. Lo transforma.</strong> El bodeguero del futuro no va a estar moviendo cajas manualmente todo el día. Va a estar supervisando sistemas, analizando datos, resolviendo problemas y tomando decisiones. Y para eso, necesita conocimiento técnico.
+                </div>
+                
+                <p>Y aquí viene una reflexión: muchos trabajadores de bodega ven la tecnología con desconfianza. Piensan que les va a quitar el trabajo. Pero la realidad es que la tecnología cambia el tipo de trabajo, no lo elimina. Y quien se adapte, va a tener más oportunidades que quien no.</p>
+                
+                <div class="destacado">
+                    El futuro de la bodega no es solo tecnología. Es tecnología + conocimiento + criterio. Porque un sistema puede decirte dónde está el producto, pero no puede decirte si esa ubicación tiene sentido. Eso lo decide una persona que entiende la operación.
+                </div>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>11. Errores Comunes con la Tecnología</h3>
+                <p>Para cerrar la parte técnica del módulo, quiero repasar los errores más comunes que se cometen con la tecnología en bodega.</p>
+                
+                <h4>Error 1: Comprar un sistema sin definir procesos</h4>
+                <p>Implementar un WMS o un ERP sin tener claros los procedimientos. Resultado: el sistema se adapta a los vicios existentes en vez de mejorarlos.</p>
+                
+                <h4>Error 2: No capacitar al personal</h4>
+                <p>Comprar tecnología y no enseñar a usarla. Resultado: la gente no la usa o la usa mal.</p>
+                
+                <h4>Error 3: No registrar los movimientos</h4>
+                <p>Tener el sistema pero no usarlo para cada movimiento. Resultado: el sistema queda desactualizado y pierde su valor.</p>
+                
+                <h4>Error 4: Confiar ciegamente en el sistema</h4>
+                <p>Asumir que si el sistema dice algo, es verdad, sin verificar. Resultado: las diferencias se acumulan sin que nadie se dé cuenta.</p>
+                
+                <h4>Error 5: No integrar los sistemas</h4>
+                <p>Tener un WMS que no se conecta con el ERP. Resultado: la información se duplica, se pierde o se contradice.</p>
+                
+                <h4>Error 6: No revisar los KPIs</h4>
+                <p>Generar reportes pero no analizarlos. Resultado: los problemas se repiten porque nadie los ve.</p>
+                
+                <h4>Error 7: Resistirse al cambio</h4>
+                <p>Seguir trabajando "como siempre" cuando hay herramientas que pueden mejorar la operación. Resultado: se pierde eficiencia y competitividad.</p>
+                
+                <div class="destacado">
+                    La tecnología es una herramienta, no una solución mágica. Para que funcione, necesita procesos claros, personas capacitadas y disciplina en el uso. Sin eso, es solo un gasto.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Cierre del Curso Completo</h3>
+                <p>Llegamos al final. Quince módulos. Un recorrido completo por la gestión de una bodega de insumos y materiales.</p>
+                <p>Y quiero cerrar este curso haciendo un recorrido rápido por todo lo que aprendimos, porque cada módulo es un ladrillo que construye el conocimiento completo.</p>
+                
+                <div class="recorrido-grid">
+                    <div class="recorrido-item">
+                        <h5>Módulo 1</h5>
+                        <p>Fundamentos de Prevención de Riesgos</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 2</h5>
+                        <p>Elementos de Protección Personal</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 3</h5>
+                        <p>Señalización y Demarcación</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 4</h5>
+                        <p>Orden, Aseo y Metodología 5S</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 5</h5>
+                        <p>Prevención y Combate de Incendios</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 6</h5>
+                        <p>Introducción a la Bodega</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 7</h5>
+                        <p>Recepción de Mercaderías</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 8</h5>
+                        <p>Almacenamiento y Ubicación</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 9</h5>
+                        <p>Manipulación de Cargas</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 10</h5>
+                        <p>Picking y Despacho</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 11</h5>
+                        <p>Control de Inventarios y Stock</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 12</h5>
+                        <p>Sistemas de Rotación (FIFO/FEFO/LIFO)</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 13</h5>
+                        <p>Provisión y Reposición</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 14</h5>
+                        <p>Sustancias Peligrosas</p>
+                    </div>
+                    <div class="recorrido-item">
+                        <h5>Módulo 15</h5>
+                        <p>Tecnología en Bodega</p>
+                    </div>
+                </div>
+                
+                <p>Si tuviera que resumir todo el curso en una sola idea, sería esta:</p>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #f39c12;">
+                    <p style="font-size: 20px; font-weight: 600; margin-bottom: 15px;">Una bodega no es un lugar donde se amontonan cosas.</p>
+                    <p>Es un sistema que debe asegurar disponibilidad, control, conservación, trazabilidad, seguridad y continuidad operacional.</p>
+                    <p>Y ese sistema conecta con Compras, con Planificación, con Finanzas y con toda la operación de la empresa.</p>
+                </div>
+                
+                <p>Aprendimos que la seguridad es primero. Que el EPP no reemplaza la prevención. Que la señalización guía y protege. Que el orden y el aseo no son opcionales. Que el fuego se previene antes de combatirlo.</p>
+                
+                <p>Aprendimos que una bodega tiene funciones claras: recibir, almacenar, controlar, preparar y despachar. Que cada función tiene su procedimiento y su responsabilidad.</p>
+                
+                <p>Aprendimos que el inventario es el corazón del control. Que la rotación evita mermas. Que la provisión conecta con Compras. Que las sustancias peligrosas requieren respeto y conocimiento.</p>
+                
+                <p>Y aprendimos que la tecnología es el puente que integra todo: que conecta a Compras con Bodega, que permite la trazabilidad, que genera datos para tomar decisiones.</p>
+                
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                
+                <p>Quiero cerrar con una reflexión personal. Cuando empecé a preparar este curso, pensaba que iba a enseñar sobre bodegas. Pero en el proceso me di cuenta de que estaba enseñando sobre algo más grande: sobre cómo funciona una operación completa. Sobre cómo las decisiones de una persona afectan a todas las demás. Sobre cómo la seguridad, el control, la tecnología y las personas son partes de un mismo sistema.</p>
+                
+                <p>Ustedes, que llegaron al final de este curso, ya no son los mismos que empezaron. Ahora ven una bodega con otros ojos. Ven los riesgos, ven los procesos, ven la información, ven la conexión con Compras, ven el impacto de cada decisión.</p>
+                
+                <p>Y eso, más que cualquier herramienta o tecnología, es lo que los va a hacer buenos profesionales de la logística.</p>
+                
+                <p class="frase-final">"La prevención no depende de la suerte.<br>El control no depende de la memoria.<br>La tecnología no depende de la magia.<br>Todo depende de personas que saben lo que hacen."</p>
+                
+                <p style="margin-top: 40px; font-size: 16px; opacity: 0.8;">Gracias por acompañarme en este recorrido. Nos vemos en la bodega.</p>
+                
+                <a href="index.html" class="back-home">Volver al Menú Principal</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

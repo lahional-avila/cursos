@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 3: Señalización y Demarcación de Áreas</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .color-box { display: inline-block; width: 30px; height: 30px; border-radius: 5px; margin-right: 10px; vertical-align: middle; border: 2px solid #333; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 3: Señalización y Demarcación</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. ¿Qué es la Señalización?</a></li>
+                <li><a href="#importancia">2. Importancia en Bodega</a></li>
+                <li><a href="#colores">3. Colores de Seguridad</a></li>
+                <li><a href="#formas">4. Formas Geométricas</a></li>
+                <li><a href="#tipos">5. Tipos de Señalización</a></li>
+                <li><a href="#demarcacion">6. Demarcación de Pisos</a></li>
+                <li><a href="#evacuacion">7. Rutas de Evacuación</a></li>
+                <li><a href="#incendios">8. Equipos Contra Incendios</a></li>
+                <li><a href="#sustancias">9. Sustancias Peligrosas</a></li>
+                <li><a href="#mantenimiento">10. Mantenimiento</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Señalización y Demarcación de Áreas</h2>
+                <p>Aprende a leer, interpretar y mantener la señalización que protege tu vida en la bodega. Porque un cartel mal puesto o un pasillo sin demarcar puede costar más que un accidente.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1601584115197-02c4c40f2b61?w=1200" alt="Señalización en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. ¿Qué es la Señalización?</h3>
+                <p>La señalización es el conjunto de carteles, colores, formas y marcas en el piso que nos comunican información importante sobre seguridad, riesgos y procedimientos dentro de un lugar de trabajo.</p>
+                
+                <p>En una bodega, la señalización es como el idioma que habla el lugar. Te dice dónde puedes caminar, dónde no, dónde hay un peligro, dónde está un extintor, por dónde evacuar si hay una emergencia.</p>
+                
+                <p>Pero ojo: la señalización no funciona sola. Debe ser clara, visible, bien ubicada y mantenida. Un cartel tapado por una caja, un piso demarcado borrado por el tiempo, o una señal mal ubicada, simplemente no sirve.</p>
+                
+                <div class="importante">
+                    <strong>La señalización no reemplaza las medidas de control.</strong> Si hay un peligro real, primero hay que controlarlo. La señalización complementa, avisa y orienta. Pero si el peligro sigue ahí, el cartel solo no te va a proteger.
+                </div>
+                
+                <p>Pensemos en un ejemplo: si tenemos un piso resbaladizo, la solución real es limpiarlo o repararlo. La señalización de "piso mojado" es un aviso temporal mientras se soluciona el problema. No es la solución definitiva.</p>
+            </section>
+
+            <section class="section" id="importancia">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. Importancia de la Señalización en Bodega</h3>
+                <p>¿Por qué es tan importante la señalización en una bodega? Porque en una bodega conviven muchas cosas al mismo tiempo: personas caminando, grúas horquilla moviéndose, cargas en altura, productos químicos, zonas de almacenamiento, pasillos de circulación.</p>
+                
+                <p>Sin señalización clara, cada trabajador tendría que adivinar dónde puede ir, qué es peligroso, dónde está la salida de emergencia. Y adivinar en una bodega es una muy mala idea.</p>
+                
+                <h4>La señalización cumple varias funciones:</h4>
+                <ul>
+                    <li><strong>Advierte sobre peligros:</strong> sustancias químicas, cargas suspendidas, zonas de tránsito de equipos.</li>
+                    <li><strong>Prohíbe acciones inseguras:</strong> no fumar, no ingresar sin autorización, no usar celular.</li>
+                    <li><strong>Obliga a usar protección:</strong> casco, lentes, guantes, zapatos de seguridad.</li>
+                    <li><strong>Indica rutas de evacuación:</strong> salidas de emergencia, puntos de encuentro.</li>
+                    <li><strong>Ubica equipos de emergencia:</strong> extintores, camillas, botiquines.</li>
+                    <li><strong>Organiza el espacio:</strong> pasillos, zonas de almacenamiento, áreas de carga y descarga.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Una bodega bien señalizada es una bodega más segura, más ordenada y más eficiente. Porque todos saben qué se espera de ellos y qué deben evitar.
+                </div>
+                
+                <p>Y algo muy importante: la señalización no es opcional. En Chile, el Decreto Supremo 594 establece obligaciones específicas sobre señalización de seguridad en los lugares de trabajo. No señalizar correctamente puede significar multas para la empresa y, lo que es más grave, puede costar vidas.</p>
+            </section>
+
+            <section class="section" id="colores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Colores de Seguridad</h3>
+                <p>Los colores de seguridad son un lenguaje universal. No importa en qué país estés, el rojo significa peligro o prohibición, el verde significa seguridad o salida, el amarillo significa advertencia.</p>
+                
+                <p>En Chile, la normativa establece los siguientes colores de seguridad:</p>
+                
+                <h4><span class="color-box" style="background: #e74c3c;"></span>ROJO</h4>
+                <ul>
+                    <li><strong>Significado:</strong> Prohibición, peligro inmediato, paro de emergencia.</li>
+                    <li><strong>Uso:</strong> Señales de prohibición, equipos contra incendios, botones de paro de emergencia.</li>
+                    <li><strong>Ejemplo:</strong> "Prohibido fumar", extintores, pulsadores de alarma.</li>
+                </ul>
+                
+                <h4><span class="color-box" style="background: #f39c12;"></span>AMARILLO</h4>
+                <ul>
+                    <li><strong>Significado:</strong> Advertencia, precaución, riesgo.</li>
+                    <li><strong>Uso:</strong> Señales de advertencia, demarcación de zonas peligrosas, partes de máquinas que pueden golpear o cortar.</li>
+                    <li><strong>Ejemplo:</strong> "Piso resbaladizo", "Cuidado carga suspendida", bordes de plataformas.</li>
+                </ul>
+                
+                <h4><span class="color-box" style="background: #27ae60;"></span>VERDE</h4>
+                <ul>
+                    <li><strong>Significado:</strong> Seguridad, condición segura, salvamento.</li>
+                    <li><strong>Uso:</strong> Señales de salida de emergencia, ubicación de botiquines, camillas, duchas de seguridad.</li>
+                    <li><strong>Ejemplo:</strong> "Salida", "Botiquín", "Ducha de emergencia".</li>
+                </ul>
+                
+                <h4><span class="color-box" style="background: #3498db;"></span>AZUL</h4>
+                <ul>
+                    <li><strong>Significado:</strong> Obligación, instrucción específica.</li>
+                    <li><strong>Uso:</strong> Señales obligatorias, instrucciones de uso de EPP.</li>
+                    <li><strong>Ejemplo:</strong> "Uso obligatorio de casco", "Uso obligatorio de lentes".</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Los colores deben ser visibles y contrastantes.</strong> Un cartel amarillo sobre una pared amarilla no se ve. Un cartel rojo en un ambiente oscuro sin iluminación no sirve. La señalización debe diseñarse para ser vista.
+                </div>
+            </section>
+
+            <section class="section" id="formas">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Formas Geométricas de las Señales</h3>
+                <p>Además del color, la forma de la señal también comunica un mensaje. Esto es importante porque incluso si no podemos leer el texto (por distancia o idioma), la forma y el color nos dicen qué tipo de mensaje es.</p>
+                
+                <h4>Círculo con borde rojo y barra diagonal</h4>
+                <p><strong>Significado:</strong> Prohibición.</p>
+                <p><strong>Ejemplo:</strong> Prohibido fumar, prohibido ingresar, prohibido usar celular.</p>
+                
+                <h4>Triángulo con borde amarillo</h4>
+                <p><strong>Significado:</strong> Advertencia, precaución.</p>
+                <p><strong>Ejemplo:</strong> Cuidado carga suspendida, piso resbaladizo, riesgo eléctrico.</p>
+                
+                <h4>Círculo azul</h4>
+                <p><strong>Significado:</strong> Obligación.</p>
+                <p><strong>Ejemplo:</strong> Uso obligatorio de casco, uso obligatorio de lentes, uso obligatorio de guantes.</p>
+                
+                <h4>Rectángulo o cuadrado verde</h4>
+                <p><strong>Significado:</strong> Condición segura, salvamento, salida.</p>
+                <p><strong>Ejemplo:</strong> Salida de emergencia, botiquín, ducha de seguridad.</p>
+                
+                <h4>Cuadrado rojo</h4>
+                <p><strong>Significado:</strong> Equipos contra incendios.</p>
+                <p><strong>Ejemplo:</strong> Ubicación de extintores, mangueras, alarmas.</p>
+                
+                <div class="destacado">
+                    La combinación de color y forma hace que la señalización sea universal. No importa el idioma, cualquier persona puede entender lo que la señal quiere comunicar.
+                </div>
+            </section>
+
+            <section class="section" id="tipos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Tipos de Señalización en Bodega</h3>
+                <p>En una bodega podemos encontrar varios tipos de señalización, cada una con un propósito específico:</p>
+                
+                <h4>Señalización de prohibición</h4>
+                <p>Indica acciones que están estrictamente prohibidas porque representan un peligro.</p>
+                <ul>
+                    <li>Prohibido fumar.</li>
+                    <li>Prohibido ingresar sin autorización.</li>
+                    <li>Prohibido usar celular.</li>
+                    <li>Prohibido apoyar cargas en ciertas zonas.</li>
+                </ul>
+                
+                <h4>Señalización de advertencia</h4>
+                <p>Advierte sobre la existencia de un peligro o riesgo.</p>
+                <ul>
+                    <li>Cuidado carga suspendida.</li>
+                    <li>Piso resbaladizo.</li>
+                    <li>Riesgo eléctrico.</li>
+                    <li>Transito de grúas horquilla.</li>
+                    <li>Superficie caliente.</li>
+                </ul>
+                
+                <h4>Señalización obligatoria</h4>
+                <p>Indica una acción que debe realizarse obligatoriamente.</p>
+                <ul>
+                    <li>Uso obligatorio de casco.</li>
+                    <li>Uso obligatorio de lentes de seguridad.</li>
+                    <li>Uso obligatorio de guantes.</li>
+                    <li>Uso obligatorio de zapatos de seguridad.</li>
+                    <li>Uso obligatorio de protección auditiva.</li>
+                </ul>
+                
+                <h4>Señalización de emergencia</h4>
+                <p>Indica rutas de evacuación, salidas y equipos de emergencia.</p>
+                <ul>
+                    <li>Salida de emergencia.</li>
+                    <li>Ruta de evacuación.</li>
+                    <li>Punto de encuentro.</li>
+                    <li>Botiquín.</li>
+                    <li>Camilla.</li>
+                    <li>Ducha de seguridad.</li>
+                    <li>Lavaojos.</li>
+                </ul>
+                
+                <h4>Señalización de equipos contra incendios</h4>
+                <p>Ubica los equipos disponibles para combatir incendios.</p>
+                <ul>
+                    <li>Extintor.</li>
+                    <li>Manguera contra incendios.</li>
+                    <li>Alarmas.</li>
+                    <li>Pulsadores de emergencia.</li>
+                </ul>
+                
+                <h4>Señalización informativa</h4>
+                <p>Proporciona información general sobre la bodega.</p>
+                <ul>
+                    <li>Ubicación de zonas de almacenamiento.</li>
+                    <li>Capacidad máxima de racks.</li>
+                    <li>Velocidad máxima permitida.</li>
+                    <li>Horarios de operación.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Toda la señalización debe ser comprensible.</strong> Si los trabajadores no entienden lo que la señal quiere decir, no sirve de nada. Por eso es importante capacitar al personal en el significado de las señales.
+                </div>
+            </section>
+
+            <section class="section" id="demarcacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Demarcación de Pisos</h3>
+                <p>La demarcación de pisos es la señalización que se pinta o adhiere directamente en el suelo de la bodega. Su función es organizar el espacio, separar zonas y guiar la circulación de personas y equipos.</p>
+                
+                <h4>¿Qué se demarca en una bodega?</h4>
+                <ul>
+                    <li><strong>Pasillos de circulación:</strong> zonas por donde deben circular personas y equipos.</li>
+                    <li><strong>Zonas de almacenamiento:</strong> áreas específicas para guardar productos.</li>
+                    <li><strong>Zonas de carga y descarga:</strong> áreas donde se reciben y despachan mercaderías.</li>
+                    <li><strong>Zonas peatonales:</strong> caminos exclusivos para personas, separados del tránsito de equipos.</li>
+                    <li><strong>Zonas de peligro:</strong> áreas donde existen riesgos específicos.</li>
+                    <li><strong>Zonas de espera:</strong> áreas para conductores o visitas.</li>
+                </ul>
+                
+                <h4>Colores para demarcación de pisos</h4>
+                <ul>
+                    <li><strong>Amarillo:</strong> demarcación de pasillos, zonas de circulación, bordes de plataformas.</li>
+                    <li><strong>Blanco:</strong> demarcación de zonas de almacenamiento, ubicación de equipos.</li>
+                    <li><strong>Rojo:</strong> zonas de peligro, áreas de equipos contra incendios.</li>
+                    <li><strong>Verde:</strong> zonas seguras, áreas de primeros auxilios.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Una bodega bien demarcada es una bodega ordenada. Los pasillos despejados y claramente identificados permiten la circulación segura de personas y equipos, reduciendo el riesgo de atropellos y caídas.
+                </div>
+                
+                <p>Y algo muy importante: la demarcación debe mantenerse. Con el tiempo, la pintura se borra, las cintas adhesivas se levantan. Si la demarcación está borrada, debe repintarse o reemplazarse. Una demarcación invisible no cumple su función.</p>
+            </section>
+
+            <section class="section" id="evacuacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Señalización de Rutas de Evacuación</h3>
+                <p>En caso de emergencia, cada segundo cuenta. Por eso, las rutas de evacuación deben estar claramente señalizadas para que todas las personas puedan salir de manera rápida y segura.</p>
+                
+                <h4>¿Qué debe estar señalizado?</h4>
+                <ul>
+                    <li><strong>Salidas de emergencia:</strong> puertas que conducen al exterior o a zonas seguras.</li>
+                    <li><strong>Rutas de evacuación:</strong> caminos que conducen a las salidas.</li>
+                    <li><strong>Puntos de encuentro:</strong> zonas seguras donde debe concentrarse el personal después de evacuar.</li>
+                    <li><strong>Escaleras de emergencia:</strong> vías de evacuación vertical.</li>
+                </ul>
+                
+                <h4>Características de la señalización de evacuación</h4>
+                <ul>
+                    <li><strong>Color verde:</strong> indica condición segura, salvamento.</li>
+                    <li><strong>Fotoluminiscente:</strong> debe brillar en la oscuridad en caso de corte de energía.</li>
+                    <li><strong>Visible:</strong> ubicada a la altura de los ojos, en lugares donde no pueda ser tapada.</li>
+                    <li><strong>Continua:</strong> las flechas deben guiar sin interrupción hasta la salida.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Las salidas de emergencia nunca deben estar bloqueadas.</strong> Es una de las infracciones más graves en prevención de riesgos. Una salida bloqueada puede significar que las personas queden atrapadas en caso de incendio u otra emergencia.
+                </div>
+                
+                <p>Y algo que muchas veces se olvida: las rutas de evacuación deben ser conocidas por todos los trabajadores. No basta con poner carteles. Hay que hacer simulacros, capacitaciones y recorridos para que todos sepan por dónde salir.</p>
+            </section>
+
+            <section class="section" id="incendios">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Señalización de Equipos Contra Incendios</h3>
+                <p>Los equipos contra incendios deben estar claramente identificados y accesibles. En caso de emergencia, no hay tiempo para andar buscando dónde está el extintor.</p>
+                
+                <h4>¿Qué debe estar señalizado?</h4>
+                <ul>
+                    <li><strong>Extintores:</strong> ubicación y tipo de extintor (ABC, CO2, agua, etc.).</li>
+                    <li><strong>Mangueras contra incendios:</strong> gabinetes con mangueras y boquillas.</li>
+                    <li><strong>Alarmas:</strong> pulsadores manuales de alarma.</li>
+                    <li><strong>Tableros eléctricos:</strong> ubicación de tableros para corte de energía.</li>
+                </ul>
+                
+                <h4>Características de la señalización</h4>
+                <ul>
+                    <li><strong>Color rojo:</strong> indica equipos contra incendios.</li>
+                    <li><strong>Visible:</strong> ubicada sobre el equipo o en lugar cercano.</li>
+                    <li><strong>Accesible:</strong> el equipo no debe estar tapado ni bloqueado por mercadería.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Un extintor tapado por cajas es un extintor que no existe en el momento de la emergencia. Por eso, alrededor de los equipos contra incendios debe mantenerse un espacio libre de al menos 1 metro, claramente demarcado en el piso.
+                </div>
+                
+                <p>Y algo muy importante: no basta con tener extintores. Los trabajadores deben saber dónde están, qué tipo de fuego pueden combatir y cómo usarlos. La señalización es solo el primer paso.</p>
+            </section>
+
+            <section class="section" id="sustancias">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Señalización de Sustancias Peligrosas</h3>
+                <p>Cuando en la bodega se almacenan o manipulan sustancias químicas peligrosas, la señalización se vuelve aún más crítica. No es lo mismo manipular agua que manipular ácido sulfúrico.</p>
+                
+                <h4>Sistema Globalmente Armonizado (SGA)</h4>
+                <p>El SGA es un sistema internacional que estandariza la clasificación y etiquetado de sustancias químicas. En Chile, está incorporado en la normativa y es de cumplimiento obligatorio.</p>
+                
+                <h4>Pictogramas de peligro</h4>
+                <p>Son rombos con borde rojo y fondo blanco que contienen un símbolo negro que representa el tipo de peligro:</p>
+                <ul>
+                    <li><strong>Llama:</strong> inflamable.</li>
+                    <li><strong>Llama sobre círculo:</strong> comburente (facilita la combustión).</li>
+                    <li><strong>Bomba explotando:</strong> explosivo.</li>
+                    <li><strong>Calavera:</strong> tóxico.</li>
+                    <li><strong>Signo de exclamación:</strong> irritante, nocivo.</li>
+                    <li><strong>Corrosión:</strong> corrosivo.</li>
+                    <li><strong>Persona con estrella:</strong> peligro para la salud.</li>
+                    <li><strong>Árbol y pez muertos:</strong> peligroso para el medio ambiente.</li>
+                </ul>
+                
+                <h4>Etiquetado de envases</h4>
+                <p>Todo envase que contenga una sustancia peligrosa debe tener una etiqueta que incluya:</p>
+                <ul>
+                    <li>Nombre del producto.</li>
+                    <li>Pictogramas de peligro.</li>
+                    <li>Palabra de advertencia (Peligro o Atención).</li>
+                    <li>Indicaciones de peligro (frases H).</li>
+                    <li>Consejos de prudencia (frases P).</li>
+                    <li>Identificación del proveedor.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Nunca manipules una sustancia química sin conocer sus riesgos.</strong> Antes de abrir cualquier envase, revisa la etiqueta y la Hoja de Datos de Seguridad (HDS). Ahí está toda la información sobre cómo manipularlo, almacenarlo y qué hacer en caso de emergencia.
+                </div>
+                
+                <p>Y algo muy importante: si encuentras un envase sin etiqueta o con etiqueta ilegible, no lo manipules. Informa inmediatamente a tu supervisor. Ese envase puede contener una sustancia peligrosa y debes saber qué es antes de tocarlo.</p>
+            </section>
+
+            <section class="section" id="mantenimiento">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Mantenimiento de la Señalización</h3>
+                <p>La señalización no se pone y se olvida. Requiere mantenimiento constante para cumplir su función. Un cartel borrado, una demarcación invisible o una señal tapada no sirve para nada.</p>
+                
+                <h4>¿Qué debemos revisar periódicamente?</h4>
+                <ul>
+                    <li><strong>Visibilidad:</strong> las señales deben estar limpias, sin manchas ni suciedad que dificulten su lectura.</li>
+                    <li><strong>Integridad:</strong> no deben estar rotas, rajadas ni despegadas.</li>
+                    <li><strong>Iluminación:</strong> las señales fotoluminiscentes deben cargarse con luz para brillar en la oscuridad.</li>
+                    <li><strong>Ubicación:</strong> no deben estar tapadas por mercadería, cajas o equipos.</li>
+                    <li><strong>Demarcación de pisos:</strong> debe repintarse cuando esté borrada o levantada.</li>
+                    <li><strong>Actualización:</strong> si cambian las condiciones de la bodega, la señalización debe actualizarse.</li>
+                </ul>
+                
+                <h4>Responsabilidades</h4>
+                <ul>
+                    <li><strong>La empresa:</strong> debe proporcionar y mantener la señalización en buen estado.</li>
+                    <li><strong>Los supervisores:</strong> deben verificar que la señalización esté correcta y visible.</li>
+                    <li><strong>Los trabajadores:</strong> deben informar cuando detecten señales dañadas, borradas o tapadas.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Si ves una señal dañada o tapada, no la ignores. Informa a tu supervisor. Ese cartel puede estar protegiendo tu vida o la de tus compañeros.
+                </div>
+                
+                <p>Y algo muy importante: cuando se realicen cambios en la bodega (reubicación de racks, nuevas zonas de almacenamiento, modificaciones de rutas), la señalización debe actualizarse inmediatamente. Una señalización desactualizada puede generar confusión y accidentes.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>La señalización y demarcación son herramientas fundamentales para la seguridad en bodega. No son decoración, no son trámite. Son el idioma que habla el lugar para protegernos.</p>
+                <p>Aprender a leer la señalización, respetarla y mantenerla es responsabilidad de todos. Porque un cartel bien puesto puede evitar un accidente, y una señal ignorada puede costar caro.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"La señalización no te protege sola.<br>Pero te da la información para protegerte tú."</p>
+                
+                <a href="parte4.html" class="next-module">Siguiente Módulo: Orden y Aseo (5S) →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES NI EMOJIS
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX') || v.lang.startsWith('es-US')));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX')));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

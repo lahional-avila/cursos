@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 5: Prevención y Combate de Incendios</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .clase-fuego { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .fuego-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.3s; border-left: 6px solid; }
+    .fuego-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .fuego-item h5 { display: inline; color: #1e3a5f; font-size: 18px; margin-left: 10px; }
+    .fuego-a { border-left-color: #27ae60; }
+    .fuego-b { border-left-color: #e74c3c; }
+    .fuego-c { border-left-color: #3498db; }
+    .fuego-d { border-left-color: #f39c12; }
+    .fuego-k { border-left-color: #9b59b6; }
+    .triangulo-container { display: flex; justify-content: center; align-items: center; margin: 30px 0; gap: 20px; flex-wrap: wrap; }
+    .triangulo-item { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 20px 30px; border-radius: 10px; text-align: center; font-weight: 600; min-width: 150px; box-shadow: 0 4px 15px rgba(231,76,60,0.3); }
+    .extintor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0; }
+    .extintor-card { background: #f8f9fa; border-radius: 10px; padding: 25px; border-top: 4px solid #e74c3c; }
+    .extintor-card h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 12px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 5: Prevención y Combate de Incendios</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#por-que-partimos">1. El fuego en la bodega</a></li>
+                <li><a href="#triangulo">2. El Triángulo del Fuego</a></li>
+                <li><a href="#clases">3. Clases de Fuego</a></li>
+                <li><a href="#metodos">4. Métodos de Extinción</a></li>
+                <li><a href="#extintores">5. Tipos de Extintores</a></li>
+                <li><a href="#uso-extintor">6. Uso Correcto del Extintor</a></li>
+                <li><a href="#prevencion-bodega">7. Prevención en Bodega</a></li>
+                <li><a href="#evacuacion">8. Plan de Evacuación</a></li>
+                <li><a href="#brigadas">9. Brigadas de Emergencia</a></li>
+                <li><a href="#normativa">10. Normativa Aplicable</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Prevención y Combate de Incendios</h2>
+                <p>El fuego puede destruir en minutos lo que tomó años construir. Aprender a prevenirlo y actuar correctamente puede marcar la diferencia entre un susto y una tragedia.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?w=1200" alt="Prevención de incendios en bodega" class="banner-image">
+
+            <section class="section" id="por-que-partimos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. El Fuego en la Bodega</h3>
+                <p>Antes de comenzar directamente con el fuego, quiero que pensemos en algo que todos tenemos en mente cuando hablamos de incendios.</p>
+                
+                <p>En una bodega tenemos cajas de cartón, pallets de madera, plástico, productos químicos, equipos eléctricos, instalaciones de gas y muchas otras cosas que pueden arder. Es decir, tenemos todo lo que el fuego necesita para crecer rápidamente.</p>
+                
+                <p>Y aquí viene lo importante: la mayoría de los incendios no son accidentes impredecibles. Son el resultado de condiciones que no se controlaron, de prácticas inseguras o de simple descuido. Y eso significa algo muy poderoso: la mayoría de los incendios se pueden prevenir.</p>
+                
+                <div class="importante">
+                    <strong>La prevención de incendios no comienza cuando aparecen las llamas.</strong> Comienza mucho antes, cuando identificamos las condiciones que podrían provocar un incendio y las corregimos a tiempo.
+                </div>
+                
+                <p>Pensemos en situaciones reales de bodega que podrían provocar un incendio:</p>
+                <ul>
+                    <li>Un cable eléctrico pelado que genera chispas cerca de cartones.</li>
+                    <li>Un cigarro mal apagado en una zona de almacenamiento.</li>
+                    <li>Productos químicos incompatibles almacenados juntos.</li>
+                    <li>Un extintor vencido o bloqueado por mercadería.</li>
+                    <li>Pasillos bloqueados que impiden la evacuación.</li>
+                    <li>Equipos eléctricos sobrecargados o en mal estado.</li>
+                </ul>
+                
+                <p>Todas estas son condiciones que, si se detectan y corrigen a tiempo, evitan un incendio. Por eso, en este módulo vamos a aprender no solo a combatir el fuego, sino principalmente a prevenirlo.</p>
+                
+                <div class="destacado">
+                    Un incendio en una bodega puede destruir en minutos lo que tomó años construir. Y lo más importante: puede costar vidas. Por eso la prevención no es opcional: es fundamental.
+                </div>
+            </section>
+
+            <section class="section" id="triangulo">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. El Triángulo del Fuego</h3>
+                <p>Para entender cómo prevenir y combatir un incendio, primero tenemos que entender qué es el fuego y cómo se produce.</p>
+                
+                <p>El fuego es una reacción química de combustión que requiere tres elementos para existir. Si falta cualquiera de estos tres elementos, el fuego no se produce o se extingue.</p>
+                
+                <div class="triangulo-container">
+                    <div class="triangulo-item">COMBUSTIBLE</div>
+                    <div class="triangulo-item">OXÍGENO</div>
+                    <div class="triangulo-item">CALOR</div>
+                </div>
+                
+                <h4>Los tres elementos del fuego</h4>
+                <ul>
+                    <li><strong>Combustible:</strong> cualquier material que puede arder. Madera, cartón, papel, plásticos, líquidos inflamables, gases. En una bodega tenemos mucho combustible.</li>
+                    <li><strong>Oxígeno:</strong> el aire que respiramos contiene aproximadamente 21% de oxígeno. El fuego necesita oxígeno para mantenerse.</li>
+                    <li><strong>Calor:</strong> la energía necesaria para iniciar la combustión. Puede venir de una chispa, una llama, una superficie caliente, electricidad, fricción.</li>
+                </ul>
+                
+                <p>Y aquí viene una idea fundamental: todos los métodos de extinción se basan en eliminar uno de estos tres elementos. Si eliminamos el combustible, el fuego se apaga. Si eliminamos el oxígeno, el fuego se apaga. Si eliminamos el calor, el fuego se apaga.</p>
+                
+                <div class="importante">
+                    <strong>Entender el triángulo del fuego nos permite elegir el método correcto de extinción.</strong> No es lo mismo apagar un fuego de madera que un fuego de gasolina o un fuego eléctrico. Cada uno requiere un tratamiento diferente.
+                </div>
+                
+                <p>En algunos casos más avanzados, se agrega un cuarto elemento: la reacción química en cadena. Cuando el fuego se mantiene y se propaga, se produce una reacción en cadena que lo alimenta. Por eso, algunos agentes extintores actúan interrumpiendo esta reacción química.</p>
+            </section>
+
+            <section class="section" id="clases">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Clases de Fuego</h3>
+                <p>Ahora viene algo muy importante. No todos los fuegos son iguales. Dependiendo del tipo de material que arde, el fuego se clasifica en diferentes categorías. Y esto es crucial, porque el tipo de fuego determina qué agente extintor debemos usar.</p>
+                
+                <p>Si usamos el extintor incorrecto, no solo no apagaremos el fuego, sino que podemos empeorarlo o poner nuestra vida en riesgo.</p>
+                
+                <div class="clase-fuego">
+                    <div class="fuego-item fuego-a">
+                        <h5>CLASE A - Sólidos Comunes</h5>
+                        <p><strong>Materiales:</strong> madera, cartón, papel, tela, plásticos, goma.</p>
+                        <p><strong>Característica:</strong> dejan brasas y cenizas.</p>
+                        <p><strong>Ejemplo en bodega:</strong> cajas de cartón, pallets de madera, embalajes.</p>
+                        <p><strong>Agente recomendado:</strong> agua, polvo químico ABC.</p>
+                    </div>
+                    <div class="fuego-item fuego-b">
+                        <h5>CLASE B - Líquidos Inflamables</h5>
+                        <p><strong>Materiales:</strong> gasolina, alcohol, pinturas, solventes, aceites.</p>
+                        <p><strong>Característica:</strong> se propagan rápidamente por la superficie.</p>
+                        <p><strong>Ejemplo en bodega:</strong> productos químicos, combustibles, pinturas.</p>
+                        <p><strong>Agente recomendado:</strong> espuma, CO2, polvo químico.</p>
+                    </div>
+                    <div class="fuego-item fuego-c">
+                        <h5>CLASE C - Equipos Eléctricos</h5>
+                        <p><strong>Materiales:</strong> tableros, motores, cables, equipos conectados.</p>
+                        <p><strong>Característica:</strong> riesgo de electrocución si se usa agua.</p>
+                        <p><strong>Ejemplo en bodega:</strong> tableros eléctricos, grúas horquilla eléctricas.</p>
+                        <p><strong>Agente recomendado:</strong> CO2, polvo químico.</p>
+                    </div>
+                    <div class="fuego-item fuego-d">
+                        <h5>CLASE D - Metales Combustibles</h5>
+                        <p><strong>Materiales:</strong> magnesio, titanio, sodio, potasio.</p>
+                        <p><strong>Característica:</strong> requieren agentes extintores especiales.</p>
+                        <p><strong>Ejemplo en bodega:</strong> poco común, pero puede haber metales específicos.</p>
+                        <p><strong>Agente recomendado:</strong> polvo especial para metales.</p>
+                    </div>
+                    <div class="fuego-item fuego-k">
+                        <h5>CLASE K - Aceites y Grasas</h5>
+                        <p><strong>Materiales:</strong> aceites y grasas vegetales o animales.</p>
+                        <p><strong>Característica:</strong> altas temperaturas, requieren agentes especiales.</p>
+                        <p><strong>Ejemplo en bodega:</strong> si hay cocina o comedor.</p>
+                        <p><strong>Agente recomendado:</strong> agente químico húmedo.</p>
+                    </div>
+                </div>
+                
+                <div class="destacado">
+                    Antes de usar un extintor, debes identificar qué tipo de fuego tienes. Usar agua en un fuego eléctrico puede ser mortal. Usar agua en un fuego de líquidos inflamables puede propagar el fuego.
+                </div>
+                
+                <p>Por eso, los extintores están etiquetados con las clases de fuego que pueden combatir. Un extintor puede ser multipropósito (como el ABC) o específico para ciertas clases. Aprender a leer esa etiqueta puede salvar tu vida.</p>
+            </section>
+
+            <section class="section" id="metodos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Métodos de Extinción</h3>
+                <p>Como vimos, el fuego necesita tres elementos para existir: combustible, oxígeno y calor. Para extinguir un fuego, debemos eliminar al menos uno de estos elementos. Y para cada elemento que eliminamos, hay un método de extinción específico.</p>
+                
+                <h4>Método 1: Enfriamiento (eliminar el calor)</h4>
+                <p>Consiste en reducir la temperatura del combustible por debajo de su punto de ignición.</p>
+                <ul>
+                    <li><strong>Agente principal:</strong> agua.</li>
+                    <li><strong>Cómo funciona:</strong> el agua absorbe el calor y reduce la temperatura.</li>
+                    <li><strong>Uso:</strong> fuegos Clase A (sólidos comunes).</li>
+                    <li><strong>No usar:</strong> en fuegos eléctricos ni en líquidos inflamables.</li>
+                </ul>
+                
+                <h4>Método 2: Sofocación (eliminar el oxígeno)</h4>
+                <p>Consiste en impedir que el oxígeno llegue al combustible.</p>
+                <ul>
+                    <li><strong>Agentes principales:</strong> espuma, CO2, polvo químico, mantas ignífugas.</li>
+                    <li><strong>Cómo funciona:</strong> el agente forma una barrera entre el combustible y el oxígeno.</li>
+                    <li><strong>Uso:</strong> fuegos Clase B y algunos Clase A.</li>
+                    <li><strong>Ejemplo práctico:</strong> cubrir una sartén con aceite en llamas con una tapa.</li>
+                </ul>
+                
+                <h4>Método 3: Eliminación del combustible</h4>
+                <p>Consiste en retirar el material combustible del fuego o separarlo.</p>
+                <ul>
+                    <li><strong>Cómo funciona:</strong> se retira el combustible o se cierra el paso de combustible.</li>
+                    <li><strong>Ejemplo práctico:</strong> cerrar la llave de paso de gas cuando hay un incendio.</li>
+                </ul>
+                
+                <h4>Método 4: Interrupción de la reacción en cadena</h4>
+                <p>Consiste en interrumpir la reacción química que mantiene el fuego.</p>
+                <ul>
+                    <li><strong>Agentes principales:</strong> polvo químico seco, agentes limpios.</li>
+                    <li><strong>Cómo funciona:</strong> el agente interfiere con la reacción química del fuego.</li>
+                    <li><strong>Uso:</strong> fuegos Clase B y C.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Cada tipo de fuego requiere un método específico de extinción.</strong> Por eso es fundamental identificar correctamente la clase de fuego antes de actuar. Usar el método incorrecto no solo no apagará el fuego, sino que puede empeorarlo o poner en riesgo tu vida.
+                </div>
+            </section>
+
+            <section class="section" id="extintores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Tipos de Extintores</h3>
+                <p>Los extintores son equipos portátiles diseñados para combatir incendios en su etapa inicial. Son nuestra primera línea de defensa cuando el fuego es pequeño y podemos actuar con seguridad.</p>
+                
+                <p>Pero ojo: no todos los extintores son iguales. Cada tipo contiene un agente extintor específico y está diseñado para ciertas clases de fuego.</p>
+                
+                <div class="extintor-grid">
+                    <div class="extintor-card">
+                        <h5>Extintor de Agua Presurizada</h5>
+                        <p><strong>Clase de fuego:</strong> A (sólidos comunes).</p>
+                        <p><strong>Método:</strong> enfriamiento.</p>
+                        <p><strong>No usar en:</strong> fuegos eléctricos ni líquidos inflamables.</p>
+                        <p><strong>Identificación:</strong> etiqueta con letra A.</p>
+                    </div>
+                    <div class="extintor-card">
+                        <h5>Extintor de Espuma (AFFF)</h5>
+                        <p><strong>Clase de fuego:</strong> A y B.</p>
+                        <p><strong>Método:</strong> sofocación y enfriamiento.</p>
+                        <p><strong>No usar en:</strong> fuegos eléctricos.</p>
+                        <p><strong>Identificación:</strong> etiqueta con A y B.</p>
+                    </div>
+                    <div class="extintor-card">
+                        <h5>Extintor de Polvo Químico Seco (PQS)</h5>
+                        <p><strong>Clase de fuego:</strong> ABC (multipropósito).</p>
+                        <p><strong>Método:</strong> interrupción de la reacción en cadena.</p>
+                        <p><strong>Ventaja:</strong> muy efectivo y versátil.</p>
+                        <p><strong>Desventaja:</strong> deja residuos, puede dañar equipos electrónicos.</p>
+                    </div>
+                    <div class="extintor-card">
+                        <h5>Extintor de CO2 (Dióxido de Carbono)</h5>
+                        <p><strong>Clase de fuego:</strong> B y C.</p>
+                        <p><strong>Método:</strong> sofocación.</p>
+                        <p><strong>Ventaja:</strong> no deja residuos, ideal para equipos electrónicos.</p>
+                        <p><strong>Desventaja:</strong> riesgo de asfixia en espacios cerrados.</p>
+                        <p><strong>Identificación:</strong> boquilla cónica.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>Antes de usar un extintor, verifica que sea adecuado para el tipo de fuego.</strong> Un extintor de agua en un fuego eléctrico puede ser mortal. Un extintor de CO2 en un fuego de madera no será efectivo.
+                </div>
+                
+                <p>Y algo muy importante: los extintores deben ser revisados periódicamente, recargados según su vencimiento y ubicados en lugares visibles y accesibles. Un extintor vencido o bloqueado por mercadería simplemente no sirve.</p>
+            </section>
+
+            <section class="section" id="uso-extintor">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Uso Correcto del Extintor</h3>
+                <p>Tener un extintor adecuado no sirve de nada si no sabemos usarlo correctamente. El uso del extintor debe ser rápido, seguro y efectivo. Y aquí viene una regla de oro: los extintores son para incendios en etapa inicial. Si el fuego ya se propagó, evacúa y llama a los bomberos.</p>
+                
+                <h4>Reglas básicas antes de usar un extintor</h4>
+                <ul>
+                    <li><strong>Asegúrate de que el fuego sea pequeño:</strong> si ya se propagó, no intentes combatirlo solo.</li>
+                    <li><strong>Identifica el tipo de fuego:</strong> verifica que el extintor sea adecuado.</li>
+                    <li><strong>Mantén una salida a tu espalda:</strong> nunca te metas entre el fuego y la salida.</li>
+                    <li><strong>Avisa a otros:</strong> activa la alarma y avisa a las personas cercanas.</li>
+                    <li><strong>Posiciónate a distancia segura:</strong> generalmente entre 2 y 3 metros del fuego.</li>
+                </ul>
+                
+                <h4>Técnica PASS</h4>
+                <p>La técnica PASS es un método simple y efectivo para usar un extintor. Son cuatro pasos que debes recordar:</p>
+                
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>P - Pull (Jalar):</strong> jala el pasador de seguridad del extintor. Esto rompe el precinto y permite activar el equipo.</li>
+                        <li><strong>A - Aim (Apuntar):</strong> apunta la boquilla o manguera hacia la base del fuego, no hacia las llamas. El fuego se apaga atacando la base, no la parte superior.</li>
+                        <li><strong>S - Squeeze (Apretar):</strong> aprieta el gatillo o palanca para liberar el agente extintor.</li>
+                        <li><strong>S - Sweep (Barrer):</strong> mueve la boquilla de lado a lado, barriendo la base del fuego desde el frente hacia atrás, avanzando medida que el fuego se reduce.</li>
+                    </ol>
+                </div>
+                
+                <div class="destacado">
+                    Recuerda: apunta a la base del fuego, no a las llamas. Si apuntas a las llamas, el agente extintor pasará a través del fuego sin apagarlo. El fuego se apaga desde abajo, atacando la fuente de combustible.
+                </div>
+                
+                <p>Y algo muy importante: si el extintor se vacía y el fuego no se ha apagado, evacúa inmediatamente. No intentes seguir combatiendo un fuego que no pudiste controlar con un extintor completo. En ese punto, necesitas a los bomberos.</p>
+            </section>
+
+            <section class="section" id="prevencion-bodega">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Prevención de Incendios en Bodega</h3>
+                <p>Ahora viene lo más importante de este módulo. Porque la mejor manera de combatir un incendio es evitando que se produzca. Y en una bodega, hay muchas medidas preventivas que podemos aplicar.</p>
+                
+                <h4>Medidas preventivas generales</h4>
+                <ul>
+                    <li><strong>Orden y limpieza:</strong> una bodega desordenada acumula materiales combustibles que pueden alimentar un incendio.</li>
+                    <li><strong>Control de fuentes de calor:</strong> revisar instalaciones eléctricas, equipos, sistemas de calefacción.</li>
+                    <li><strong>Prohibición de fumar:</strong> en zonas de almacenamiento, especialmente cerca de materiales inflamables.</li>
+                    <li><strong>Almacenamiento correcto de sustancias:</strong> respetar la segregación de productos químicos incompatibles.</li>
+                    <li><strong>Mantenimiento de equipos:</strong> grúas horquilla, transpaletas, sistemas eléctricos.</li>
+                    <li><strong>Vías de evacuación despejadas:</strong> nunca bloquear salidas de emergencia ni pasillos.</li>
+                    <li><strong>Equipos contra incendios accesibles:</strong> extintores, mangueras, alarmas siempre visibles y sin obstáculos.</li>
+                </ul>
+                
+                <h4>¿Por qué una bodega desordenada aumenta el riesgo de incendio?</h4>
+                <p>Esta es una pregunta que me gusta hacer. Porque mucha gente piensa que el desorden es solo un problema estético o de eficiencia. Pero no. Una bodega desordenada:</p>
+                <ul>
+                    <li>Dificulta detectar condiciones peligrosas.</li>
+                    <li>Dificulta acceder a equipos contra incendios.</li>
+                    <li>Dificulta la circulación y la evacuación.</li>
+                    <li>Aumenta la cantidad de material combustible disponible.</li>
+                    <li>Dificulta controlar la emergencia una vez iniciada.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El orden y la limpieza no son solo una cuestión estética.</strong> Son medidas de prevención de incendios. Una bodega ordenada es una bodega más segura.
+                </div>
+                
+                <h4>Almacenamiento de sustancias peligrosas</h4>
+                <p>Si en la bodega almacenamos sustancias químicas peligrosas, las medidas de prevención se vuelven aún más críticas:</p>
+                <ul>
+                    <li><strong>Segregación:</strong> sustancias incompatibles deben almacenarse separadas.</li>
+                    <li><strong>Ventilación:</strong> evitar acumulación de vapores inflamables.</li>
+                    <li><strong>Control de derrames:</strong> tener materiales de contención disponibles.</li>
+                    <li><strong>Señalización:</strong> identificar claramente las zonas de almacenamiento de sustancias peligrosas.</li>
+                    <li><strong>Equipos contra incendios específicos:</strong> no todos los extintores sirven para todos los productos químicos.</li>
+                </ul>
+                
+                <div class="destacado">
+                    La prevención de incendios no es responsabilidad de una sola persona. Es responsabilidad de todos. Cada vez que vemos una condición insegura, debemos reportarla. Porque esa condición insegura puede ser la chispa que inicie un incendio.
+                </div>
+            </section>
+
+            <section class="section" id="evacuacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Plan de Evacuación</h3>
+                <p>Ahora vamos a hablar de algo que esperamos no tener que usar nunca, pero que todos debemos conocer: el plan de evacuación. Porque si ocurre un incendio u otra emergencia, cada segundo cuenta.</p>
+                
+                <h4>¿Qué es un plan de evacuación?</h4>
+                <p>Es un conjunto de procedimientos que indican cómo deben salir las personas de un lugar en caso de emergencia. Incluye rutas de salida, puntos de encuentro, roles específicos y procedimientos de actuación.</p>
+                
+                <h4>Elementos de un plan de evacuación</h4>
+                <ul>
+                    <li><strong>Rutas de evacuación:</strong> caminos señalizados que conducen a las salidas de emergencia.</li>
+                    <li><strong>Salidas de emergencia:</strong> puertas que conducen al exterior o a zonas seguras.</li>
+                    <li><strong>Puntos de encuentro:</strong> zonas seguras donde debe concentrarse el personal después de evacuar.</li>
+                    <li><strong>Señalización:</strong> carteles fotoluminiscentes que indican las rutas y salidas.</li>
+                    <li><strong>Roles específicos:</strong> quién activa la alarma, quién guía la evacuación, quién verifica que todos salieron.</li>
+                </ul>
+                
+                <h4>¿Qué hacer en caso de evacuación?</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Mantén la calma:</strong> el pánico puede ser tan peligroso como el incendio.</li>
+                        <li><strong>Sigue las rutas señaladas:</strong> no improvises caminos ni tomes atajos.</li>
+                        <li><strong>No uses ascensores:</strong> siempre usa las escaleras.</li>
+                        <li><strong>Si hay humo, agáchate:</strong> el humo sube, el aire más limpio está cerca del suelo.</li>
+                        <li><strong>No regreses por objetos personales:</strong> tu vida vale más que cualquier cosa material.</li>
+                        <li><strong>Ve al punto de encuentro:</strong> ahí se hará el conteo para verificar que todos salieron.</li>
+                    </ol>
+                </div>
+                
+                <div class="importante">
+                    <strong>Las salidas de emergencia nunca deben estar bloqueadas.</strong> Es una de las infracciones más graves en prevención de riesgos. Una salida bloqueada puede significar que las personas queden atrapadas en caso de emergencia.
+                </div>
+                
+                <p>Y algo muy importante: los planes de evacuación deben practicarse con simulacros. No basta con tener un plan escrito. Todos deben conocer las rutas, los puntos de encuentro y los procedimientos. Un simulacro puede salvar vidas.</p>
+            </section>
+
+            <section class="section" id="brigadas">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. Brigadas de Emergencia</h3>
+                <p>En las empresas, generalmente existen grupos de trabajadores capacitados para actuar en caso de emergencia. Estos grupos se llaman brigadas de emergencia.</p>
+                
+                <h4>¿Qué es una brigada de emergencia?</h4>
+                <p>Es un grupo de trabajadores entrenados para actuar frente a diferentes tipos de emergencias: incendios, primeros auxilios, evacuación, derrames químicos, entre otros.</p>
+                
+                <h4>Tipos de brigadas</h4>
+                <ul>
+                    <li><strong>Brigada contra incendios:</strong> capacitada para usar extintores y equipos contra incendios en la etapa inicial del fuego.</li>
+                    <li><strong>Brigada de primeros auxilios:</strong> capacitada para atender lesiones hasta que llegue ayuda médica profesional.</li>
+                    <li><strong>Brigada de evacuación:</strong> capacitada para guiar a las personas hacia las salidas de emergencia y verificar que todos salieron.</li>
+                    <li><strong>Brigada de rescate:</strong> capacitada para buscar y rescatar personas atrapadas (en casos más avanzados).</li>
+                </ul>
+                
+                <h4>¿Por qué son importantes las brigadas?</h4>
+                <p>Porque en una emergencia, los primeros minutos son cruciales. Los bomberos o el personal médico pueden demorar en llegar. Mientras tanto, las brigadas pueden:</p>
+                <ul>
+                    <li>Controlar un incendio en su etapa inicial.</li>
+                    <li>Brindar primeros auxilios a una persona lesionada.</li>
+                    <li>Guiar la evacuación de manera ordenada.</li>
+                    <li>Evitar que la emergencia se agrave.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Las brigadas de emergencia salvan vidas. Pero necesitan capacitación, práctica y equipos adecuados. Y necesitan que todos los trabajadores conozcan quiénes son y cómo actuar en una emergencia.
+                </div>
+                
+                <p>Si en tu empresa existe una brigada de emergencia, infórmate sobre quiénes la integran y cuáles son sus funciones. Y si no existe, puedes sugerir su formación. Es una inversión en seguridad que puede marcar la diferencia.</p>
+            </section>
+
+            <section class="section" id="normativa">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Normativa Aplicable</h3>
+                <p>En Chile, la prevención y el combate de incendios están regulados por varias normativas. No vamos a entrar en detalle legal, pero es importante que conozcas las principales.</p>
+                
+                <h4>Decreto Supremo 594</h4>
+                <p>Regula las condiciones sanitarias y ambientales básicas en los lugares de trabajo. Dentro de este decreto se incluyen disposiciones sobre prevención y protección contra incendios.</p>
+                
+                <h4>Ordenanza General de Urbanismo y Construcciones (OGUC)</h4>
+                <p>Establece requisitos para la construcción de edificios, incluyendo medidas de protección contra incendios: salidas de emergencia, vías de evacuación, resistencia al fuego de los materiales, entre otros.</p>
+                
+                <h4>Normas de la Mutualidad</h4>
+                <p>Los organismos administradores del seguro de la Ley 16.744 (Mutual de Seguridad, ACHS, ISL) establecen requisitos específicos para la prevención de incendios en los lugares de trabajo.</p>
+                
+                <h4>Normativa sobre sustancias peligrosas</h4>
+                <p>El Decreto Supremo 43 regula el almacenamiento de sustancias peligrosas. Este decreto establece requisitos específicos para la prevención de incendios en bodegas que almacenan productos inflamables o combustibles.</p>
+                
+                <div class="importante">
+                    <strong>No necesitas memorizar artículos de leyes.</strong> Lo importante es entender que existen normativas que establecen requisitos mínimos de seguridad, y que esas normativas están diseñadas para proteger tu vida y la de tus compañeros.
+                </div>
+                
+                <p>Y aquí viene una idea importante: las normas internas de la empresa pueden ser más estrictas que la ley, pero nunca más permisivas. Es decir, si la ley permite algo, la empresa puede restringirlo. Pero si la ley prohíbe algo, la empresa no puede permitirlo.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>El fuego es una herramienta poderosa, pero también una de las fuerzas más destructivas que existen. En una bodega, donde tenemos materiales combustibles, productos químicos y equipos eléctricos, el riesgo de incendio es real y constante.</p>
+                <p>Pero la mayoría de los incendios se pueden prevenir. Y si ocurre un incendio, saber cómo actuar correctamente puede marcar la diferencia entre un susto y una tragedia.</p>
+                <p>Recuerda: la prevención de incendios no comienza cuando aparecen las llamas. Comienza cuando identificamos las condiciones inseguras y las corregimos. Comienza cuando mantenemos el orden y la limpieza. Comienza cuando respetamos las normas y los procedimientos.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"El mejor incendio es el que nunca ocurre.<br>Y la mejor manera de combatirlo es previniéndolo."</p>
+                
+                <a href="parte6.html" class="next-module">Siguiente Módulo: Introducción a la Bodega y su Organización →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && (v.lang.startsWith('es-ES') || v.lang.startsWith('es-MX') || v.lang.startsWith('es-US') || v.lang.startsWith('es-CL')));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            
+            // ELIMINAR CONTROLES TTS (los botones que no deben leerse)
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            
+            // ELIMINAR VIDEOS, IMÁGENES Y OTROS ELEMENTOS NO LEÍBLES
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            
+            currentUtterance.onend = () => { resetSection(section); };
+            
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

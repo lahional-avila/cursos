@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 11: Control de Inventarios y Stock</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .parte-banner { background: linear-gradient(135deg, #27ae60, #229954); color: white; padding: 20px 40px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+    .parte-banner h3 { font-size: 20px; margin-bottom: 5px; }
+    .parte-banner p { font-size: 14px; opacity: 0.9; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.inventario { border-top: 5px solid #3498db; }
+    .caja.stock { border-top: 5px solid #27ae60; }
+    .caja.inventario h5 { color: #2980b9; }
+    .caja.stock h5 { color: #27ae60; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .tipos-inventario { display: grid; grid-template-columns: 1fr; gap: 15px; margin: 25px 0; }
+    .tipo-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; border-left: 6px solid #27ae60; transition: all 0.3s; }
+    .tipo-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .tipo-item h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 8px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 25px 0; }
+    .kpi-item { background: #f8f9fa; border-radius: 10px; padding: 25px; text-align: center; border-top: 4px solid #27ae60; }
+    .kpi-item h5 { color: #1e3a5f; font-size: 16px; margin-bottom: 10px; }
+    .kpi-item .formula { font-family: 'Courier New', monospace; font-size: 13px; color: #2c5282; background: #e8f4f8; padding: 8px; border-radius: 5px; margin-top: 10px; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 11: Control de Inventarios y Stock</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Bienvenidos a la Parte III</a></li>
+                <li><a href="#que-es">2. ¿Qué es el Control de Inventarios?</a></li>
+                <li><a href="#inventario-stock">3. Inventario vs Stock</a></li>
+                <li><a href="#tipos">4. Tipos de Inventario</a></li>
+                <li><a href="#fisico">5. El Inventario Físico</a></li>
+                <li><a href="#diferencias">6. Diferencias de Inventario</a></li>
+                <li><a href="#mermas">7. Mermas y Pérdidas</a></li>
+                <li><a href="#ciclicos">8. Conteos Cíclicos</a></li>
+                <li><a href="#kardex">9. El Kardex</a></li>
+                <li><a href="#kpis">10. KPIs de Inventario</a></li>
+                <li><a href="#compras">11. La Conexión con Compras</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="parte-banner">
+                <h3>PARTE III: CONTROL Y GESTIÓN</h3>
+                <p>Entramos a la inteligencia de la bodega: inventarios, rotación, reposición, sustancias peligrosas y tecnología</p>
+            </div>
+
+            <div class="content-header">
+                <h2>Control de Inventarios y Stock</h2>
+                <p>Ya sabemos recibir, almacenar y despachar. Ahora viene la pregunta más importante de todas: ¿realmente tenemos lo que creemos tener? Porque un inventario descuadrado es un síntoma de que algo falló en la cadena.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200" alt="Control de inventarios en bodega" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Bienvenidos a la Parte III: Control y Gestión</h3>
+                <p>Hasta ahora hemos recorrido un camino largo. Aprendimos sobre seguridad, EPP, señalización, orden, incendios, cómo funciona una bodega, cómo se recibe, cómo se almacena, cómo se mueven las cargas y cómo se despacha. Es decir, ya sabemos operar una bodega.</p>
+                
+                <p>Pero ahora viene la pregunta más importante de todas: ¿realmente tenemos lo que creemos tener?</p>
+                
+                <p>Porque de nada sirve tener una bodega ordenada, limpia, segura y con buenos procedimientos, si al final del día el sistema dice que tenemos 100 unidades de un producto y físicamente solo hay 85. Eso significa que algo falló.</p>
+                
+                <div class="importante">
+                    <strong>La Parte III del curso se trata de control.</strong> Y el control más importante de todos es el control de inventarios. Porque el inventario es la fotografía exacta de lo que tenemos en la bodega en un momento determinado. Si esa fotografía no es real, todo lo demás se cae.
+                </div>
+                
+                <p>Y quiero partir con una idea que quiero que se les grabe: el inventario no es solo "contar cajas". El inventario es dinero. Porque cada producto que está en la bodega representa plata invertida: costo del producto, costo de transporte, costo de almacenamiento, costo de seguros, costo de administración.</p>
+                
+                <p>Por eso, cuando el inventario se descuadra, no es solo un problema operativo. Es un problema financiero. Y muchas veces, también es un problema legal.</p>
+                
+                <div class="destacado">
+                    Una bodega bien operada pero mal controlada es una bodega que pierde plata todos los días sin que nadie se dé cuenta. Por eso el control de inventarios es tan importante.
+                </div>
+            </section>
+
+            <section class="section" id="que-es">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. ¿Qué es el Control de Inventarios?</h3>
+                <p>El control de inventarios es el conjunto de procedimientos y herramientas que nos permiten saber, en cualquier momento, qué productos tenemos, cuántos tenemos, dónde están, en qué estado están y cuánto valen.</p>
+                
+                <p>Parece simple, pero no lo es. Porque en una bodega entran y salen productos todos los días. Llega mercadería, se despacha a usuarios, se mueve entre ubicaciones, se daña, se vence, se pierde. Y cada uno de esos movimientos debe quedar registrado.</p>
+                
+                <h4>¿Qué busca el control de inventarios?</h4>
+                <ul>
+                    <li><strong>Disponibilidad:</strong> que cuando alguien necesite un producto, esté disponible.</li>
+                    <li><strong>Exactitud:</strong> que lo que dice el sistema coincida con lo que hay físicamente.</li>
+                    <li><strong>Trazabilidad:</strong> saber de dónde vino cada producto, cuándo llegó, a quién se le entregó.</li>
+                    <li><strong>Conservación:</strong> que los productos estén en buen estado y no se deterioren.</li>
+                    <li><strong>Optimización:</strong> tener lo justo, ni más ni menos.</li>
+                    <li><strong>Protección:</strong> evitar robos, pérdidas, daños y mermas.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El control de inventarios no es tarea de una sola persona.</strong> Es responsabilidad de todos los que trabajan en la bodega: del que recibe, del que almacena, del que hace picking, del que despacha, del supervisor, del administrativo. Todos aportan al control.
+                </div>
+                
+                <p>Y aquí quiero hacer una distinción importante: el control de inventarios no es lo mismo que el inventario físico. El inventario físico es una actividad puntual: contar productos. El control de inventarios es un proceso continuo que se mantiene todos los días, con cada movimiento que se hace.</p>
+                
+                <div class="destacado">
+                    Un buen control de inventarios hace que el inventario físico sea solo una confirmación. Si el control diario es bueno, cuando llegue el momento de contar, las diferencias van a ser mínimas.
+                </div>
+            </section>
+
+            <section class="section" id="inventario-stock">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. Inventario vs Stock</h3>
+                <p>Muchas personas usan estas dos palabras como sinónimos, pero no son lo mismo. Y entender la diferencia es importante.</p>
+                
+                <div class="comparacion">
+                    <div class="caja inventario">
+                        <h5>INVENTARIO</h5>
+                        <p>Es el <strong>registro y control</strong> de todos los productos que existen en la bodega.</p>
+                        <p>Incluye información completa: qué productos hay, cuántos, dónde están, en qué lote, con qué vencimiento, en qué estado, cuánto valen.</p>
+                        <p>Es un <strong>sistema</strong>, no solo una cantidad.</p>
+                    </div>
+                    <div class="caja stock">
+                        <h5>STOCK</h5>
+                        <p>Es la <strong>cantidad disponible</strong> de un producto específico en un momento determinado.</p>
+                        <p>Es un número concreto: tengo 50 unidades de este producto.</p>
+                        <p>Es una <strong>fotografía</strong> del inventario en un instante.</p>
+                    </div>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Imaginen que tenemos guantes de nitrilo talla L.</p>
+                    <p><strong>El inventario</strong> nos dice: producto código GNT-L, descripción guante nitrilo talla L, ubicado en Rack B-03-N2, lote 2025-001, vencimiento diciembre 2026, cantidad 50 unidades, valor unitario $800, proveedor XYZ, fecha de ingreso 15 de marzo.</p>
+                    <p><strong>El stock</strong> es simplemente: 50 unidades.</p>
+                    <p>Si despacho 15 unidades, el stock queda en 35. Pero el inventario sigue teniendo toda la información del producto.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>El inventario es el sistema completo. El stock es un dato dentro del inventario.</strong> Cuando alguien pregunta "¿cuánto stock hay de este producto?", está preguntando por un número. Cuando pregunta "¿cómo está el inventario?", está preguntando por el estado general del control.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿ustedes pueden responder, en este momento, cuánto stock tienen de sus productos más importantes? Si la respuesta es "tengo que mirar el sistema" o "no estoy seguro", tenemos un problema de control.</p>
+            </section>
+
+            <section class="section" id="tipos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Tipos de Inventario</h3>
+                <p>Los inventarios se pueden clasificar de diferentes maneras. Vamos a ver las clasificaciones más importantes.</p>
+                
+                <h4>Según su periodicidad</h4>
+                
+                <div class="tipos-inventario">
+                    <div class="tipo-item">
+                        <h5>Inventario Perpetuo o Permanente</h5>
+                        <p>Se actualiza en tiempo real cada vez que entra o sale un producto. Generalmente se hace con un sistema informático (WMS o ERP). Ofrece un control exacto del stock en cualquier momento.</p>
+                        <p><strong>Ventaja:</strong> información siempre actualizada.</p>
+                        <p><strong>Desventaja:</strong> requiere sistema y disciplina de registro.</p>
+                    </div>
+                    <div class="tipo-item">
+                        <h5>Inventario Periódico</h5>
+                        <p>Se realiza de forma manual cada cierto tiempo: mensual, trimestral o anual. Requiere detener la operación de la bodega para contar todo el stock.</p>
+                        <p><strong>Ventaja:</strong> no requiere sistema sofisticado.</p>
+                        <p><strong>Desventaja:</strong> la información queda desactualizada entre conteo y conteo.</p>
+                    </div>
+                    <div class="tipo-item">
+                        <h5>Inventario Cíclico o Rotativo</h5>
+                        <p>Consiste en contar grupos de productos seleccionados diariamente o semanalmente durante todo el año. Generalmente se guía por la clasificación ABC.</p>
+                        <p><strong>Ventaja:</strong> no requiere detener la operación, detecta diferencias rápidamente.</p>
+                        <p><strong>Desventaja:</strong> requiere planificación y disciplina.</p>
+                    </div>
+                </div>
+                
+                <h4>Según su función logística</h4>
+                <ul>
+                    <li><strong>Stock de seguridad:</strong> cantidad extra para evitar quiebres ante retrasos del proveedor o aumentos inesperados de demanda.</li>
+                    <li><strong>Stock de ciclo:</strong> inventario regular para abastecer la demanda habitual entre un pedido y el siguiente.</li>
+                    <li><strong>Stock en tránsito:</strong> mercadería que ya fue comprada pero todavía está viajando hacia la bodega.</li>
+                    <li><strong>Stock estacional:</strong> acumulado antes de épocas de alta demanda (ejemplo: antes de fin de año).</li>
+                    <li><strong>Stock especulativo:</strong> comprado anticipadamente por expectativa de aumento de precio o escasez.</li>
+                    <li><strong>Stock muerto u obsoleto:</strong> productos que ya no se pueden vender o usar, y generan costo de almacenamiento.</li>
+                </ul>
+                
+                <div class="destacado">
+                    No todos los tipos de stock son buenos. El stock muerto, por ejemplo, es un problema: ocupa espacio, inmoviliza capital y puede generar pérdidas. Identificarlo y darle salida es parte del control de inventarios.
+                </div>
+            </section>
+
+            <section class="section" id="fisico">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. El Inventario Físico</h3>
+                <p>El inventario físico es la actividad de contar físicamente todos los productos que hay en la bodega, y compararlos con lo que dice el sistema.</p>
+                
+                <h4>¿Cuándo se hace?</h4>
+                <ul>
+                    <li><strong>Anualmente:</strong> por obligación contable y tributaria. La mayoría de las empresas hace un inventario físico completo al cierre del año.</li>
+                    <li><strong>Periódicamente:</strong> algunas empresas lo hacen trimestral o semestralmente.</li>
+                    <li><strong>Cuando hay diferencias importantes:</strong> si se detectan descuadres recurrentes, se hace un inventario para investigar.</li>
+                    <li><strong>Ante cambios de responsable:</strong> cuando cambia el jefe de bodega o el administrador.</li>
+                </ul>
+                
+                <h4>¿Cómo se hace correctamente?</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Planificación:</strong> definir fecha, hora, equipos responsables, zonas a contar.</li>
+                        <li><strong>Preparación:</strong> ordenar la bodega, identificar productos, limpiar ubicaciones.</li>
+                        <li><strong>Congelamiento:</strong> detener los movimientos de entrada y salida durante el conteo.</li>
+                        <li><strong>Conteo:</strong> contar físicamente cada producto, idealmente por equipos de dos personas (una cuenta, otra registra).</li>
+                        <li><strong>Registro:</strong> anotar las cantidades contadas en planillas o dispositivos.</li>
+                        <li><strong>Comparación:</strong> comparar lo físico con lo que dice el sistema.</li>
+                        <li><strong>Análisis de diferencias:</strong> investigar las causas de las diferencias encontradas.</li>
+                        <li><strong>Ajuste:</strong> registrar los ajustes correspondientes en el sistema.</li>
+                        <li><strong>Informe:</strong> documentar los resultados y las acciones correctivas.</li>
+                    </ol>
+                </div>
+                
+                <div class="importante">
+                    <strong>El inventario físico no es solo contar.</strong> Es planificar, organizar, contar, comparar, analizar y ajustar. Si se hace mal, los resultados no sirven de nada.
+                </div>
+                
+                <h4>Errores comunes en el inventario físico</h4>
+                <ul>
+                    <li>No ordenar la bodega antes de contar.</li>
+                    <li>No detener los movimientos durante el conteo.</li>
+                    <li>Contar sin un procedimiento claro.</li>
+                    <li>No verificar las cantidades (contar una sola vez).</li>
+                    <li>No analizar las diferencias.</li>
+                    <li>No documentar los resultados.</li>
+                </ul>
+                
+                <div class="destacado">
+                    Un inventario físico bien hecho es una fotografía confiable de la bodega. Un inventario físico mal hecho es una pérdida de tiempo que genera más confusión que claridad.
+                </div>
+            </section>
+
+            <section class="section" id="diferencias">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Diferencias de Inventario</h3>
+                <p>Cuando lo que dice el sistema no coincide con lo que hay físicamente, tenemos una diferencia de inventario. Y eso es una señal de alerta: algo falló en el proceso.</p>
+                
+                <h4>Tipos de diferencias</h4>
+                <ul>
+                    <li><strong>Faltante:</strong> el sistema dice que hay 100 unidades, pero físicamente hay 96. Faltan 4.</li>
+                    <li><strong>Sobrante:</strong> el sistema dice que hay 100 unidades, pero físicamente hay 105. Sobran 5.</li>
+                    <li><strong>Diferencia de ubicación:</strong> el sistema dice que el producto está en el Rack A-01, pero físicamente está en el Rack B-03.</li>
+                    <li><strong>Diferencia de lote o vencimiento:</strong> el sistema registra un lote, pero físicamente hay otro.</li>
+                </ul>
+                
+                <h4>¿Por qué se producen las diferencias?</h4>
+                <ul>
+                    <li><strong>Errores de recepción:</strong> se registró mal la cantidad recibida.</li>
+                    <li><strong>Errores de despacho:</strong> se despachó más o menos de lo registrado.</li>
+                    <li><strong>Errores de digitación:</strong> se ingresó mal un número al sistema.</li>
+                    <li><strong>Movimientos no registrados:</strong> se movió mercadería sin actualizar el sistema.</li>
+                    <li><strong>Robos o pérdidas:</strong> productos que desaparecen.</li>
+                    <li><strong>Mermas no registradas:</strong> productos dañados o vencidos que no se dieron de baja.</li>
+                    <li><strong>Errores de conteo:</strong> durante el inventario físico se contó mal.</li>
+                    <li><strong>Productos mal ubicados:</strong> están en la bodega pero en otra ubicación.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de investigación de diferencias</h5>
+                    <p>El sistema dice que tengo 100 unidades de un producto. El conteo físico muestra 96. Faltan 4 unidades.</p>
+                    <p>¿Qué investigo?</p>
+                    <ol>
+                        <li>¿Hubo una recepción reciente donde pudieron registrar mal?</li>
+                        <li>¿Hubo despachos recientes donde pudieron entregar de más?</li>
+                        <li>¿Hay productos en otra ubicación que no se consideraron en el conteo?</li>
+                        <li>¿Hay mermas o productos dañados que no se dieron de baja?</li>
+                        <li>¿Se contó correctamente?</li>
+                    </ol>
+                    <p>La respuesta a estas preguntas me va a decir dónde estuvo el problema. Y si no encuentro la causa, tengo que asumir que es una pérdida real y registrarla.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>Las diferencias de inventario no son inevitables.</strong> Un buen control diario reduce las diferencias al mínimo. Si las diferencias son recurrentes, significa que hay un problema en el proceso que debe ser corregido.
+                </div>
+                
+                <p>Y aquí viene una idea importante: las diferencias no se ocultan. Se reportan, se investigan y se documentan. Porque ocultar una diferencia hoy es generar un problema mayor mañana.</p>
+            </section>
+
+            <section class="section" id="mermas">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Mermas y Pérdidas</h3>
+                <p>La merma es la pérdida o disminución de productos por diferentes causas. Es un costo para la empresa y debe ser registrada y analizada.</p>
+                
+                <h4>Causas más comunes de merma</h4>
+                <ul>
+                    <li><strong>Vencimiento:</strong> productos que llegan a su fecha de vencimiento y no pueden usarse.</li>
+                    <li><strong>Deterioro:</strong> productos dañados por mala manipulación, mal almacenamiento o condiciones inadecuadas.</li>
+                    <li><strong>Rotura:</strong> envases quebrados, productos fracturados.</li>
+                    <li><strong>Derrames:</strong> productos líquidos que se derraman durante la manipulación.</li>
+                    <li><strong>Obsolescencia:</strong> productos que ya no se usan porque cambiaron los procesos o la tecnología.</li>
+                    <li><strong>Robo:</strong> sustracción de productos.</li>
+                    <li><strong>Errores de despacho:</strong> productos enviados al cliente equivocado y que no se pueden recuperar.</li>
+                </ul>
+                
+                <h4>¿Qué se hace con la merma?</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Identificar:</strong> detectar los productos dañados, vencidos o perdidos.</li>
+                        <li><strong>Separar:</strong> retirarlos del stock disponible y ubicarlos en zona de cuarentena o rechazo.</li>
+                        <li><strong>Registrar:</strong> dejar constancia de la merma con fecha, producto, cantidad y causa.</li>
+                        <li><strong>Informar:</strong> comunicar al supervisor y a las áreas correspondientes.</li>
+                        <li><strong>Analizar:</strong> investigar la causa para evitar que vuelva a ocurrir.</li>
+                        <li><strong>Dar de baja:</strong> ajustar el sistema para descontar las unidades.</li>
+                        <li><strong>Disponer:</strong> eliminar, devolver al proveedor o dar otro destino según corresponda.</li>
+                    </ol>
+                </div>
+                
+                <div class="importante">
+                    <strong>La merma no es un número más.</strong> Cada unidad perdida representa dinero. Si la merma es recurrente, hay que investigar la causa raíz. Porque si no corregimos la causa, la merma va a seguir aumentando.
+                </div>
+                
+                <h4>Indicador de merma</h4>
+                <p>La merma se suele medir como porcentaje del valor total del inventario o de las ventas.</p>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <h5>Tasa de Merma</h5>
+                        <p>Porcentaje del inventario perdido</p>
+                        <div class="formula">(Valor mermas / Valor inventario) × 100</div>
+                    </div>
+                </div>
+                
+                <p>Un buen indicador de merma depende del tipo de producto. En productos frescos o perecederos, una merma del 2% al 5% puede ser aceptable. En productos secos o de larga duración, la merma debería ser cercana a 0%.</p>
+                
+                <div class="destacado">
+                    La merma no es un accidente. Es un síntoma. Detrás de cada merma hay una causa: mala manipulación, mal almacenamiento, mala rotación, mal control. Y esa causa se puede corregir.
+                </div>
+            </section>
+
+            <section class="section" id="ciclicos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Conteos Cíclicos</h3>
+                <p>Los conteos cíclicos, también llamados inventarios rotativos, son una alternativa al inventario físico anual. Consisten en contar grupos de productos de manera programada a lo largo del año, sin detener la operación completa de la bodega.</p>
+                
+                <h4>¿Cómo funcionan?</h4>
+                <p>En lugar de contar toda la bodega una vez al año, se cuenta una parte cada día, cada semana o cada mes. De manera que, al finalizar el año, todos los productos han sido contados al menos una vez.</p>
+                
+                <h4>¿Cómo se seleccionan los productos a contar?</h4>
+                <p>Generalmente se usa la clasificación ABC que vimos en el módulo de almacenamiento:</p>
+                <ul>
+                    <li><strong>Productos A (alta importancia):</strong> se cuentan con mayor frecuencia, por ejemplo mensualmente.</li>
+                    <li><strong>Productos B (importancia media):</strong> se cuentan trimestralmente.</li>
+                    <li><strong>Productos C (baja importancia):</strong> se cuentan una o dos veces al año.</li>
+                </ul>
+                
+                <h4>Ventajas de los conteos cíclicos</h4>
+                <ul>
+                    <li>No requieren detener la operación de la bodega.</li>
+                    <li>Detectan diferencias rápidamente, antes de que se conviertan en problemas grandes.</li>
+                    <li>Permiten investigar las causas de las diferencias mientras la información está fresca.</li>
+                    <li>Mantienen el inventario actualizado durante todo el año.</li>
+                    <li>Generan disciplina y cultura de control en el equipo.</li>
+                </ul>
+                
+                <h4>Desventajas</h4>
+                <ul>
+                    <li>Requieren planificación y disciplina.</li>
+                    <li>Exigen un sistema que gestione el calendario de conteos.</li>
+                    <li>Necesitan personal dedicado a esta tarea.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de calendario de conteos cíclicos</h5>
+                    <p>Imaginen una bodega con 1000 productos:</p>
+                    <ul>
+                        <li>200 productos A: se cuentan todos los meses (12 veces al año).</li>
+                        <li>300 productos B: se cuentan cada tres meses (4 veces al año).</li>
+                        <li>500 productos C: se cuentan una vez al año.</li>
+                    </ul>
+                    <p>Eso significa que cada semana se cuentan aproximadamente 60 productos. En un año, todos los productos fueron contados al menos una vez, y los más importantes muchas veces más.</p>
+                </div>
+                
+                <div class="importante">
+                    <strong>Los conteos cíclicos son la mejor herramienta para mantener el inventario bajo control.</strong> Porque permiten detectar problemas rápido, sin detener la operación y sin esperar a fin de año para saber si el inventario cuadra.
+                </div>
+                
+                <p>Y algo muy importante: los conteos cíclicos deben ser aleatorios o sorpresivos en algunos casos, para evitar que alguien pueda manipular el inventario antes del conteo.</p>
+            </section>
+
+            <section class="section" id="kardex">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. El Kardex</h3>
+                <p>El Kardex es un registro histórico de todos los movimientos de un producto. Es como el "historial clínico" de cada ítem en la bodega.</p>
+                
+                <p>Antiguamente, el Kardex era una ficha física, una cartulina donde se anotaba cada entrada y cada salida. Hoy, en la mayoría de las bodegas, el Kardex es digital y lo genera el sistema informático (WMS o ERP).</p>
+                
+                <h4>¿Qué información contiene el Kardex?</h4>
+                <ul>
+                    <li><strong>Datos del producto:</strong> código, descripción, unidad de medida.</li>
+                    <li><strong>Movimientos:</strong> fecha, tipo (entrada, salida, transferencia), cantidad, documento asociado.</li>
+                    <li><strong>Stock:</strong> cantidad disponible después de cada movimiento.</li>
+                    <li><strong>Valores:</strong> costo unitario, valor total del movimiento, valor del stock.</li>
+                    <li><strong>Referencias:</strong> número de orden de compra, guía de despacho, vale de salida, etc.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de Kardex simplificado</h5>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #1e3a5f; color: white;">
+                                <th style="padding: 10px; border: 1px solid #ddd;">Fecha</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Concepto</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Entrada</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Salida</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">01/03</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Saldo inicial</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">-</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">-</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">50</td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 10px; border: 1px solid #ddd;">15/03</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Recepción OC 1234</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">100</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">-</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">150</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">20/03</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Despacho VS 567</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">-</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">30</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">120</td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 10px; border: 1px solid #ddd;">28/03</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Merma</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">-</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">2</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">118</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h4>¿Para qué sirve el Kardex?</h4>
+                <ul>
+                    <li><strong>Trazabilidad:</strong> saber el historial completo de un producto.</li>
+                    <li><strong>Investigación:</strong> cuando hay diferencias, el Kardex permite ver qué movimientos hubo.</li>
+                    <li><strong>Auditoría:</strong> los auditores revisan el Kardex para verificar la integridad del inventario.</li>
+                    <li><strong>Valorización:</strong> permite saber el valor del inventario en cualquier momento.</li>
+                    <li><strong>Análisis:</strong> permite analizar rotación, mermas, patrones de consumo.</li>
+                </ul>
+                
+                <div class="destacado">
+                    El Kardex es la memoria del inventario. Sin Kardex, cada movimiento se pierde en el tiempo. Con Kardex, cada movimiento queda registrado y se puede rastrear.
+                </div>
+                
+                <p>Y algo muy importante: el Kardex debe ser confiable. Si los movimientos no se registran correctamente, el Kardex pierde su valor. Por eso cada entrada y cada salida debe quedar documentada con el documento correspondiente.</p>
+            </section>
+
+            <section class="section" id="kpis">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. KPIs de Inventario</h3>
+                <p>Los KPIs (Key Performance Indicators o Indicadores Clave de Desempeño) son medidas que nos permiten saber cómo está funcionando el inventario. Sin indicadores, estamos trabajando a ciegas.</p>
+                
+                <h4>Los KPIs más importantes de inventario</h4>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <h5>Exactitud de Inventario</h5>
+                        <p>Mide qué tan coincide el sistema con lo físico</p>
+                        <div class="formula">(Coincidencias / Total conteo) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Rotación de Inventario</h5>
+                        <p>Cuántas veces se renueva el stock en un período</p>
+                        <div class="formula">Consumo anual / Stock promedio</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Días de Inventario</h5>
+                        <p>Cuántos días alcanza el stock con el consumo actual</p>
+                        <div class="formula">(Stock / Consumo diario)</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Tasa de Merma</h5>
+                        <p>Porcentaje del inventario que se pierde</p>
+                        <div class="formula">(Valor mermas / Valor inventario) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Quiebres de Stock</h5>
+                        <p>Veces que no hubo stock cuando se necesitó</p>
+                        <div class="formula">(Solicitudes sin stock / Total solicitudes) × 100</div>
+                    </div>
+                    <div class="kpi-item">
+                        <h5>Cumplimiento de Pedidos</h5>
+                        <p>Porcentaje de pedidos atendidos correctamente</p>
+                        <div class="formula">(Pedidos perfectos / Total pedidos) × 100</div>
+                    </div>
+                </div>
+                
+                <h4>¿Por qué son importantes los KPIs?</h4>
+                <ul>
+                    <li>Permiten detectar problemas antes de que se conviertan en crisis.</li>
+                    <li>Permiten tomar decisiones basadas en datos, no en suposiciones.</li>
+                    <li>Permiten comparar el desempeño en el tiempo.</li>
+                    <li>Permiten establecer metas y evaluar el cumplimiento.</li>
+                    <li>Permiten identificar oportunidades de mejora.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo de uso de KPIs</h5>
+                    <p>Supongamos que medimos la rotación de inventario y obtenemos estos resultados:</p>
+                    <ul>
+                        <li>Producto A: rotación de 12 veces al año (se renueva cada mes).</li>
+                        <li>Producto B: rotación de 4 veces al año (se renueva cada 3 meses).</li>
+                        <li>Producto C: rotación de 0.5 veces al año (se renueva cada 2 años).</li>
+                    </ul>
+                    <p>¿Qué nos dicen estos números?</p>
+                    <ul>
+                        <li>El Producto A se mueve mucho, hay que asegurar disponibilidad.</li>
+                        <li>El Producto B se mueve moderadamente, requiere control estándar.</li>
+                        <li>El Producto C casi no se mueve, puede ser candidato a eliminación o a reducir su stock.</li>
+                    </ul>
+                </div>
+                
+                <div class="importante">
+                    <strong>Los KPIs no son números para guardar en un cajón.</strong> Son herramientas de gestión que deben revisarse periódicamente y usarse para tomar decisiones. Un KPI que no genera acción es solo un número.
+                </div>
+            </section>
+
+            <section class="section" id="compras">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>11. La Conexión con Compras y Adquisiciones</h3>
+                <p>Y aquí viene un tema que me parece fundamental, y que muchas veces no se ve con claridad: la conexión entre el control de inventarios y el área de Compras o Adquisiciones.</p>
+                
+                <p>Porque el inventario no empieza ni termina en la bodega. El inventario es el resultado de decisiones que se toman mucho antes de que el producto llegue.</p>
+                
+                <h4>¿Cómo afecta Compras al inventario?</h4>
+                <ul>
+                    <li><strong>Cantidad comprada:</strong> si se compra demasiado, se genera sobrestock. Si se compra poco, se genera quiebre.</li>
+                    <li><strong>Frecuencia de compra:</strong> si se compra muy seguido, hay más recepciones y más trabajo. Si se compra poco seguido, se acumula stock.</li>
+                    <li><strong>Plazo de entrega (lead time):</strong> si el proveedor demora mucho, hay que mantener más stock de seguridad. Si demora poco, se puede trabajar con menos stock.</li>
+                    <li><strong>Calidad del proveedor:</strong> si el proveedor entrega bien, el inventario es más predecible. Si entrega mal, hay diferencias y problemas.</li>
+                    <li><strong>Condiciones de compra:</strong> lotes mínimos, descuentos por volumen, etc., afectan las decisiones de compra y, por lo tanto, el inventario.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo del impacto de Compras en Bodega</h5>
+                    <p>Imaginen dos escenarios:</p>
+                    <p><strong>Escenario A:</strong> Compras adquiere 1000 unidades de un producto porque el proveedor ofrece un descuento del 10% por volumen.</p>
+                    <p><strong>Escenario B:</strong> Compras adquiere 200 unidades cada dos meses, sin descuento.</p>
+                    <p>A primera vista, el Escenario A parece mejor porque se compra más barato. Pero hay que considerar:</p>
+                    <ul>
+                        <li>¿Tengo espacio para almacenar 1000 unidades?</li>
+                        <li>¿El producto se vence antes de usarlo?</li>
+                        <li>¿Cuánto capital estoy inmovilizando?</li>
+                        <li>¿Cuánto cuesta almacenar esas 1000 unidades durante un año?</li>
+                        <li>¿Qué pasa si el producto se vuelve obsoleto?</li>
+                    </ul>
+                    <p>La respuesta puede ser que el Escenario B, aunque tenga un precio unitario mayor, es más eficiente para la empresa.</p>
+                </div>
+                
+                <h4>Conceptos clave desde Adquisiciones</h4>
+                <ul>
+                    <li><strong>Lead time:</strong> tiempo total desde que se genera la necesidad hasta que el producto está disponible en bodega. Incluye: solicitud, aprobación, cotización, negociación, orden de compra, preparación del proveedor, despacho, transporte, recepción, inspección, ingreso al sistema y disponibilidad.</li>
+                    <li><strong>Costo total de adquisición (TCO):</strong> no solo el precio del producto, sino también transporte, almacenamiento, seguros, costos de gestión, mermas, obsolescencia.</li>
+                    <li><strong>Criticidad del material:</strong> no todos los productos tienen la misma importancia. Un repuesto crítico que detiene la operación merece un tratamiento diferente que un tornillo común.</li>
+                    <li><strong>Stock de seguridad:</strong> cantidad extra para cubrir variabilidad en demanda o plazos de entrega.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Compras y Bodega no deberían funcionar como áreas separadas.</strong> Las decisiones de compra determinan en gran medida lo que posteriormente ocurre en almacenamiento, inventario y despacho. Por eso la comunicación entre ambas áreas es fundamental.
+                </div>
+                
+                <p>Y aquí viene una pregunta para el debate: ¿quién es responsable de un quiebre de stock? ¿Bodega porque no tenía el producto? ¿Compras porque no compró a tiempo? ¿El proveedor porque entregó tarde? ¿Planificación porque estimó mal la demanda?</p>
+                
+                <p>La respuesta es: depende. Y para saber de quién es la responsabilidad, necesitamos tener registros claros de todo el proceso. Por eso la trazabilidad es tan importante.</p>
+                
+                <div class="destacado">
+                    El desempeño de la bodega también está condicionado por la calidad del proceso de abastecimiento. Por eso, cuando hablamos de control de inventarios, tenemos que mirar toda la cadena, no solo lo que pasa dentro de las cuatro paredes de la bodega.
+                </div>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>El control de inventarios es el corazón de la gestión de bodega. Porque de nada sirve tener una bodega ordenada, limpia y segura, si no sabemos realmente qué tenemos, cuánto tenemos y en qué estado está.</p>
+                <p>Un inventario bien controlado es la base para tomar buenas decisiones: cuándo reponer, cuánto comprar, qué productos eliminar, dónde optimizar. Un inventario descuadrado es un síntoma de que algo falló en la cadena, y hay que investigarlo.</p>
+                <p>Y recuerden: el control de inventarios no es tarea de una sola persona. Es responsabilidad de todos los que trabajan en la bodega. Cada movimiento bien registrado, cada diferencia reportada, cada merma documentada, aporta a mantener el inventario bajo control.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Un inventario descuadrado es un síntoma.<br>La pregunta no es cuánto falta,<br>sino por qué falta."</p>
+                
+                <a href="parte12.html" class="next-module">Siguiente Módulo: Sistemas de Rotación (FIFO, FEFO, LIFO) →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>

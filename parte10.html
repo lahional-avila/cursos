@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 10: Preparación de Pedidos (Picking) y Despacho</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f5f7fa; }
+    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
+    .back-button:hover { background: rgba(255,255,255,0.3); transform: translateX(-3px); }
+    .module-info h1 { font-size: 20px; font-weight: 600; }
+    .module-info span { font-size: 13px; opacity: 0.9; }
+    .progress-bar { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 5px; width: 200px; }
+    .progress-fill { background: #f39c12; height: 8px; border-radius: 6px; width: 0%; transition: width 0.3s; }
+    .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; }
+    .sidebar { width: 350px; background: white; height: calc(100vh - 70px); position: sticky; top: 70px; overflow-y: auto; border-right: 1px solid #e2e8f0; padding: 30px; }
+    .sidebar h3 { color: #1e3a5f; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .sidebar-nav { list-style: none; }
+    .sidebar-nav li { margin-bottom: 5px; }
+    .sidebar-nav a { display: block; padding: 12px 15px; color: #4a5568; text-decoration: none; border-radius: 6px; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-nav a:hover { background: #f39c12; color: white; transform: translateX(5px); }
+    .sidebar-nav a.active { background: #1e3a5f; color: white; }
+    .sidebar-nav a::before { content: "📌"; font-size: 12px; }
+    .content { flex: 1; padding: 40px; max-width: 900px; }
+    .content-header { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .content-header h2 { color: #1e3a5f; font-size: 36px; margin-bottom: 15px; }
+    .content-header p { color: #718096; font-size: 16px; line-height: 1.6; }
+    .banner-image { width: 100%; height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 30px; }
+    .section { background: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); scroll-margin-top: 100px; }
+    .section h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
+    .section h4 { color: #2c5282; font-size: 20px; margin: 25px 0 15px 0; }
+    .section p { margin-bottom: 15px; text-align: justify; font-size: 15px; line-height: 1.8; color: #4a5568; }
+    .section ul { margin: 15px 0 15px 25px; }
+    .section ul li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; }
+    .destacado { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-left: 5px solid #f39c12; padding: 20px 25px; margin: 25px 0; border-radius: 8px; font-style: italic; }
+    .importante { background: linear-gradient(135deg, #e8f4f8, #d1e8f2); border-left: 5px solid #2c5282; padding: 20px 25px; margin: 25px 0; border-radius: 8px; }
+    .importante strong { color: #1e3a5f; }
+    .comparacion { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+    .caja { padding: 25px; border-radius: 10px; background: #f8f9fa; }
+    .caja h5 { margin-bottom: 15px; font-size: 18px; }
+    .caja.correcto { border-top: 5px solid #27ae60; }
+    .caja.incorrecto { border-top: 5px solid #e74c3c; }
+    .caja.correcto h5 { color: #27ae60; }
+    .caja.incorrecto h5 { color: #c0392b; }
+    .lista-pasos { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 30px; border-radius: 10px; margin: 25px 0; }
+    .lista-pasos ol { margin-left: 25px; }
+    .lista-pasos ol li { margin-bottom: 15px; font-size: 15px; line-height: 1.6; }
+    .lista-pasos ol li strong { color: #1e3a5f; }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; }
+    .image-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 25px 0; }
+    .image-gallery img { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .cierre { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 60px 40px; text-align: center; border-radius: 15px; margin-top: 40px; }
+    .cierre h3 { font-size: 32px; margin-bottom: 20px; border: none; color: white; }
+    .cierre p { font-size: 18px; max-width: 800px; margin: 0 auto 15px auto; line-height: 1.8; color: rgba(255,255,255,0.9); }
+    .cierre .frase-final { font-size: 24px; font-weight: bold; margin-top: 30px; color: #f39c12; }
+    .next-module { display: inline-block; margin-top: 30px; background: #f39c12; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+    .next-module:hover { background: #e67e22; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(243, 156, 18, 0.4); }
+    .scroll-top { position: fixed; bottom: 30px; right: 30px; background: #f39c12; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s; opacity: 0; visibility: hidden; z-index: 999; }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { background: #e67e22; transform: translateY(-5px); }
+    .tts-controls { display: inline-flex; gap: 5px; margin-bottom: 15px; background: #f7fafc; padding: 8px 12px; border-radius: 20px; border: 1px solid #e2e8f0; }
+    .tts-btn { background: white; border: 1px solid #cbd5e0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 14px; }
+    .tts-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+    .tts-btn.active { background: #f39c12; color: white; border-color: #f39c12; }
+    .section.reading { background: #fffef5; border-left: 4px solid #f39c12; }
+    .flujo-picking { display: flex; flex-direction: column; gap: 10px; margin: 25px 0; }
+    .paso-picking { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px 20px; display: flex; align-items: center; gap: 15px; transition: all 0.3s; }
+    .paso-picking:hover { border-color: #f39c12; transform: translateX(5px); }
+    .paso-num { background: #f39c12; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    .picking-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0; }
+    .picking-card { background: #f8f9fa; border-radius: 10px; padding: 25px; border-left: 4px solid #2c5282; transition: all 0.3s; }
+    .picking-card:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .picking-card h5 { color: #1e3a5f; font-size: 17px; margin-bottom: 12px; }
+    .ejemplo-box { background: #fff3cd; border: 2px solid #f39c12; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    .ejemplo-box h5 { color: #1e3a5f; margin-bottom: 15px; font-size: 17px; }
+    .doc-despacho { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin: 25px 0; }
+    .doc-item { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; transition: all 0.3s; }
+    .doc-item:hover { border-color: #2c5282; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .doc-item h5 { color: #1e3a5f; font-size: 15px; margin-bottom: 8px; }
+    .doc-item p { font-size: 13px; color: #718096; }
+    @media (max-width: 1024px) { .sidebar { display: none; } .comparacion { grid-template-columns: 1fr; } .image-gallery { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .nav-container { padding: 0 20px; } .content { padding: 20px; } .section { padding: 25px; } .content-header h2 { font-size: 28px; } }
+</style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="back-button">← Menú Principal</a>
+                <div class="module-info">
+                    <h1>Módulo 10: Picking y Despacho</h1>
+                    <span>Progreso del curso</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <h3>Contenido del Módulo</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#introduccion">1. Introducción al Picking</a></li>
+                <li><a href="#que-es">2. ¿Qué es el Picking?</a></li>
+                <li><a href="#proceso">3. El Proceso de Picking</a></li>
+                <li><a href="#tipos">4. Tipos de Picking</a></li>
+                <li><a href="#verificacion">5. Verificación durante el Picking</a></li>
+                <li><a href="#packing">6. Packing (Embalaje)</a></li>
+                <li><a href="#consolidacion">7. Consolidación</a></li>
+                <li><a href="#documentacion">8. Documentación de Despacho</a></li>
+                <li><a href="#despacho">9. El Proceso de Despacho</a></li>
+                <li><a href="#errores">10. Errores Comunes</a></li>
+                <li><a href="#cierre">Reflexión Final</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <div class="content-header">
+                <h2>Preparación de Pedidos (Picking) y Despacho</h2>
+                <p>Ya sabemos recibir, almacenar y controlar. Ahora viene la otra mitad del trabajo: sacar el producto correctamente y entregarlo a quien lo necesita. Porque de nada sirve tener todo bien guardado si no podemos entregarlo bien.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200" alt="Preparación de pedidos y despacho" class="banner-image">
+
+            <section class="section" id="introduccion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>1. Introducción al Picking y Despacho</h3>
+                <p>Hasta ahora hemos hablado de cómo entra la mercadería, cómo se almacena, cómo se controla y cómo se mueve. Pero hay una pregunta que todavía no hemos respondido: ¿cómo sale?</p>
+                
+                <p>Porque la bodega no es un museo. Los productos no están ahí para quedarse para siempre. Están ahí para ser usados, vendidos, despachados, entregados. Y ese proceso de salida es tan importante como el de entrada.</p>
+                
+                <div class="importante">
+                    <strong>Si la recepción es donde verificamos que lo que llega es correcto, el picking y despacho es donde verificamos que lo que sale es correcto.</strong> Y un error en la salida puede ser tan grave como un error en la entrada. Porque si despacho el producto equivocado, en la cantidad equivocada o en malas condiciones, genero un problema para el usuario o cliente.
+                </div>
+                
+                <p>Y aquí quiero que piensen en algo: cuando alguien necesita un producto de la bodega, esa persona confía en que le vamos a entregar exactamente lo que pidió. Ni más, ni menos. Ni un producto diferente. Ni algo dañado. Ni algo vencido.</p>
+                
+                <p>Esa confianza se construye con un proceso bien hecho. Y ese proceso tiene un nombre: picking y despacho.</p>
+                
+                <div class="destacado">
+                    El picking y el despacho son la cara visible de la bodega. Porque es el momento donde el usuario o cliente recibe lo que pidió. Y si ese momento falla, todo lo anterior pierde valor.
+                </div>
+                
+                <p>Así que vamos a ver cómo se hace correctamente. Paso a paso. Sin apuro. Porque en este módulo, más que velocidad, lo que necesitamos es precisión.</p>
+            </section>
+
+            <section class="section" id="que-es">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>2. ¿Qué es el Picking?</h3>
+                <p>Vamos a partir por lo básico. ¿Qué es picking?</p>
+                
+                <p>La palabra viene del inglés "to pick", que significa seleccionar, recoger, elegir. En el contexto de bodega, picking es el proceso de seleccionar productos de las estanterías para completar un pedido.</p>
+                
+                <p>Pero ojo: no es simplemente "ir a sacar cosas". Eso lo hace cualquiera. El picking es un proceso estructurado que implica:</p>
+                
+                <ul>
+                    <li><strong>Recibir una solicitud:</strong> alguien necesita algo y lo pide formalmente.</li>
+                    <li><strong>Identificar los productos:</strong> saber exactamente qué se necesita.</li>
+                    <li><strong>Ubicar los productos:</strong> saber dónde están en la bodega.</li>
+                    <li><strong>Seleccionar la cantidad correcta:</strong> ni más, ni menos.</li>
+                    <li><strong>Verificar el producto correcto:</strong> que sea exactamente lo que se pidió.</li>
+                    <li><strong>Verificar el estado:</strong> que no esté dañado, vencido o en mal estado.</li>
+                    <li><strong>Registrar la salida:</strong> actualizar el sistema para que el inventario se descuente.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El picking no es "sacar cosas". Es seleccionar correctamente, verificar y registrar.</strong> Si solo saco cosas sin verificar, puedo entregar el producto equivocado, la cantidad equivocada o algo en mal estado. Y eso genera problemas.
+                </div>
+                
+                <p>Y aquí viene una pregunta que me gusta hacer: ¿cuánto tiempo tardan en preparar un pedido en su bodega actual? Si tardan demasiado, puede ser que las ubicaciones no estén bien definidas, o que no haya un sistema claro, o que los productos de alta rotación estén en zonas lejanas.</p>
+                
+                <div class="destacado">
+                    Un buen picking es rápido, pero sobre todo es preciso. De nada sirve ser rápido si entrego el producto equivocado. La velocidad sin precisión genera errores. Y los errores cuestan más que la velocidad.
+                </div>
+            </section>
+
+            <section class="section" id="proceso">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>3. El Proceso de Picking Paso a Paso</h3>
+                <p>Ahora vamos a ver el proceso completo de picking, desde que llega la solicitud hasta que el producto está listo para despachar.</p>
+                
+                <div class="flujo-picking">
+                    <div class="paso-picking">
+                        <div class="paso-num">1</div>
+                        <div>
+                            <strong>Recepción de la solicitud</strong>
+                            <p>Alguien necesita productos. Puede ser un usuario interno, un cliente, otra área de la empresa. La solicitud debe ser formal: con código, descripción, cantidad y destinatario.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">2</div>
+                        <div>
+                            <strong>Verificación de disponibilidad</strong>
+                            <p>Antes de ir a buscar, verifico en el sistema si tengo stock suficiente. Si no hay, informo inmediatamente. No puedo ir a buscar algo que no tengo.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">3</div>
+                        <div>
+                            <strong>Identificación de ubicaciones</strong>
+                            <p>El sistema me dice dónde está cada producto. Si no tengo sistema, uso mi conocimiento de la bodega o un plano de ubicaciones.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">4</div>
+                        <div>
+                            <strong>Recorrido y selección</strong>
+                            <p>Voy a las ubicaciones y selecciono los productos. Respeto la rotación (FIFO o FEFO). Tomo el producto correcto, en la cantidad correcta.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">5</div>
+                        <div>
+                            <strong>Verificación del producto</strong>
+                            <p>Compruebo que sea el producto correcto, que esté en buen estado, que no esté vencido, que la cantidad sea la correcta.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">6</div>
+                        <div>
+                            <strong>Registro de la salida</strong>
+                            <p>Actualizo el sistema: descuento la cantidad del inventario. Si no registro, el inventario se descuadra.</p>
+                        </div>
+                    </div>
+                    <div class="paso-picking">
+                        <div class="paso-num">7</div>
+                        <div>
+                            <strong>Preparación para despacho</strong>
+                            <p>Embalo, etiqueto, consolido y dejo listo para la entrega.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>Llega una solicitud:</p>
+                    <ul>
+                        <li>5 pares de guantes de nitrilo talla L</li>
+                        <li>2 cascos de seguridad</li>
+                        <li>10 mascarillas N95</li>
+                    </ul>
+                    <p>El proceso sería:</p>
+                    <ol>
+                        <li>Verifico en el sistema que tengo stock de los tres productos.</li>
+                        <li>El sistema me dice las ubicaciones: guantes en Rack B-03-N2, cascos en Rack A-01-N1, mascarillas en Rack C-05-N3.</li>
+                        <li>Voy a cada ubicación y selecciono las cantidades correctas.</li>
+                        <li>Verifico que los guantes sean talla L (no M ni S), que los cascos estén en buen estado, que las mascarillas no estén vencidas.</li>
+                        <li>Registro la salida en el sistema: descuento 5 guantes, 2 cascos y 10 mascarillas.</li>
+                        <li>Embalo todo junto, etiqueto y dejo listo para despacho.</li>
+                    </ol>
+                </div>
+                
+                <div class="importante">
+                    <strong>Cada paso es importante.</strong> Si me salto la verificación, puedo entregar algo equivocado. Si no registro, el inventario se descuadra. Si no embalo bien, el producto puede dañarse en el transporte. Todo está conectado.
+                </div>
+            </section>
+
+            <section class="section" id="tipos">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>4. Tipos de Picking</h3>
+                <p>No todos los picking son iguales. Dependiendo del volumen de pedidos, del tipo de productos y de la organización de la bodega, existen diferentes métodos.</p>
+                
+                <div class="picking-grid">
+                    <div class="picking-card">
+                        <h5>Picking por Pedido (Discreto)</h5>
+                        <p>Se prepara un pedido completo a la vez. El operario recorre la bodega buscando todos los productos de ese pedido específico.</p>
+                        <p><strong>Ventaja:</strong> simple, fácil de controlar.</p>
+                        <p><strong>Desventaja:</strong> si hay muchos pedidos, se recorre mucho.</p>
+                        <p><strong>Ideal para:</strong> bodegas con pocos pedidos o pedidos grandes.</p>
+                    </div>
+                    <div class="picking-card">
+                        <h5>Picking por Lotes (Batch)</h5>
+                        <p>Se agrupan varios pedidos y se preparan juntos. El operario recoge todos los productos de varios pedidos en un solo recorrido.</p>
+                        <p><strong>Ventaja:</strong> reduce recorridos, más eficiente.</p>
+                        <p><strong>Desventaja:</strong> requiere separar después por pedido.</p>
+                        <p><strong>Ideal para:</strong> bodegas con muchos pedidos pequeños similares.</p>
+                    </div>
+                    <div class="picking-card">
+                        <h5>Picking por Zona</h5>
+                        <p>Cada operario se encarga de una zona específica de la bodega. El pedido pasa por varias zonas y cada operario agrega los productos de su zona.</p>
+                        <p><strong>Ventaja:</strong> cada operario conoce bien su zona, más rápido.</p>
+                        <p><strong>Desventaja:</strong> requiere coordinación entre zonas.</p>
+                        <p><strong>Ideal para:</strong> bodegas grandes con muchos productos.</p>
+                    </div>
+                    <div class="picking-card">
+                        <h5>Picking por Ola (Wave)</h5>
+                        <p>Se programan "olas" de pedidos en horarios específicos. Por ejemplo, todos los pedidos de la mañana se preparan juntos y se despachan al mediodía.</p>
+                        <p><strong>Ventaja:</strong> permite planificar mejor el despacho.</p>
+                        <p><strong>Desventaja:</strong> menos flexible para pedidos urgentes.</p>
+                        <p><strong>Ideal para:</strong> operaciones con horarios de despacho fijos.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>En una bodega de insumos y materiales, lo más común es el picking por pedido o por zona.</strong> Porque generalmente los pedidos son de pocos productos y se atienden de manera individual. Pero es importante conocer las otras opciones para entender cómo funcionan bodegas más grandes.
+                </div>
+                
+                <p>Y una pregunta que me gusta hacer: ¿ustedes saben qué tipo de picking se usa en su bodega actual? Si no lo saben, probablemente están haciendo picking por pedido de manera informal. Y eso está bien, pero si lo organizamos un poco más, podemos ser más eficientes.</p>
+            </section>
+
+            <section class="section" id="verificacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>5. Verificación durante el Picking</h3>
+                <p>La verificación es el corazón del picking. Porque es lo que garantiza que estamos entregando exactamente lo que se pidió.</p>
+                
+                <h4>¿Qué verifico durante el picking?</h4>
+                <ul>
+                    <li><strong>Producto correcto:</strong> ¿es exactamente lo que se pidió? Mismo código, misma descripción, mismas características.</li>
+                    <li><strong>Cantidad correcta:</strong> ¿son las unidades exactas que se solicitaron? Ni más, ni menos.</li>
+                    <li><strong>Estado del producto:</strong> ¿está en buenas condiciones? Sin daños, sin deformaciones, sin contaminación.</li>
+                    <li><strong>Fecha de vencimiento:</strong> si el producto tiene vencimiento, verifico que no esté vencido ni próximo a vencer.</li>
+                    <li><strong>Lote:</strong> cuando corresponde, verifico que el lote sea el correcto (especialmente en productos con trazabilidad).</li>
+                    <li><strong>Rotación:</strong> si aplico FIFO o FEFO, verifico que estoy sacando el producto que corresponde según la rotación.</li>
+                </ul>
+                
+                <div class="comparacion">
+                    <div class="caja correcto">
+                        <h5>Verificación correcta</h5>
+                        <ul>
+                            <li>Comparo el producto con la solicitud.</li>
+                            <li>Cuento las unidades.</li>
+                            <li>Reviso el estado visual.</li>
+                            <li>Verifico vencimiento si aplica.</li>
+                            <li>Confirmo antes de seguir.</li>
+                        </ul>
+                    </div>
+                    <div class="caja incorrecto">
+                        <h5>Verificación incorrecta</h5>
+                        <ul>
+                            <li>Saco lo primero que veo.</li>
+                            <li>No cuento, "echo un vistazo".</li>
+                            <li>No reviso el estado.</li>
+                            <li>Ignoro el vencimiento.</li>
+                            <li>Asumo que está bien sin verificar.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="destacado">
+                    La verificación no es perder tiempo. Es invertir tiempo para evitar un error. Porque un error en el picking significa que el usuario recibe algo equivocado, y eso genera un reclamo, una devolución, un reproceso y una pérdida de confianza.
+                </div>
+                
+                <p>Y aquí viene una idea que quiero que se graben: el picking no termina cuando saco el producto de la estantería. Termina cuando verifico que es correcto y lo registro en el sistema. Si no verifico, no terminé. Si no registro, no terminé.</p>
+            </section>
+
+            <section class="section" id="packing">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>6. Packing (Embalaje)</h3>
+                <p>Una vez que seleccioné y verifiqué los productos, viene el packing. Packing significa embalar, empaquetar, preparar físicamente los productos para su transporte o entrega.</p>
+                
+                <h4>¿Por qué es importante el packing?</h4>
+                <ul>
+                    <li><strong>Protección:</strong> el embalaje protege los productos durante el transporte.</li>
+                    <li><strong>Organización:</strong> mantiene los productos juntos y ordenados.</li>
+                    <li><strong>Identificación:</strong> permite saber qué contiene el paquete sin abrirlo.</li>
+                    <li><strong>Presentación:</strong> un buen embalaje genera confianza en quien recibe.</li>
+                    <li><strong>Seguridad:</strong> evita que los productos se caigan, se golpeen o se dañen.</li>
+                </ul>
+                
+                <h4>Tipos de embalaje según el producto</h4>
+                <ul>
+                    <li><strong>Cajas de cartón:</strong> para productos generales, livianos o medianos.</li>
+                    <li><strong>Film plástico (alusa):</strong> para consolidar pallets o proteger de la humedad.</li>
+                    <li><strong>Plástico de burbujas:</strong> para productos frágiles.</li>
+                    <li><strong>Espuma o plumavit:</strong> para productos muy delicados.</li>
+                    <li><strong>Flejes o zunchos:</strong> para asegurar cajas o pallets.</li>
+                    <li><strong>Esquineros:</strong> para proteger las esquinas de cajas o pallets.</li>
+                </ul>
+                
+                <h4>Reglas básicas del packing</h4>
+                <ul>
+                    <li>El embalaje debe ser adecuado al producto. No es lo mismo embalar guantes que embalar un equipo electrónico.</li>
+                    <li>Los productos pesados van abajo, los livianos arriba.</li>
+                    <li>Los productos frágiles van protegidos con material de amortiguación.</li>
+                    <li>El paquete no debe quedar flojo ni demasiado apretado.</li>
+                    <li>Debe quedar claramente identificado: qué contiene, para quién es, cuántas unidades.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>Un mal embalaje puede dañar el producto antes de que llegue al usuario.</strong> Y si el producto llega dañado porque el embalaje fue insuficiente, la responsabilidad es de quien preparó el despacho. Por eso el packing no es un detalle menor: es parte del proceso de calidad.
+                </div>
+            </section>
+
+            <section class="section" id="consolidacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>7. Consolidación</h3>
+                <p>La consolidación es el proceso de agrupar varios productos o varios pedidos en una sola unidad de despacho. En vez de enviar diez paquetes pequeños, los junto en uno más grande.</p>
+                
+                <h4>¿Cuándo se consolida?</h4>
+                <ul>
+                    <li>Cuando un mismo usuario o cliente pidió varios productos diferentes.</li>
+                    <li>Cuando varios pedidos van al mismo destino.</li>
+                    <li>Cuando es más eficiente enviar todo junto que por separado.</li>
+                </ul>
+                
+                <h4>¿Cómo se consolida?</h4>
+                <ul>
+                    <li>Se agrupan los productos por destinatario.</li>
+                    <li>Se embalan juntos en una caja o pallet.</li>
+                    <li>Se genera una etiqueta única que identifica el paquete consolidado.</li>
+                    <li>Se registra en el sistema que todos esos productos salieron juntos.</li>
+                </ul>
+                
+                <div class="ejemplo-box">
+                    <h5>Ejemplo práctico</h5>
+                    <p>El usuario Juan Pérez pidió:</p>
+                    <ul>
+                        <li>5 guantes (picking 1)</li>
+                        <li>2 cascos (picking 2)</li>
+                        <li>10 mascarillas (picking 3)</li>
+                    </ul>
+                    <p>En vez de hacer tres paquetes separados, consolido todo en una sola caja etiquetada: "Juan Pérez - 3 ítems". Así el despacho es más simple, más rápido y hay menos riesgo de que se pierda algo.</p>
+                </div>
+                
+                <div class="destacado">
+                    La consolidación ahorra tiempo, espacio y reduce errores. Pero solo funciona si se hace con orden y con una identificación clara. Si consolido sin etiquetar correctamente, después nadie sabe qué contiene el paquete.
+                </div>
+            </section>
+
+            <section class="section" id="documentacion">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>8. Documentación de Despacho</h3>
+                <p>Así como la recepción tiene su documentación, el despacho también tiene la suya. Porque todo movimiento de salida debe quedar registrado y respaldado.</p>
+                
+                <div class="doc-despacho">
+                    <div class="doc-item">
+                        <h5>Solicitud de Materiales</h5>
+                        <p>El documento que inició el pedido. Indica qué se necesita, cuánto y para quién.</p>
+                    </div>
+                    <div class="doc-item">
+                        <h5>Guía de Despacho</h5>
+                        <p>Documento tributario que certifica la salida de la mercadería. En Chile es electrónica (DTE).</p>
+                    </div>
+                    <div class="doc-item">
+                        <h5>Vale de Salida</h5>
+                        <p>Documento interno que registra qué productos salieron, en qué cantidad y quién los retiró.</p>
+                    </div>
+                    <div class="doc-item">
+                        <h5>Etiqueta de Despacho</h5>
+                        <p>Identifica el paquete: destinatario, contenido, cantidad, fecha, código de tracking si aplica.</p>
+                    </div>
+                    <div class="doc-item">
+                        <h5>Registro en el Sistema</h5>
+                        <p>El movimiento de salida debe quedar registrado en el WMS o ERP para actualizar el inventario.</p>
+                    </div>
+                </div>
+                
+                <div class="importante">
+                    <strong>Si un producto sale de la bodega sin documentación, es como si se hubiera perdido.</strong> Porque no hay registro de quién lo tiene, cuánto se llevó ni cuándo salió. Y eso genera problemas de control, de inventario y de responsabilidad.
+                </div>
+                
+                <p>Y aquí viene una regla que quiero que se graben: todo lo que sale de la bodega debe tener un documento que lo respalde. No importa si es una caja grande o un solo tornillo. Si sale, se registra.</p>
+                
+                <div class="destacado">
+                    La documentación no es burocracia. Es trazabilidad. Es saber dónde está cada producto en cada momento. Y si algo se pierde o alguien reclama que no recibió lo que pidió, la documentación es nuestra evidencia.
+                </div>
+            </section>
+
+            <section class="section" id="despacho">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>9. El Proceso de Despacho</h3>
+                <p>El despacho es la etapa final. Es cuando el producto sale físicamente de la bodega y se entrega al usuario, al cliente o al transporte.</p>
+                
+                <h4>Pasos del despacho</h4>
+                <div class="lista-pasos">
+                    <ol>
+                        <li><strong>Verificación final:</strong> antes de entregar, hago una última comprobación. Producto correcto, cantidad correcta, estado correcto.</li>
+                        <li><strong>Documentación completa:</strong> me aseguro de que todos los documentos estén listos: guía, vale de salida, etiquetas.</li>
+                        <li><strong>Entrega al transporte o usuario:</strong> entrego físicamente el producto. Si es un usuario interno, firma el vale de salida. Si es un transporte externo, firma la guía de despacho.</li>
+                        <li><strong>Registro de la entrega:</strong> anoto la hora, quién retiró, qué se llevó. Esto queda como respaldo.</li>
+                        <li><strong>Actualización del sistema:</strong> el inventario se descuenta automáticamente si ya registré el picking, o lo hago manualmente si corresponde.</li>
+                        <li><strong>Cierre del pedido:</strong> marco el pedido como completado en el sistema.</li>
+                    </ol>
+                </div>
+                
+                <h4>¿Qué verifico antes de despachar?</h4>
+                <ul>
+                    <li>Que el producto sea el correcto.</li>
+                    <li>Que la cantidad sea la correcta.</li>
+                    <li>Que el estado sea adecuado (sin daños, sin vencimiento).</li>
+                    <li>Que el embalaje sea suficiente para el transporte.</li>
+                    <li>Que la documentación esté completa.</li>
+                    <li>Que el destinatario esté claramente identificado.</li>
+                </ul>
+                
+                <div class="importante">
+                    <strong>El despacho es el último punto de control antes de que el producto llegue al usuario.</strong> Si dejo pasar un error aquí, el usuario lo va a recibir. Y corregir un error después del despacho es mucho más difícil que corregirlo antes.
+                </div>
+                
+                <p>Y una pregunta que me gusta hacer: ¿cuántas veces les ha pasado que despachan algo y después el usuario dice "esto no es lo que pedí" o "faltan unidades"? Si eso pasa seguido, tenemos un problema en el proceso de verificación. Y ese problema se corrige con más control, no con más velocidad.</p>
+            </section>
+
+            <section class="section" id="errores">
+                <div class="tts-controls">
+                    <button class="tts-btn" onclick="playSection(this)" title="Reproducir">▶️</button>
+                    <button class="tts-btn" onclick="pauseTTS()" title="Pausar" disabled>⏸️</button>
+                    <button class="tts-btn" onclick="stopTTS()" title="Detener" disabled>⏹️</button>
+                </div>
+                <h3>10. Errores Comunes en Picking y Despacho</h3>
+                <p>Para cerrar este módulo, quiero repasar los errores más comunes. Conocerlos es el primer paso para evitarlos.</p>
+                
+                <h4>Error 1: No verificar la disponibilidad antes de ir a buscar</h4>
+                <p>Ir a la estantería a buscar un producto sin antes confirmar que hay stock. Resultado: pierdo tiempo buscando algo que no está.</p>
+                
+                <h4>Error 2: Tomar el producto equivocado</h4>
+                <p>Confundir un producto con otro similar. Por ejemplo, guantes talla L con guantes talla M. O un código de producto con otro parecido.</p>
+                
+                <h4>Error 3: No respetar la rotación</h4>
+                <p>Sacar el producto nuevo en vez del viejo. Resultado: el producto viejo queda atrás y puede vencerse.</p>
+                
+                <h4>Error 4: No registrar la salida</h4>
+                <p>Despachar sin actualizar el sistema. Resultado: el sistema dice que tengo stock, pero físicamente no está. Inventario descuadrado.</p>
+                
+                <h4>Error 5: Despachar sin verificación final</h4>
+                <p>Entregar el producto sin una última comprobación. Resultado: el usuario recibe algo equivocado o incompleto.</p>
+                
+                <h4>Error 6: Embalaje insuficiente</h4>
+                <p>No proteger bien el producto para el transporte. Resultado: llega dañado al destino.</p>
+                
+                <h4>Error 7: Documentación incompleta</h4>
+                <p>Despachar sin guía, sin vale de salida o sin firma del receptor. Resultado: no hay respaldo de la entrega.</p>
+                
+                <h4>Error 8: Despachar productos vencidos o dañados</h4>
+                <p>No revisar el estado antes de entregar. Resultado: el usuario recibe algo que no puede usar.</p>
+                
+                <h4>Error 9: Trabajar con apuro</h4>
+                <p>El apuro es el enemigo de la precisión. Cuando uno está apurado, toma atajos, y los atajos en picking generan errores.</p>
+                
+                <div class="destacado">
+                    Un error en el picking no es solo un error de bodega. Es un problema para el usuario que no recibe lo que necesita, para la empresa que pierde tiempo y dinero en reprocesos, y para la confianza en el sistema. Por eso la precisión es más importante que la velocidad.
+                </div>
+                
+                <p>Y quiero cerrar con una idea: el picking y el despacho son la cara visible de la bodega. Porque es el momento donde el usuario recibe lo que pidió. Y si ese momento funciona bien, todo lo anterior tiene sentido. Si ese momento falla, todo lo anterior pierde valor.</p>
+            </section>
+
+            <div class="cierre" id="cierre">
+                <h3>Reflexión Final</h3>
+                <p>Con este módulo cerramos la Parte II: Operación de Bodega. Ya sabemos cómo se recibe, cómo se almacena, cómo se mueve y cómo se despacha. Es decir, ya conocemos el ciclo operativo completo.</p>
+                <p>Pero todavía falta algo muy importante: el control. Porque de nada sirve mover productos si no sabemos cuánto tenemos, dónde está y cuándo necesitamos reponer. Eso lo veremos en la Parte III: Control y Gestión.</p>
+                <p>Por ahora, quiero que se queden con esta idea: el picking y el despacho no son tareas menores. Son el momento donde la bodega entrega valor. Donde todo lo que aprendimos sobre seguridad, orden, almacenamiento y control se pone a prueba. Porque si el picking falla, todo lo anterior pierde sentido.</p>
+                <div style="width: 100px; height: 3px; background: #f39c12; margin: 30px auto;"></div>
+                <p class="frase-final">"Un buen picking es rápido, pero sobre todo es preciso.<br>Porque la velocidad sin precisión genera errores.<br>Y los errores cuestan más que la velocidad."</p>
+                
+                <a href="parte11.html" class="next-module">Siguiente Módulo: Control de Inventarios y Stock →</a>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const sections = document.querySelectorAll('.section, .cierre');
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPosition = window.scrollY;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPosition >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollPosition / totalHeight) * 100;
+            progressBar.style.width = progress + '%';
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (scrollPosition > 500) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // TTS MEJORADO - NO LEE BOTONES, EMOJIS NI SELECTORES
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let currentSection = null;
+        let isPlaying = false;
+        let bestVoice = null;
+
+        function findBestSpanishVoice() {
+            const voices = synth.getVoices();
+            const googleSpanish = voices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
+            if (googleSpanish) return googleSpanish;
+            const microsoftSpanish = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('es'));
+            if (microsoftSpanish) return microsoftSpanish;
+            const anySpanish = voices.find(v => v.lang.startsWith('es'));
+            if (anySpanish) return anySpanish;
+            return voices[0] || null;
+        }
+
+        function removeEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}]/gu, '');
+        }
+
+        function getSectionText(section) {
+            const clone = section.cloneNode(true);
+            const ttsControls = clone.querySelectorAll('.tts-controls');
+            ttsControls.forEach(control => control.remove());
+            const videos = clone.querySelectorAll('.video-container, .image-gallery');
+            videos.forEach(video => video.remove());
+            let text = clone.textContent.trim();
+            text = removeEmojis(text);
+            text = text.replace(/\s+/g, ' ').trim();
+            return text;
+        }
+
+        function playSection(button) {
+            const section = button.closest('.section');
+            if (isPlaying && currentSection === section) { pauseTTS(); return; }
+            stopTTS();
+            const text = getSectionText(section);
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentSection = section;
+            if (!bestVoice) bestVoice = findBestSpanishVoice();
+            if (bestVoice) currentUtterance.voice = bestVoice;
+            currentUtterance.rate = 1;
+            currentUtterance.pitch = 1;
+            currentUtterance.volume = 1;
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                section.classList.add('reading');
+                const controls = section.querySelectorAll('.tts-btn');
+                controls[0].classList.add('active');
+                controls[1].disabled = false;
+                controls[2].disabled = false;
+            };
+            currentUtterance.onend = () => { resetSection(section); };
+            synth.speak(currentUtterance);
+        }
+
+        function pauseTTS() {
+            if (synth.speaking && !synth.paused) { synth.pause(); isPlaying = false; }
+            else if (synth.paused) { synth.resume(); isPlaying = true; }
+        }
+
+        function stopTTS() {
+            if (synth.speaking || synth.paused) synth.cancel();
+            document.querySelectorAll('.section.reading').forEach(s => resetSection(s));
+            isPlaying = false;
+        }
+
+        function resetSection(section) {
+            section.classList.remove('reading');
+            const controls = section.querySelectorAll('.tts-btn');
+            controls[0].classList.remove('active');
+            controls[1].disabled = true;
+            controls[2].disabled = true;
+        }
+
+        window.addEventListener('load', () => {
+            synth.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => { bestVoice = findBestSpanishVoice(); };
+            }
+            bestVoice = findBestSpanishVoice();
+        });
+    </script>
+
+</body>
+</html>
