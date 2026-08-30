@@ -4,356 +4,238 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Técnicas y Operaciones de Gestión de Mercaderías en Bodega</title>
-
-<!-- PWA: Estas 3 líneas hacen que funcione como App -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e3a5f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Curso Bodega">
-
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; min-height: 100vh; }
-    .header { background: rgba(255, 255, 255, 0.98); padding: 20px 0; box-shadow: 0 2px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-    .header-content { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { display: flex; align-items: center; gap: 15px; }
-    .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #1e3a5f, #2c5282); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
-    .logo h1 { color: #1e3a5f; font-size: 20px; font-weight: 700; }
-    .logo span { color: #f39c12; font-size: 13px; display: block; font-weight: 400; }
-    .hero { background: linear-gradient(135deg, rgba(30, 58, 95, 0.92), rgba(44, 82, 130, 0.92)), url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/4fd1a0a28-d648-49e5-ae57-f7108f90a8ff3101.png'); background-size: cover; background-position: center; color: white; padding: 100px 40px; text-align: center; }
-    .hero h2 { font-size: 42px; margin-bottom: 20px; font-weight: 700; line-height: 1.2; max-width: 1000px; margin-left: auto; margin-right: auto; }
-    .hero p { font-size: 18px; max-width: 800px; margin: 0 auto 40px auto; opacity: 0.9; line-height: 1.6; }
-    .hero-stats { display: flex; justify-content: center; gap: 50px; margin-top: 60px; flex-wrap: wrap; }
-    .stat { text-align: center; }
-    .stat-number { font-size: 48px; font-weight: 700; color: #f39c12; display: block; }
-    .stat-label { font-size: 16px; opacity: 0.9; }
-    .main-container { max-width: 1200px; margin: -60px auto 60px auto; padding: 0 40px; position: relative; z-index: 100; }
-    .parte-section { margin-bottom: 60px; }
-    .parte-header { background: white; padding: 30px 40px; border-radius: 15px 15px 0 0; border-left: 6px solid; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .parte-header.parte-1 { border-left-color: #e74c3c; }
-    .parte-header.parte-2 { border-left-color: #f39c12; }
-    .parte-header.parte-3 { border-left-color: #27ae60; }
-    .parte-header.parte-4 { border-left-color: #8e44ad; }
-    .parte-header h3 { color: #1e3a5f; font-size: 28px; margin-bottom: 10px; }
-    .parte-header p { color: #718096; font-size: 15px; }
-    .parte-tag { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-size: 13px; font-weight: 600; margin-bottom: 15px; }
-    .parte-1 .parte-tag { background: #e74c3c; }
-    .parte-2 .parte-tag { background: #f39c12; }
-    .parte-3 .parte-tag { background: #27ae60; }
-    .parte-4 .parte-tag { background: #8e44ad; }
-    .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; background: white; padding: 40px; border-radius: 0 0 15px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .module-card { background: #f8f9fa; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block; border: 2px solid #27ae60; }
-    .module-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-    .module-card.practica { border: 2px solid #8e44ad; }
-    .module-image { height: 180px; background-size: cover; background-position: center; position: relative; }
-    .module-badge { position: absolute; top: 15px; right: 15px; background: #27ae60; color: white; padding: 6px 15px; border-radius: 20px; font-weight: 600; font-size: 12px; }
-    .module-badge.practica { background: #8e44ad; }
-    .module-content { padding: 25px; }
-    .module-number { color: #f39c12; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-    .module-number.practica { color: #8e44ad; }
-    .module-title { color: #1e3a5f; font-size: 18px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
-    .module-description { color: #718096; font-size: 14px; line-height: 1.5; margin-bottom: 15px; }
-    .module-meta { display: flex; gap: 15px; font-size: 13px; color: #a0aec0; }
-    .module-meta span { display: flex; align-items: center; gap: 5px; }
-    .features { background: white; padding: 80px 40px; margin-top: 60px; }
-    .features-container { max-width: 1200px; margin: 0 auto; }
-    .features h3 { text-align: center; color: #1e3a5f; font-size: 36px; margin-bottom: 60px; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
-    .feature { text-align: center; padding: 30px; }
-    .feature-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 36px; color: white; }
-    .feature h4 { color: #1e3a5f; font-size: 20px; margin-bottom: 10px; }
-    .feature p { color: #718096; font-size: 15px; line-height: 1.6; }
-    .footer { background: #1e3a5f; color: white; text-align: center; padding: 40px; }
-    .footer p { opacity: 0.8; font-size: 14px; }
-    @media (max-width: 768px) {
-        .hero h2 { font-size: 28px; }
-        .hero p { font-size: 16px; }
-        .modules-grid { grid-template-columns: 1fr; padding: 20px; }
-        .header-content { padding: 0 20px; }
-        .main-container { padding: 0 20px; }
-        .parte-header { padding: 20px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f5f7fa;min-height:100vh}
+    .header{background:rgba(255,255,255,.98);padding:20px 0;box-shadow:0 2px 20px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000}
+    .header-content{max-width:1200px;margin:0 auto;padding:0 40px;display:flex;justify-content:space-between;align-items:center}
+    .logo{display:flex;align-items:center;gap:15px}
+    .logo-icon{width:50px;height:50px;background:linear-gradient(135deg,#1e3a5f,#2c5282);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px}
+    .logo h1{color:#1e3a5f;font-size:20px;font-weight:700}
+    .logo span{color:#f39c12;font-size:13px;display:block;font-weight:400}
+    .hero{background:linear-gradient(135deg,rgba(30,58,95,.92),rgba(44,82,130,.92)),url('https://images.pexels.com/photos/6169660/pexels-photo-6169660.jpeg?auto=compress&cs=tinysrgb&w=1600');background-size:cover;background-position:center;color:#fff;padding:100px 40px;text-align:center}
+    .hero h2{font-size:42px;margin-bottom:20px;font-weight:700;line-height:1.2;max-width:1000px;margin-left:auto;margin-right:auto}
+    .hero p{font-size:18px;max-width:800px;margin:0 auto 40px;opacity:.9;line-height:1.6}
+    .hero-stats{display:flex;justify-content:center;gap:50px;margin-top:60px;flex-wrap:wrap}
+    .stat{text-align:center}
+    .stat-number{font-size:48px;font-weight:700;color:#f39c12;display:block}
+    .stat-label{font-size:16px;opacity:.9}
+    .main-container{max-width:1200px;margin:-60px auto 60px;padding:0 40px;position:relative;z-index:100}
+    .parte-section{margin-bottom:60px}
+    .parte-header{background:#fff;padding:30px 40px;border-radius:15px 15px 0 0;border-left:6px solid;box-shadow:0 4px 15px rgba(0,0,0,.05)}
+    .parte-header.parte-1{border-left-color:#e74c3c}
+    .parte-header.parte-2{border-left-color:#f39c12}
+    .parte-header.parte-3{border-left-color:#27ae60}
+    .parte-header.parte-4{border-left-color:#8e44ad}
+    .parte-header h3{color:#1e3a5f;font-size:28px;margin-bottom:10px}
+    .parte-header p{color:#718096;font-size:15px}
+    .parte-tag{display:inline-block;padding:5px 15px;border-radius:20px;color:#fff;font-size:13px;font-weight:600;margin-bottom:15px}
+    .parte-1 .parte-tag{background:#e74c3c}
+    .parte-2 .parte-tag{background:#f39c12}
+    .parte-3 .parte-tag{background:#27ae60}
+    .parte-4 .parte-tag{background:#8e44ad}
+    .modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:25px;background:#fff;padding:40px;border-radius:0 0 15px 15px;box-shadow:0 4px 15px rgba(0,0,0,.05)}
+    .module-card{background:#f8f9fa;border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.08);transition:transform .3s,box-shadow .3s;cursor:pointer;text-decoration:none;color:inherit;display:block;border:2px solid #27ae60}
+    .module-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,0,0,.15)}
+    .module-card.practica{border:2px solid #8e44ad}
+    .module-image{height:180px;background-size:cover;background-position:center;position:relative;background-color:#dce6f5}
+    .module-badge{position:absolute;top:15px;right:15px;background:#27ae60;color:#fff;padding:6px 15px;border-radius:20px;font-weight:600;font-size:12px}
+    .module-badge.practica{background:#8e44ad}
+    .module-content{padding:25px}
+    .module-number{color:#f39c12;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+    .module-number.practica{color:#8e44ad}
+    .module-title{color:#1e3a5f;font-size:18px;font-weight:700;margin-bottom:12px;line-height:1.3}
+    .module-description{color:#718096;font-size:14px;line-height:1.5;margin-bottom:15px}
+    .module-meta{display:flex;gap:15px;font-size:13px;color:#a0aec0}
+    .module-meta span{display:flex;align-items:center;gap:5px}
+    .features{background:#fff;padding:80px 40px;margin-top:60px}
+    .features-container{max-width:1200px;margin:0 auto}
+    .features h3{text-align:center;color:#1e3a5f;font-size:36px;margin-bottom:60px}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px}
+    .feature{text-align:center;padding:30px}
+    .feature-icon{width:80px;height:80px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px;color:#fff}
+    .feature h4{color:#1e3a5f;font-size:20px;margin-bottom:10px}
+    .feature p{color:#718096;font-size:15px;line-height:1.6}
+    .footer{background:#1e3a5f;color:#fff;text-align:center;padding:40px}
+    .footer p{opacity:.8;font-size:14px}
+    @media(max-width:768px){
+        .hero h2{font-size:28px}.hero p{font-size:16px}
+        .modules-grid{grid-template-columns:1fr;padding:20px}
+        .header-content{padding:0 20px}.main-container{padding:0 20px}
+        .parte-header{padding:20px}
     }
 </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">📦</div>
-                <div>
-                    <h1>Gestión de Bodega</h1>
-                    <span>Curso Profesional Completo</span>
-                </div>
+<header class="header">
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-icon">📦</div>
+            <div>
+                <h1>Gestión de Bodega</h1>
+                <span>Curso Profesional Completo</span>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <section class="hero">
-        <h2>Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</h2>
-        <p>Formación integral para dominar el flujo completo de una bodega: desde la seguridad y prevención de riesgos, pasando por la recepción y almacenamiento, hasta el control de inventarios, la tecnología logística y la práctica en simuladores interactivos.</p>
-        <div class="hero-stats">
-            <div class="stat"><span class="stat-number">16</span><span class="stat-label">Módulos</span></div>
-            <div class="stat"><span class="stat-number">2</span><span class="stat-label">Simuladores</span></div>
-            <div class="stat"><span class="stat-number">4</span><span class="stat-label">Partes</span></div>
-            <div class="stat"><span class="stat-number">100%</span><span class="stat-label">Práctico</span></div>
+<section class="hero">
+    <h2>Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</h2>
+    <p>Formación integral para dominar el flujo completo de una bodega: desde la seguridad y prevención de riesgos, pasando por la recepción y almacenamiento, hasta el control de inventarios, la tecnología logística y la práctica en simuladores interactivos.</p>
+    <div class="hero-stats">
+        <div class="stat"><span class="stat-number">16</span><span class="stat-label">Módulos</span></div>
+        <div class="stat"><span class="stat-number">2</span><span class="stat-label">Simuladores</span></div>
+        <div class="stat"><span class="stat-number">4</span><span class="stat-label">Partes</span></div>
+        <div class="stat"><span class="stat-number">100%</span><span class="stat-label">Práctico</span></div>
+    </div>
+</section>
+
+<div class="main-container">
+
+    <!-- PARTE I -->
+    <div class="parte-section">
+        <div class="parte-header parte-1">
+            <span class="parte-tag">PARTE I</span>
+            <h3>Fundamentos y Seguridad</h3>
+            <p>La base de todo: prevención de riesgos, protección personal, señalización, orden y combate de incendios</p>
         </div>
-    </section>
-
-    <div class="main-container">
-
-        <!-- PARTE I -->
-        <div class="parte-section">
-            <div class="parte-header parte-1">
-                <span class="parte-tag">PARTE I</span>
-                <h3>Fundamentos y Seguridad</h3>
-                <p>La base de todo: prevención de riesgos, protección personal, señalización, orden y combate de incendios</p>
-            </div>
-            <div class="modules-grid">
-                <a href="parte1.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&h=400&fit=crop');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 01</div>
-                        <h3 class="module-title">Fundamentos de Prevención de Riesgos</h3>
-                        <p class="module-description">Conceptos básicos, peligro vs riesgo, accidentes del trabajo, enfermedades profesionales y cultura de seguridad.</p>
-                        <div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 45 min</span></div>
-                    </div>
-                </a>
-                <a href="parte2.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/5fd1a0a28-d648-49e5-ae57-f7108f90a8ff7367.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 02</div>
-                        <h3 class="module-title">Elementos de Protección Personal (EPP)</h3>
-                        <p class="module-description">Tipos de EPP, selección correcta, uso adecuado, mantenimiento, normativa y limitaciones.</p>
-                        <div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 40 min</span></div>
-                    </div>
-                </a>
-                <a href="parte3.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/3fd1a0a28-d648-49e5-ae57-f7108f90a8ff6529.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 03</div>
-                        <h3 class="module-title">Señalización y Demarcación de Áreas</h3>
-                        <p class="module-description">Colores de seguridad, tipos de señalización, demarcación de pasillos y zonas de riesgo.</p>
-                        <div class="module-meta"><span>📚 6 lecciones</span><span>⏱️ 30 min</span></div>
-                    </div>
-                </a>
-                <a href="parte4.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/5fd1a0a28-d648-49e5-ae57-f7108f90a8ff4278.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 04</div>
-                        <h3 class="module-title">Orden, Aseo y Metodología 5S</h3>
-                        <p class="module-description">Clasificar, ordenar, limpiar, estandarizar y disciplinar aplicados a bodegas.</p>
-                        <div class="module-meta"><span>📚 7 lecciones</span><span>⏱️ 35 min</span></div>
-                    </div>
-                </a>
-                <a href="parte5.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/0fd1a0a28-d648-49e5-ae57-f7108f90a8ff1671.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 05</div>
-                        <h3 class="module-title">Prevención y Combate de Incendios</h3>
-                        <p class="module-description">Tipos de fuego, extintores, sistemas de detección, evacuación y brigadas de emergencia.</p>
-                        <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 45 min</span></div>
-                    </div>
-                </a>
-            </div>
+        <div class="modules-grid">
+            <a href="parte1.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 01</div><h3 class="module-title">Fundamentos de Prevención de Riesgos</h3><p class="module-description">Conceptos básicos, peligro vs riesgo, accidentes del trabajo, enfermedades profesionales y cultura de seguridad.</p><div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 45 min</span></div></div>
+            </a>
+            <a href="parte2.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/7822577/pexels-photo-7822577.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 02</div><h3 class="module-title">Elementos de Protección Personal (EPP)</h3><p class="module-description">Tipos de EPP, selección correcta, uso adecuado, mantenimiento, normativa y limitaciones.</p><div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 40 min</span></div></div>
+            </a>
+            <a href="parte3.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169660/pexels-photo-6169660.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 03</div><h3 class="module-title">Señalización y Demarcación de Áreas</h3><p class="module-description">Colores de seguridad, tipos de señalización, demarcación de pasillos y zonas de riesgo.</p><div class="module-meta"><span>📚 6 lecciones</span><span>⏱️ 30 min</span></div></div>
+            </a>
+            <a href="parte4.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169618/pexels-photo-6169618.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 04</div><h3 class="module-title">Orden, Aseo y Metodología 5S</h3><p class="module-description">Clasificar, ordenar, limpiar, estandarizar y disciplinar aplicados a bodegas.</p><div class="module-meta"><span>📚 7 lecciones</span><span>⏱️ 35 min</span></div></div>
+            </a>
+            <a href="parte5.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6502627/pexels-photo-6502627.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 05</div><h3 class="module-title">Prevención y Combate de Incendios</h3><p class="module-description">Tipos de fuego, extintores, sistemas de detección, evacuación y brigadas de emergencia.</p><div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 45 min</span></div></div>
+            </a>
         </div>
-
-        <!-- PARTE II -->
-        <div class="parte-section">
-            <div class="parte-header parte-2">
-                <span class="parte-tag">PARTE II</span>
-                <h3>Operación de Bodega</h3>
-                <p>El corazón del trabajo: recepción, almacenamiento, manipulación de cargas y preparación de pedidos</p>
-            </div>
-            <div class="modules-grid">
-                <a href="parte6.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/3fd1a0a28-d648-49e5-ae57-f7108f90a8ff6810.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 06</div>
-                        <h3 class="module-title">Introducción a la Bodega y su Organización</h3>
-                        <p class="module-description">Funciones de la bodega, tipos de almacenes, layout, flujos y organización del espacio.</p>
-                        <div class="module-meta"><span>📚 7 lecciones</span><span>⏱️ 40 min</span></div>
-                    </div>
-                </a>
-                <a href="parte7.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/0fd1a0a28-d648-49e5-ae57-f7108f90a8ff9586.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 07</div>
-                        <h3 class="module-title">Recepción de Mercaderías</h3>
-                        <p class="module-description">Descarga, verificación, inspección de daños, documentación y registro de ingresos.</p>
-                        <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div>
-                    </div>
-                </a>
-                <a href="parte8.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2fd1a0a28-d648-49e5-ae57-f7108f90a8ff1944.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 08</div>
-                        <h3 class="module-title">Almacenamiento y Ubicación de Productos</h3>
-                        <p class="module-description">Estanterías, pallets, criterios de ubicación, codificación y conservación de productos.</p>
-                        <div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 55 min</span></div>
-                    </div>
-                </a>
-                <a href="parte9.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2fd1a0a28-d648-49e5-ae57-f7108f90a8ff6496.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 09</div>
-                        <h3 class="module-title">Manipulación Manual y Mecanizada de Cargas</h3>
-                        <p class="module-description">Técnicas de levantamiento, ergonomía, transpaletas, grúas horquilla y licencia Clase D.</p>
-                        <div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 60 min</span></div>
-                    </div>
-                </a>
-                <a href="parte10.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/5fd1a0a28-d648-49e5-ae57-f7108f90a8ff8407.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 10</div>
-                        <h3 class="module-title">Preparación de Pedidos (Picking) y Despacho</h3>
-                        <p class="module-description">Picking, packing, verificación, embalaje, documentación y entrega al transporte.</p>
-                        <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- PARTE III -->
-        <div class="parte-section">
-            <div class="parte-header parte-3">
-                <span class="parte-tag">PARTE III</span>
-                <h3>Control y Gestión</h3>
-                <p>La inteligencia detrás de la bodega: inventarios, rotación, provisión, sustancias peligrosas y tecnología</p>
-            </div>
-            <div class="modules-grid">
-                <a href="parte11.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/1fd1a0a28-d648-49e5-ae57-f7108f90a8ff8671.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 11</div>
-                        <h3 class="module-title">Control de Inventarios y Stock</h3>
-                        <p class="module-description">Conceptos de inventario y stock, inventario físico, diferencias, mermas y conteos cíclicos.</p>
-                        <div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 55 min</span></div>
-                    </div>
-                </a>
-                <a href="parte12.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/1fd1a0a28-d648-49e5-ae57-f7108f90a8ff1027.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 12</div>
-                        <h3 class="module-title">Sistemas de Rotación (FIFO, FEFO, LIFO)</h3>
-                        <p class="module-description">Criterios de rotación, cuándo usar cada uno, impacto en vencimientos y obsolescencia.</p>
-                        <div class="module-meta"><span>📚 6 lecciones</span><span>⏱️ 35 min</span></div>
-                    </div>
-                </a>
-                <a href="parte13.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2fd1a0a28-d648-49e5-ae57-f7108f90a8ff6539.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 13</div>
-                        <h3 class="module-title">Provisión, Reposición y Abastecimiento</h3>
-                        <p class="module-description">Stock mínimo, máximo, punto de reposición, lead time y conexión con adquisiciones.</p>
-                        <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div>
-                    </div>
-                </a>
-                <a href="parte14.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/3fd1a0a28-d648-49e5-ae57-f7108f90a8ff8851.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 14</div>
-                        <h3 class="module-title">Sustancias Peligrosas y Manejo de Derrames</h3>
-                        <p class="module-description">Clasificación ONU, HDS, segregación, DS 43, protocolo antiderrames y bodegas SUSPEL.</p>
-                        <div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 65 min</span></div>
-                    </div>
-                </a>
-                <a href="parte15.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/4fd1a0a28-d648-49e5-ae57-f7108f90a8ff1007.png');"><span class="module-badge">✓ Disponible</span></div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 15</div>
-                        <h3 class="module-title">Tecnología en Bodega (WMS, ERP y Trazabilidad)</h3>
-                        <p class="module-description">Sistemas WMS y ERP, código de barras, trazabilidad, KPIs y cierre del recorrido operativo.</p>
-                        <div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 55 min</span></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- PARTE IV -->
-        <div class="parte-section">
-            <div class="parte-header parte-4">
-                <span class="parte-tag">PARTE IV</span>
-                <h3>Complemento y Práctica Interactiva</h3>
-                <p>Marco de gestión internacional y simuladores para practicar con las manos lo aprendido en el curso</p>
-            </div>
-            <div class="modules-grid">
-
-                <!-- MÓDULO 16 - NORMAS ISO (IMAGEN CORREGIDA) -->
-                <a href="parte16.html" class="module-card">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/2ff2aefa1-4213-4986-9f58-cd4770df7755.png');">
-                        <span class="module-badge">✓ Disponible</span>
-                    </div>
-                    <div class="module-content">
-                        <div class="module-number">Módulo 16</div>
-                        <h3 class="module-title">Normas ISO en la Bodega (9001, 14001 y 45001)</h3>
-                        <p class="module-description">Qué son las normas ISO, certificación, auditorías, y cómo se viven la calidad, el medio ambiente y la seguridad en el día a día.</p>
-                        <div class="module-meta"><span>📚 11 lecciones</span><span>⏱️ 40 min</span></div>
-                    </div>
-                </a>
-
-                <a href="simulador.html" class="module-card practica">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/27edc736c-1451-41cb-82d1-cdacc0d8a9cb6307.png');">
-                        <span class="module-badge practica">🖥️ Práctica</span>
-                    </div>
-                    <div class="module-content">
-                        <div class="module-number practica">Práctica Interactiva</div>
-                        <h3 class="module-title">Simulador WMS / ERP Educativo</h3>
-                        <p class="module-description">Crea productos, registra recepciones y despachos, aplica FEFO, revisa el Kardex y recibe alertas de reposición en un sistema amigable con ejercicios guiados.</p>
-                        <div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div>
-                    </div>
-                </a>
-
-                <a href="sap.html" class="module-card practica">
-                    <div class="module-image" style="background-image: url('https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/07edc736c-1451-41cb-82d1-cdacc0d8a9cb9382.png');">
-                        <span class="module-badge practica">🖥️ Práctica</span>
-                    </div>
-                    <div class="module-content">
-                        <div class="module-number practica">Práctica Interactiva</div>
-                        <h3 class="module-title">Simulador Tipo SAP (Transacciones MM)</h3>
-                        <p class="module-description">Aprende la lógica de SAP con transacciones reales: MM01, MIGO, MB52, MB51, ME21N y MI01, en una interfaz idéntica a SAP GUI.</p>
-                        <div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div>
-                    </div>
-                </a>
-
-            </div>
-        </div>
-
     </div>
 
-    <section class="features">
-        <div class="features-container">
-            <h3>¿Por qué tomar este curso?</h3>
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">🎯</div>
-                    <h4>100% Práctico</h4>
-                    <p>Enfocado en situaciones reales de bodega con ejemplos aplicables inmediatamente en tu trabajo diario.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔊</div>
-                    <h4>Audio Integrado</h4>
-                    <p>Cada sección incluye reproducción de texto a voz para estudiar mientras realizas otras actividades.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🖥️</div>
-                    <h4>Simuladores Reales</h4>
-                    <p>Practica con un WMS educativo y un simulador tipo SAP que comparten los mismos datos, como en la vida real.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🏆</div>
-                    <h4>Normativa Chilena e ISO</h4>
-                    <p>Contenido alineado con la Ley 16.744, DS 594, DS 43 y las normas ISO 9001, 14001 y 45001.</p>
-                </div>
-            </div>
+    <!-- PARTE II -->
+    <div class="parte-section">
+        <div class="parte-header parte-2">
+            <span class="parte-tag">PARTE II</span>
+            <h3>Operación de Bodega</h3>
+            <p>El corazón del trabajo: recepción, almacenamiento, manipulación de cargas y preparación de pedidos</p>
         </div>
-    </section>
+        <div class="modules-grid">
+            <a href="parte6.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169660/pexels-photo-6169660.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 06</div><h3 class="module-title">Introducción a la Bodega y su Organización</h3><p class="module-description">Funciones de la bodega, tipos de almacenes, layout, flujos y organización del espacio.</p><div class="module-meta"><span>📚 7 lecciones</span><span>⏱️ 40 min</span></div></div>
+            </a>
+            <a href="parte7.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/5691640/pexels-photo-5691640.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 07</div><h3 class="module-title">Recepción de Mercaderías</h3><p class="module-description">Descarga, verificación, inspección de daños, documentación y registro de ingresos.</p><div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div></div>
+            </a>
+            <a href="parte8.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169618/pexels-photo-6169618.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 08</div><h3 class="module-title">Almacenamiento y Ubicación de Productos</h3><p class="module-description">Estanterías, pallets, criterios de ubicación, codificación y conservación de productos.</p><div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 55 min</span></div></div>
+            </a>
+            <a href="parte9.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6502627/pexels-photo-6502627.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 09</div><h3 class="module-title">Manipulación Manual y Mecanizada de Cargas</h3><p class="module-description">Técnicas de levantamiento, ergonomía, transpaletas, grúas horquilla y licencia Clase D.</p><div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 60 min</span></div></div>
+            </a>
+            <a href="parte10.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/5691640/pexels-photo-5691640.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 10</div><h3 class="module-title">Preparación de Pedidos (Picking) y Despacho</h3><p class="module-description">Picking, packing, verificación, embalaje, documentación y entrega al transporte.</p><div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div></div>
+            </a>
+        </div>
+    </div>
 
-    <footer class="footer">
-        <p>&copy; 2026 Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</p>
-        <p style="margin-top: 10px; font-size: 12px;">Formando profesionales comprometidos con la seguridad y la eficiencia logística</p>
-    </footer>
+    <!-- PARTE III -->
+    <div class="parte-section">
+        <div class="parte-header parte-3">
+            <span class="parte-tag">PARTE III</span>
+            <h3>Control y Gestión</h3>
+            <p>La inteligencia detrás de la bodega: inventarios, rotación, provisión, sustancias peligrosas y tecnología</p>
+        </div>
+        <div class="modules-grid">
+            <a href="parte11.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169618/pexels-photo-6169618.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 11</div><h3 class="module-title">Control de Inventarios y Stock</h3><p class="module-description">Conceptos de inventario y stock, inventario físico, diferencias, mermas y conteos cíclicos.</p><div class="module-meta"><span>📚 9 lecciones</span><span>⏱️ 55 min</span></div></div>
+            </a>
+            <a href="parte12.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169660/pexels-photo-6169660.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 12</div><h3 class="module-title">Sistemas de Rotación (FIFO, FEFO, LIFO)</h3><p class="module-description">Criterios de rotación, cuándo usar cada uno, impacto en vencimientos y obsolescencia.</p><div class="module-meta"><span>📚 6 lecciones</span><span>⏱️ 35 min</span></div></div>
+            </a>
+            <a href="parte13.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/5691640/pexels-photo-5691640.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 13</div><h3 class="module-title">Provisión, Reposición y Abastecimiento</h3><p class="module-description">Stock mínimo, máximo, punto de reposición, lead time y conexión con adquisiciones.</p><div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 50 min</span></div></div>
+            </a>
+            <a href="parte14.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6502627/pexels-photo-6502627.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 14</div><h3 class="module-title">Sustancias Peligrosas y Manejo de Derrames</h3><p class="module-description">Clasificación ONU, HDS, segregación, DS 43, protocolo antiderrames y bodegas SUSPEL.</p><div class="module-meta"><span>📚 10 lecciones</span><span>⏱️ 65 min</span></div></div>
+            </a>
+            <a href="parte15.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169618/pexels-photo-6169618.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 15</div><h3 class="module-title">Tecnología en Bodega (WMS, ERP y Trazabilidad)</h3><p class="module-description">Sistemas WMS y ERP, código de barras, trazabilidad, KPIs y cierre del recorrido operativo.</p><div class="module-meta"><span>📚 8 lecciones</span><span>⏱️ 55 min</span></div></div>
+            </a>
+        </div>
+    </div>
+
+    <!-- PARTE IV -->
+    <div class="parte-section">
+        <div class="parte-header parte-4">
+            <span class="parte-tag">PARTE IV</span>
+            <h3>Complemento y Práctica Interactiva</h3>
+            <p>Marco de gestión internacional y simuladores para practicar con las manos lo aprendido en el curso</p>
+        </div>
+        <div class="modules-grid">
+
+            <a href="parte16.html" class="module-card">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge">✓ Disponible</span></div>
+                <div class="module-content"><div class="module-number">Módulo 16</div><h3 class="module-title">Normas ISO en la Bodega (9001, 14001 y 45001)</h3><p class="module-description">Qué son las normas ISO, certificación, auditorías, y cómo se viven la calidad, el medio ambiente y la seguridad en el día a día.</p><div class="module-meta"><span>📚 11 lecciones</span><span>⏱️ 40 min</span></div></div>
+            </a>
+
+            <a href="simulador.html" class="module-card practica">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169618/pexels-photo-6169618.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge practica">🖥️ Práctica</span></div>
+                <div class="module-content"><div class="module-number practica">Práctica Interactiva</div><h3 class="module-title">Simulador WMS / ERP Educativo</h3><p class="module-description">Crea productos, registra recepciones y despachos, aplica FEFO, revisa el Kardex y recibe alertas de reposición en un sistema amigable con ejercicios guiados.</p><div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div></div>
+            </a>
+
+            <a href="sap.html" class="module-card practica">
+                <div class="module-image" style="background-image:url('https://images.pexels.com/photos/6169660/pexels-photo-6169660.jpeg?auto=compress&cs=tinysrgb&w=600')"><span class="module-badge practica">🖥️ Práctica</span></div>
+                <div class="module-content"><div class="module-number practica">Práctica Interactiva</div><h3 class="module-title">Simulador Tipo SAP (Transacciones MM)</h3><p class="module-description">Aprende la lógica de SAP con transacciones reales: MM01, MIGO, MB52, MB51, ME21N y MI01, en una interfaz idéntica a SAP GUI.</p><div class="module-meta"><span>🖥️ Interactivo</span><span>⏱️ Práctica libre</span></div></div>
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+<section class="features">
+    <div class="features-container">
+        <h3>¿Por qué tomar este curso?</h3>
+        <div class="features-grid">
+            <div class="feature"><div class="feature-icon">🎯</div><h4>100% Práctico</h4><p>Enfocado en situaciones reales de bodega con ejemplos aplicables inmediatamente en tu trabajo diario.</p></div>
+            <div class="feature"><div class="feature-icon">🔊</div><h4>Audio Integrado</h4><p>Cada sección incluye reproducción de texto a voz para estudiar mientras realizas otras actividades.</p></div>
+            <div class="feature"><div class="feature-icon">🖥️</div><h4>Simuladores Reales</h4><p>Practica con un WMS educativo y un simulador tipo SAP que comparten los mismos datos, como en la vida real.</p></div>
+            <div class="feature"><div class="feature-icon">🏆</div><h4>Normativa Chilena e ISO</h4><p>Contenido alineado con la Ley 16.744, DS 594, DS 43 y las normas ISO 9001, 14001 y 45001.</p></div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <p>&copy; 2026 Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales</p>
+    <p style="margin-top:10px;font-size:12px">Formando profesionales comprometidos con la seguridad y la eficiencia logística</p>
+</footer>
 
 </body>
 </html>
