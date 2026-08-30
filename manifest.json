@@ -1,0 +1,17 @@
+{
+  "name": "Curso Gestión de Bodega",
+  "short_name": "Bodega",
+  "description": "Técnicas y Operaciones de Gestión de Mercaderías en Bodega de Insumos y Materiales",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1e3a5f",
+  "theme_color": "#1e3a5f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://image.qwenlm.ai/public_source/1939992d-1639-46a6-83b2-4eef314e1cd1/4fd1a0a28-d648-49e5-ae57-f7108f90a8ff3101.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
