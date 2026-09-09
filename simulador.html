@@ -1,448 +1,832 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador WMS/ERP - Curso de Bodega</title>
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #2c3e50; }
-    .top-nav { background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
-    .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .nav-title h1 { font-size: 20px; }
-    .nav-title span { font-size: 12px; opacity: 0.85; }
-    .back-button { background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; }
-    .back-button:hover { background: rgba(255,255,255,0.3); }
-    .tabs { background: white; border-bottom: 2px solid #e2e8f0; position: sticky; top: 62px; z-index: 999; }
-    .tabs-inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; gap: 5px; overflow-x: auto; }
-    .tab-btn { border: none; background: none; padding: 15px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: #718096; border-bottom: 3px solid transparent; white-space: nowrap; }
-    .tab-btn:hover { color: #1e3a5f; }
-    .tab-btn.active { color: #1e3a5f; border-bottom-color: #f39c12; }
-    .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .kpi-card { background: white; border-radius: 12px; padding: 20px; text-align: center; border-top: 4px solid #2c5282; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-    .kpi-card .num { font-size: 32px; font-weight: 700; color: #1e3a5f; }
-    .kpi-card .lbl { font-size: 13px; color: #718096; margin-top: 5px; }
-    .kpi-card.alerta { border-top-color: #e74c3c; }
-    .panel { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-    .panel h2 { color: #1e3a5f; font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid #f39c12; padding-bottom: 8px; }
-    .panel h3 { color: #2c5282; font-size: 16px; margin: 15px 0 10px 0; }
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-    label { display: block; font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; }
-    input:focus, select:focus { outline: none; border-color: #f39c12; }
-    .btn { background: #f39c12; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .btn:hover { background: #e67e22; }
-    .btn.secondary { background: #718096; }
-    .btn.secondary:hover { background: #4a5568; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-    th { background: #1e3a5f; color: white; padding: 10px; text-align: left; }
-    td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
-    tr:hover td { background: #f8f9fa; }
-    .st { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
-    .st.ok { background: #d4edda; color: #27ae60; }
-    .st.warn { background: #fff3cd; color: #d68910; }
-    .st.crit { background: #f8d7da; color: #c0392b; }
-    .edu { padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 14px; line-height: 1.6; }
-    .edu.ok { background: #d4edda; border-left: 4px solid #27ae60; color: #1e5c34; }
-    .edu.err { background: #f8d7da; border-left: 4px solid #e74c3c; color: #7a1f2b; }
-    .edu.warn { background: #fff3cd; border-left: 4px solid #f39c12; color: #7a5a10; }
-    .edu.info { background: #e8f4f8; border-left: 4px solid #2c5282; color: #1e3a5f; }
-    .alert-item { padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
-    .alert-item.crit { background: #f8d7da; border-left: 4px solid #e74c3c; color: #7a1f2b; }
-    .alert-item.warn { background: #fff3cd; border-left: 4px solid #f39c12; color: #7a5a10; }
-    .profesor { background: linear-gradient(135deg, #1e3a5f, #2c5282); color: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
-    .profesor h3 { color: #f39c12; margin-bottom: 10px; }
-    .profesor p { font-size: 14px; line-height: 1.7; opacity: 0.95; }
-    .tipo-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; }
-    .tipo-in { background: #d4edda; color: #27ae60; }
-    .tipo-out { background: #fde3c8; color: #d68910; }
-    .ejercicio { background: #f8f9fa; border-left: 4px solid #27ae60; border-radius: 8px; padding: 15px; margin-bottom: 12px; font-size: 14px; }
-    .ejercicio strong { color: #1e3a5f; }
-    @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador WMS/ERP Pro - Curso de Bodega</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --border: #bdc3c7;
+            --bg-body: #f4f6f7;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--dark); font-size: 14px; }
+
+        /* HEADER */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        header h1 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+        .header-status { font-size: 0.8rem; opacity: 0.8; }
+
+        /* NAVIGATION */
+        .nav-links {
+            background: white;
+            padding: 8px 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .nav-links a:hover { background: var(--light); }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            padding: 0 10px;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--secondary); }
+        .tab-btn.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+            background-color: #f8f9fa;
+        }
+
+        /* CONTENT */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS & PANELS */
+        .card {
+            background: white;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+        .card h2 { margin-top: 0; color: var(--primary); border-bottom: 1px solid var(--light); padding-bottom: 10px; font-size: 1.1rem; }
+        .card h3 { color: var(--secondary); margin-top: 15px; font-size: 1rem; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-weight: 600; color: #555; font-size: 0.85rem; }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .form-col { flex: 1; min-width: 200px; }
+
+        /* BUTTONS */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-primary { background-color: var(--secondary); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--light); color: var(--dark); font-weight: 600; }
+        tr:hover { background-color: #f9f9f9; }
+
+        /* ALERTS */
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border-left: 4px solid;
+            font-size: 0.9rem;
+        }
+        .alert-info { background-color: #d1ecf1; border-color: var(--secondary); color: #0c5460; }
+        .alert-success { background-color: #d4edda; border-color: var(--success); color: #155724; }
+        .alert-warning { background-color: #fff3cd; border-color: var(--warning); color: #856404; }
+        .alert-danger { background-color: #f8d7da; border-color: var(--danger); color: #721c24; }
+
+        /* BADGES */
+        .badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-low { background-color: var(--danger); }
+        .badge-ok { background-color: var(--success); }
+        .badge-pending { background-color: var(--warning); }
+
+        /* KPI DASHBOARD */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .kpi-card { background: white; padding: 15px; border-radius: 6px; border-left: 4px solid var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .kpi-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .kpi-label { font-size: 0.8rem; color: #777; text-transform: uppercase; }
+
+    </style>
 </head>
 <body>
 
-<nav class="top-nav">
-    <div class="nav-container">
-        <div class="nav-title">
-            <h1>🖥️ SIMULADOR WMS / ERP</h1>
-            <span>Versión educativa - Curso Técnicas y Operaciones de Gestión de Mercaderías en Bodega</span>
-        </div>
-        <div style="display:flex; gap:8px;">
-            <a href="parte15.html" class="back-button">← Módulo 15</a>
-            <a href="index.html" class="back-button">Menú Principal</a>
-        </div>
+<header>
+    <div>
+        <h1>🏭 WMS / ERP SIMULATOR PRO</h1>
+        <div class="header-status">Entorno: Producción Simulada | Usuario: Admin</div>
     </div>
-</nav>
+    <div>
+        <a href="index.html" style="color:white; text-decoration:none; font-size:0.9rem;">🏠 Menú Principal</a>
+    </div>
+</header>
 
 <div class="tabs">
-    <div class="tabs-inner">
-        <button class="tab-btn active" data-tab="panel">📊 Panel</button>
-        <button class="tab-btn" data-tab="productos">📦 Productos</button>
-        <button class="tab-btn" data-tab="recepcion">📥 Recepción</button>
-        <button class="tab-btn" data-tab="despacho">📤 Despacho</button>
-        <button class="tab-btn" data-tab="kardex">📒 Kardex</button>
-        <button class="tab-btn" data-tab="ayuda">❓ Cómo usar</button>
-    </div>
+    <button class="tab-btn active" onclick="openTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" onclick="openTab('masters')">📂 Maestros (Prod/Prov)</button>
+    <button class="tab-btn" onclick="openTab('purchasing')">🛒 Compras (OC)</button>
+    <button class="tab-btn" onclick="openTab('reception')">📥 Recepción (GR)</button>
+    <button class="tab-btn" onclick="openTab('sales')">💰 Ventas (PV)</button>
+    <button class="tab-btn" onclick="openTab('dispatch')">📤 Despacho (GI)</button>
+    <button class="tab-btn" onclick="openTab('inventory')">📦 Inventario / Kardex</button>
 </div>
 
 <div class="container">
 
-    <!-- PANEL -->
-    <section id="tab-panel" class="tab-content active">
-        <div class="profesor">
-            <h3>👨🏫 Bienvenido al simulador</h3>
-            <p>Esto es una versión simplificada de un WMS/ERP (como el módulo MM de SAP). Aquí vas a poder crear productos, recibir mercadería, despachar y ver cómo el sistema mantiene el inventario actualizado. Cada acción que hagas te va a explicar qué está pasando por detrás, igual que en una bodega real. Tus datos quedan guardados en este navegador.</p>
-        </div>
-        <div class="kpi-row" id="kpiRow"></div>
-        <div class="panel">
-            <h2>⚠️ Alertas del sistema</h2>
-            <div id="alertsBox"></div>
-        </div>
-    </section>
-
-    <!-- PRODUCTOS -->
-    <section id="tab-productos" class="tab-content">
-        <div class="panel">
-            <h2>➕ Crear producto (Maestro de Materiales)</h2>
-            <div class="form-grid">
-                <div><label>Código (SKU)</label><input id="pSku" placeholder="Ej: GUA-CUE"></div>
-                <div><label>Descripción</label><input id="pName" placeholder="Ej: Guantes de cuero"></div>
-                <div><label>Unidad</label><input id="pUnit" placeholder="par / un / caja"></div>
-                <div><label>Stock mínimo</label><input id="pMin" type="number" value="10"></div>
-                <div><label>Stock máximo</label><input id="pMax" type="number" value="100"></div>
-                <div><label>Punto de reposición</label><input id="pRep" type="number" value="30"></div>
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="tab-content active">
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-color: var(--secondary);">
+                <div class="kpi-label">SKUs Activos</div>
+                <div class="kpi-value" id="kpi-skus">0</div>
             </div>
-            <label style="display:flex; align-items:center; gap:8px; margin-bottom:15px;">
-                <input type="checkbox" id="pFefo" style="width:auto;" checked> Se controla por lote y vencimiento (aplica FEFO)
-            </label>
-            <button class="btn" onclick="createProduct()">Crear producto</button>
-            <div id="prodFeedback"></div>
-        </div>
-        <div class="panel">
-            <h2>📦 Maestro de productos</h2>
-            <table id="prodTable"></table>
-        </div>
-    </section>
-
-    <!-- RECEPCION -->
-    <section id="tab-recepcion" class="tab-content">
-        <div class="panel">
-            <h2>📥 Registrar recepción (Entrada de mercadería)</h2>
-            <div class="form-grid">
-                <div><label>Producto</label><select id="inSku"></select></div>
-                <div><label>Lote (opcional)</label><input id="inLot" placeholder="Ej: L-2026-020"></div>
-                <div><label>Vencimiento (opcional)</label><input id="inExp" type="date"></div>
-                <div><label>Cantidad</label><input id="inQty" type="number" min="1" placeholder="0"></div>
-                <div><label>Documento (OC / Guía)</label><input id="inDoc" placeholder="Ej: OC-1023 / GD-778"></div>
+            <div class="kpi-card" style="border-color: var(--success);">
+                <div class="kpi-label">Stock Total (Unidades)</div>
+                <div class="kpi-value" id="kpi-stock">0</div>
             </div>
-            <button class="btn" onclick="registerInbound()">Registrar recepción</button>
-            <div id="inFeedback"></div>
-            <div class="edu info">💡 <strong>Recuerda (Módulo 7):</strong> recibir no es solo descargar. En un sistema real, aquí estás verificando contra la Orden de Compra y la Guía de Despacho antes de registrar. El registro actualiza el inventario: lo que no se registra, no existe para el sistema.</div>
-        </div>
-    </section>
-
-    <!-- DESPACHO -->
-    <section id="tab-despacho" class="tab-content">
-        <div class="panel">
-            <h2>📤 Registrar despacho (Salida / Picking)</h2>
-            <div class="form-grid">
-                <div><label>Producto</label><select id="outSku" onchange="onOutSkuChange()"></select></div>
-                <div><label>Lote a despachar</label><select id="outLot" onchange="updateFefoNote()"></select></div>
-                <div><label>Cantidad</label><input id="outQty" type="number" min="1" placeholder="0"></div>
-                <div><label>Documento (Vale / Solicitud)</label><input id="outDoc" placeholder="Ej: VS-330"></div>
+            <div class="kpi-card" style="border-color: var(--warning);">
+                <div class="kpi-label">OC Pendientes</div>
+                <div class="kpi-value" id="kpi-po">0</div>
             </div>
-            <div id="fefoNote"></div>
-            <br>
-            <button class="btn" onclick="registerOutbound()">Registrar despacho</button>
-            <div id="outFeedback"></div>
-            <div class="edu info">💡 <strong>Recuerda (Módulo 12):</strong> el sistema te sugiere el lote según FEFO (primero en vencer, primero en salir). Si eliges otro lote a propósito, fíjate en la advertencia: eso es exactamente lo que pasa en una bodega real cuando no se respeta la rotación.</div>
+            <div class="kpi-card" style="border-color: var(--danger);">
+                <div class="kpi-label">Alertas Stock Bajo</div>
+                <div class="kpi-value" id="kpi-alerts">0</div>
+            </div>
         </div>
-    </section>
 
-    <!-- KARDEX -->
-    <section id="tab-kardex" class="tab-content">
-        <div class="panel">
-            <h2>📒 Stock actual</h2>
-            <table id="stockTable"></table>
+        <div class="card">
+            <h2>⚠️ Centro de Notificaciones</h2>
+            <div id="alerts-container"></div>
         </div>
-        <div class="panel">
-            <h2>🔄 Historial de movimientos (Kardex)</h2>
-            <table id="movTable"></table>
-        </div>
-    </section>
 
-    <!-- AYUDA -->
-    <section id="tab-ayuda" class="tab-content">
-        <div class="panel">
-            <h2>❓ ¿Qué es este simulador?</h2>
-            <p style="font-size:14px; line-height:1.8; margin-bottom:15px;">Es una versión educativa y simplificada de un <strong>WMS</strong> (sistema de gestión de bodega) integrado con lógica de <strong>ERP</strong> (maestro de materiales, entradas, salidas y Kardex), inspirado en el módulo MM de SAP. No reemplaza un sistema real, pero te permite entender la lógica: todo movimiento se registra, todo registro actualiza el stock, y todo stock genera alertas cuando corresponde.</p>
-            <h3>🎯 Ejercicios guiados para practicar</h3>
-            <div class="ejercicio"><strong>Ejercicio 1:</strong> Ve a <em>Productos</em> y crea un producto nuevo con sus parámetros (mínimo, máximo, punto de reposición). Observa cómo aparece en el maestro.</div>
-            <div class="ejercicio"><strong>Ejercicio 2:</strong> Ve a <em>Recepción</em> y registra una entrada con lote y vencimiento. Mira cómo el stock sube y queda el movimiento en el Kardex.</div>
-            <div class="ejercicio"><strong>Ejercicio 3:</strong> Ve a <em>Despacho</em> y observa qué lote te sugiere el sistema (FEFO). Cambia el lote a propósito y lee la advertencia.</div>
-            <div class="ejercicio"><strong>Ejercicio 4:</strong> Despacha cantidades hasta dejar un producto bajo el punto de reposición. Ve al <em>Panel</em> y observa la alerta. Eso es exactamente lo que dispara una reposición (Módulo 13).</div>
-            <div class="ejercicio"><strong>Ejercicio 5:</strong> Intenta despachar más cantidad de la que hay en el lote. El sistema te bloqueará: así funciona un WMS real.</div>
-            <div class="ejercicio"><strong>Ejercicio 6:</strong> Revisa el <em>Kardex</em> y compara el stock del sistema con lo que "físicamente" habría en la bodega. ¿Cuadrarían en un inventario físico?</div>
-            <br>
-            <button class="btn secondary" onclick="resetData()">🔄 Reiniciar simulador (datos de ejemplo)</button>
+        <div class="card">
+            <h2>📋 Últimos Movimientos</h2>
+            <table id="recent-moves-table">
+                <thead><tr><th>Fecha</th><th>Tipo</th><th>Doc</th><th>Detalle</th></tr></thead>
+                <tbody></tbody>
+            </table>
         </div>
-    </section>
+    </div>
+
+    <!-- MAESTROS -->
+    <div id="masters" class="tab-content">
+        <div class="form-row">
+            <div class="form-col">
+                <div class="card">
+                    <h2>📦 Nuevo Producto (SKU)</h2>
+                    <div class="form-group"><label>Código (SKU)</label><input type="text" id="prod-code" class="form-control" placeholder="Ej: MAT-001"></div>
+                    <div class="form-group"><label>Descripción</label><input type="text" id="prod-desc" class="form-control"></div>
+                    <div class="form-row">
+                        <div class="form-col"><label>Unidad</label><select id="prod-unit" class="form-control"><option>UN</option><option>KG</option><option>LT</option><option>CAJA</option></select></div>
+                        <div class="form-col"><label>Stock Mín.</label><input type="number" id="prod-min" class="form-control" value="10"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="createProduct()">Guardar Producto</button>
+                </div>
+            </div>
+            <div class="form-col">
+                <div class="card">
+                    <h2>🏢 Nuevo Proveedor / Cliente</h2>
+                    <div class="form-group"><label>Código (ID)</label><input type="text" id="partner-code" class="form-control" placeholder="Ej: PROV-001"></div>
+                    <div class="form-group"><label>Nombre / Razón Social</label><input type="text" id="partner-name" class="form-control"></div>
+                    <div class="form-group"><label>Tipo</label>
+                        <select id="partner-type" class="form-control">
+                            <option value="PROVEEDOR">Proveedor</option>
+                            <option value="CLIENTE">Cliente</option>
+                            <option value="AMBOS">Ambos</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="createPartner()">Guardar Partner</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Listado de Maestros</h2>
+            <div class="form-row">
+                <div class="form-col">
+                    <h3>Productos</h3>
+                    <table id="products-table"><thead><tr><th>Código</th><th>Desc</th><th>Min</th></tr></thead><tbody></tbody></table>
+                </div>
+                <div class="form-col">
+                    <h3>Partners</h3>
+                    <table id="partners-table"><thead><tr><th>Código</th><th>Nombre</th><th>Tipo</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PURCHASING (OC) -->
+    <div id="purchasing" class="tab-content">
+        <div class="card">
+            <h2>🛒 Crear Orden de Compra (OC)</h2>
+            <p class="alert alert-info">Una OC es una solicitud formal a un proveedor. No aumenta el stock hasta que se recibe.</p>
+            <div class="form-row">
+                <div class="form-col"><label>Proveedor</label><select id="po-vendor" class="form-control"></select></div>
+                <div class="form-col"><label>Producto</label><select id="po-prod" class="form-control"></select></div>
+                <div class="form-col"><label>Cantidad</label><input type="number" id="po-qty" class="form-control" value="100"></div>
+            </div>
+            <button class="btn btn-success" onclick="createPO()">Generar OC</button>
+        </div>
+        <div class="card">
+            <h2>Órdenes Abiertas</h2>
+            <table id="po-table">
+                <thead><tr><th>N° OC</th><th>Proveedor</th><th>Producto</th><th>Cant. Pedida</th><th>Cant. Recibida</th><th>Estado</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- RECEPTION (GR) -->
+    <div id="reception" class="tab-content">
+        <div class="card">
+            <h2>📥 Entrada de Mercancía (MIGO / GR)</h2>
+            <p class="alert alert-warning">Debes seleccionar una OC válida. El sistema validará que no recibas más de lo pedido.</p>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Seleccionar OC Pendiente</label>
+                    <select id="gr-po-select" class="form-control" onchange="loadPODetails()"></select>
+                </div>
+            </div>
+            <div id="gr-details" style="display:none; background:#f9f9f9; padding:10px; margin-bottom:10px; border:1px dashed #ccc;">
+                <p><strong>Detalle OC:</strong> <span id="gr-po-info"></span></p>
+                <p><strong>Pendiente por recibir:</strong> <span id="gr-pending-qty" style="font-weight:bold; color:var(--primary)"></span></p>
+            </div>
+            <div class="form-row">
+                <div class="form-col"><label>Cantidad a Recibir</label><input type="number" id="gr-qty" class="form-control"></div>
+                <div class="form-col"><label>Lote (Opcional)</label><input type="text" id="gr-batch" class="form-control" placeholder="L-2023-01"></div>
+                <div class="form-col"><label>Ubicación (Rack)</label><input type="text" id="gr-loc" class="form-control" placeholder="A-01-02"></div>
+            </div>
+            <button class="btn btn-success" onclick="postGR()">Registrar Entrada (Post GR)</button>
+        </div>
+    </div>
+
+    <!-- SALES (PV) -->
+    <div id="sales" class="tab-content">
+        <div class="card">
+            <h2>💰 Crear Pedido de Venta (PV)</h2>
+            <p class="alert alert-info">Un PV es un compromiso con un cliente. Reserva stock lógicamente (en este sim, solo controlamos flujo).</p>
+            <div class="form-row">
+                <div class="form-col"><label>Cliente</label><select id="so-customer" class="form-control"></select></div>
+                <div class="form-col"><label>Producto</label><select id="so-prod" class="form-control"></select></div>
+                <div class="form-col"><label>Cantidad</label><input type="number" id="so-qty" class="form-control" value="10"></div>
+            </div>
+            <button class="btn btn-primary" onclick="createSO()">Generar Pedido</button>
+        </div>
+        <div class="card">
+            <h2>Pedidos Pendientes de Entrega</h2>
+            <table id="so-table">
+                <thead><tr><th>N° PV</th><th>Cliente</th><th>Producto</th><th>Cant. Pedida</th><th>Cant. Entregada</th><th>Estado</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DISPATCH (GI) -->
+    <div id="dispatch" class="tab-content">
+        <div class="card">
+            <h2>📤 Salida de Mercancía (VL / GI)</h2>
+            <p class="alert alert-warning">Selecciona un Pedido de Venta. El sistema aplicará FEFO automáticamente si no eliges lote.</p>
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Seleccionar Pedido (PV)</label>
+                    <select id="gi-so-select" class="form-control" onchange="loadSODetails()"></select>
+                </div>
+            </div>
+            <div id="gi-details" style="display:none; background:#f9f9f9; padding:10px; margin-bottom:10px; border:1px dashed #ccc;">
+                <p><strong>Detalle PV:</strong> <span id="gi-so-info"></span></p>
+                <p><strong>Pendiente por entregar:</strong> <span id="gi-pending-qty" style="font-weight:bold; color:var(--primary)"></span></p>
+            </div>
+            <div class="form-row">
+                <div class="form-col"><label>Cantidad a Entregar</label><input type="number" id="gi-qty" class="form-control"></div>
+                <div class="form-col">
+                    <label>Lote Específico (Opcional - Deja vacío para FEFO)</label>
+                    <select id="gi-batch" class="form-control"><option value="">-- Automático (FEFO) --</option></select>
+                </div>
+            </div>
+            <div id="gi-warning" class="alert alert-danger" style="display:none;"></div>
+            <button class="btn btn-warning" onclick="postGI()">Registrar Salida (Post GI)</button>
+        </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div id="inventory" class="tab-content">
+        <div class="card">
+            <h2>📦 Stock Actual (Por Lote y Ubicación)</h2>
+            <table id="stock-table">
+                <thead><tr><th>Producto</th><th>Lote</th><th>Ubicación</th><th>Cantidad</th><th>Vencimiento</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="card">
+            <h2>📒 Kardex (Historial)</h2>
+            <table id="history-table">
+                <thead><tr><th>Fecha</th><th>Tipo</th><th>Doc Ref</th><th>Producto</th><th>Lote</th><th>Cant (+/-)</th><th>Saldo</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div style="text-align:center; margin-top:20px;">
+            <button class="btn btn-danger" onclick="resetSystem()">⚠️ Reiniciar Sistema (Borrar Todo)</button>
+        </div>
+    </div>
 
 </div>
 
 <script>
-// ============ DATOS DE EJEMPLO ============
-var DEFAULT_DATA = {
-    products: [
-        { sku: 'GNT-L', name: 'Guante Nitrilo Talla L', unit: 'par', min: 20, max: 300, rep: 70, fefo: true },
-        { sku: 'CAS-ABS', name: 'Casco Seguridad ABS c/barbiquejo', unit: 'un', min: 10, max: 120, rep: 30, fefo: false },
-        { sku: 'MAS-N95', name: 'Mascarilla N95', unit: 'un', min: 50, max: 800, rep: 150, fefo: true },
-        { sku: 'CINT-REF', name: 'Cinturón Reflectante', unit: 'un', min: 15, max: 150, rep: 40, fefo: false }
-    ],
-    lots: [
-        { sku: 'GNT-L', lot: 'L-2026-001', exp: '2027-12-31', qty: 100 },
-        { sku: 'GNT-L', lot: 'L-2026-014', exp: '2026-10-31', qty: 50 },
-        { sku: 'CAS-ABS', lot: 'S/L', exp: '', qty: 45 },
-        { sku: 'MAS-N95', lot: 'M-2026-003', exp: '2026-11-30', qty: 200 },
-        { sku: 'MAS-N95', lot: 'M-2026-010', exp: '2027-06-30', qty: 150 },
-        { sku: 'CINT-REF', lot: 'S/L', exp: '', qty: 60 }
-    ],
-    movements: [
-        { id: 1, date: '01-08-2026 09:00', type: 'IN', sku: 'GNT-L', lot: 'L-2026-001', qty: 100, doc: 'OC-1001 / GD-501' },
-        { id: 2, date: '05-08-2026 10:30', type: 'IN', sku: 'GNT-L', lot: 'L-2026-014', qty: 50, doc: 'OC-1008 / GD-522' },
-        { id: 3, date: '03-08-2026 12:00', type: 'IN', sku: 'CAS-ABS', lot: 'S/L', qty: 45, doc: 'OC-1002 / GD-505' },
-        { id: 4, date: '02-08-2026 09:15', type: 'IN', sku: 'MAS-N95', lot: 'M-2026-003', qty: 200, doc: 'OC-1003 / GD-508' },
-        { id: 5, date: '10-08-2026 11:00', type: 'IN', sku: 'MAS-N95', lot: 'M-2026-010', qty: 150, doc: 'OC-1010 / GD-540' },
-        { id: 6, date: '12-08-2026 15:20', type: 'OUT', sku: 'GNT-L', lot: 'L-2026-001', qty: 50, doc: 'VS-201' },
-        { id: 7, date: '15-08-2026 08:45', type: 'IN', sku: 'CINT-REF', lot: 'S/L', qty: 60, doc: 'OC-1012 / GD-555' }
-    ]
-};
+    // --- DATA STRUCTURE (MORE REALISTIC) ---
+    let db = JSON.parse(localStorage.getItem('wms_pro_db')) || {
+        products: [], // { code, desc, unit, min }
+        partners: [], // { code, name, type }
+        inventory: [], // { code, batch, loc, qty, exp }
+        pos: [], // { id, vendor, prod, qty, received, status }
+        sos: [], // { id, customer, prod, qty, delivered, status }
+        history: [] // { date, type, doc, prod, batch, qty, balance }
+    };
 
-// ============ CARGA / GUARDADO ============
-function load() {
-    try {
-        var raw = localStorage.getItem('wmsSim');
-        if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_DATA));
-}
-function save() { localStorage.setItem('wmsSim', JSON.stringify(data)); }
-var data = load();
-
-// ============ UTILIDADES ============
-function esc(s) { return String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function prod(sku) { for (var i = 0; i < data.products.length; i++) if (data.products[i].sku === sku) return data.products[i]; return null; }
-function stockOf(sku) { var t = 0; for (var i = 0; i < data.lots.length; i++) if (data.lots[i].sku === sku) t += data.lots[i].qty; return t; }
-function nowStr() { var d = new Date(); return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }); }
-function fefoLot(sku) {
-    var ls = data.lots.filter(function (l) { return l.sku === sku && l.qty > 0; });
-    var withExp = ls.filter(function (l) { return l.exp; }).sort(function (a, b) { return a.exp.localeCompare(b.exp); });
-    if (withExp.length) return withExp[0];
-    return ls[0] || null;
-}
-function feedback(id, tipo, msg) {
-    document.getElementById(id).innerHTML = '<div class="edu ' + tipo + '">' + msg + '</div>';
-}
-
-// ============ TABS ============
-document.querySelectorAll('.tab-btn').forEach(function (b) {
-    b.addEventListener('click', function () {
-        document.querySelectorAll('.tab-btn').forEach(function (x) { x.classList.remove('active'); });
-        document.querySelectorAll('.tab-content').forEach(function (x) { x.classList.remove('active'); });
-        b.classList.add('active');
-        document.getElementById('tab-' + b.dataset.tab).classList.add('active');
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        if (db.products.length === 0) {
+            // Seed Data
+            db.products = [
+                { code: 'MAT-001', desc: 'Tornillos Acero 1/4', unit: 'KG', min: 50 },
+                { code: 'MAT-002', desc: 'Aceite Hidráulico 20L', unit: 'UN', min: 10 }
+            ];
+            db.partners = [
+                { code: 'PROV-001', name: 'Distribuidora Industrial SA', type: 'PROVEEDOR' },
+                { code: 'CLI-001', name: 'Constructora Andes Ltda', type: 'CLIENTE' }
+            ];
+            db.inventory = [
+                { code: 'MAT-001', batch: 'L23-001', loc: 'A-01-01', qty: 100, exp: '2025-12-31' },
+                { code: 'MAT-002', batch: 'L23-002', loc: 'B-02-05', qty: 20, exp: '2024-06-30' }
+            ];
+            saveDB();
+        }
+        refreshAll();
     });
-});
 
-// ============ ALERTAS ============
-function computeAlerts() {
-    var alerts = [];
-    data.products.forEach(function (p) {
-        var st = stockOf(p.sku);
-        if (st < p.min) alerts.push({ lvl: 'crit', txt: '🔴 ' + p.sku + ' — Stock ' + st + ' bajo el MÍNIMO (' + p.min + '). Riesgo de quiebre de stock.' });
-        else if (st < p.rep) alerts.push({ lvl: 'warn', txt: '🟡 ' + p.sku + ' — Stock ' + st + ' bajo el PUNTO DE REPOSICIÓN (' + p.rep + '). Evaluar nueva compra (Módulo 13).' });
-        if (st > p.max) alerts.push({ lvl: 'warn', txt: '🟡 ' + p.sku + ' — Stock ' + st + ' sobre el MÁXIMO (' + p.max + '). Sobrestock: capital inmovilizado y espacio ocupado.' });
-    });
-    var limit = new Date(Date.now() + 60 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-    data.lots.forEach(function (l) {
-        if (l.exp && l.exp <= limit && l.qty > 0) alerts.push({ lvl: 'warn', txt: '🟡 FEFO: lote ' + l.lot + ' de ' + l.sku + ' vence el ' + l.exp + ' (quedan ' + l.qty + '). Priorizar su despacho.' });
-    });
-    return alerts;
-}
-
-// ============ RENDER ============
-function renderDashboard() {
-    var totalUnits = data.lots.reduce(function (s, l) { return s + l.qty; }, 0);
-    var ins = data.movements.filter(function (m) { return m.type === 'IN'; }).length;
-    var outs = data.movements.filter(function (m) { return m.type === 'OUT'; }).length;
-    var alerts = computeAlerts();
-    document.getElementById('kpiRow').innerHTML =
-        '<div class="kpi-card"><div class="num">' + data.products.length + '</div><div class="lbl">Productos (SKU)</div></div>' +
-        '<div class="kpi-card"><div class="num">' + totalUnits + '</div><div class="lbl">Unidades en stock</div></div>' +
-        '<div class="kpi-card"><div class="num">' + ins + '</div><div class="lbl">Recepciones</div></div>' +
-        '<div class="kpi-card"><div class="num">' + outs + '</div><div class="lbl">Despachos</div></div>' +
-        '<div class="kpi-card alerta"><div class="num">' + alerts.length + '</div><div class="lbl">Alertas activas</div></div>';
-    var box = document.getElementById('alertsBox');
-    if (!alerts.length) box.innerHTML = '<div class="edu ok">✓ Sin alertas. Todos los productos están dentro de sus rangos. Así se ve una bodega bien gestionada.</div>';
-    else box.innerHTML = alerts.map(function (a) { return '<div class="alert-item ' + a.lvl + '">' + esc(a.txt) + '</div>'; }).join('');
-}
-
-function renderProducts() {
-    var html = '<tr><th>SKU</th><th>Descripción</th><th>Unidad</th><th>Mín</th><th>Repos.</th><th>Máx</th><th>Rotación</th><th>Stock</th><th>Estado</th></tr>';
-    data.products.forEach(function (p) {
-        var st = stockOf(p.sku);
-        var estado = st < p.min ? '<span class="st crit">CRÍTICO</span>' : st < p.rep ? '<span class="st warn">REPONER</span>' : st > p.max ? '<span class="st warn">SOBRE</span>' : '<span class="st ok">OK</span>';
-        html += '<tr><td><strong>' + esc(p.sku) + '</strong></td><td>' + esc(p.name) + '</td><td>' + esc(p.unit) + '</td><td>' + p.min + '</td><td>' + p.rep + '</td><td>' + p.max + '</td><td>' + (p.fefo ? 'FEFO' : 'FIFO') + '</td><td><strong>' + st + '</strong></td><td>' + estado + '</td></tr>';
-    });
-    document.getElementById('prodTable').innerHTML = html;
-}
-
-function renderKardex() {
-    var html = '<tr><th>SKU</th><th>Producto</th><th>Stock</th><th>Mín</th><th>Repos.</th><th>Máx</th><th>Estado</th></tr>';
-    data.products.forEach(function (p) {
-        var st = stockOf(p.sku);
-        var estado = st < p.min ? '<span class="st crit">CRÍTICO</span>' : st < p.rep ? '<span class="st warn">REPONER</span>' : st > p.max ? '<span class="st warn">SOBRE</span>' : '<span class="st ok">OK</span>';
-        html += '<tr><td><strong>' + esc(p.sku) + '</strong></td><td>' + esc(p.name) + '</td><td><strong>' + st + '</strong></td><td>' + p.min + '</td><td>' + p.rep + '</td><td>' + p.max + '</td><td>' + estado + '</td></tr>';
-    });
-    document.getElementById('stockTable').innerHTML = html;
-    var movs = data.movements.slice().sort(function (a, b) { return b.id - a.id; });
-    var mhtml = '<tr><th>Fecha</th><th>Tipo</th><th>SKU</th><th>Lote</th><th>Cantidad</th><th>Documento</th></tr>';
-    movs.forEach(function (m) {
-        var badge = m.type === 'IN' ? '<span class="tipo-badge tipo-in">ENTRADA</span>' : '<span class="tipo-badge tipo-out">SALIDA</span>';
-        mhtml += '<tr><td>' + esc(m.date) + '</td><td>' + badge + '</td><td><strong>' + esc(m.sku) + '</strong></td><td>' + esc(m.lot) + '</td><td>' + (m.type === 'IN' ? '+' : '-') + m.qty + '</td><td>' + esc(m.doc) + '</td></tr>';
-    });
-    document.getElementById('movTable').innerHTML = mhtml;
-}
-
-function fillProductSelects() {
-    var curIn = document.getElementById('inSku').value;
-    var curOut = document.getElementById('outSku').value;
-    var opts = data.products.map(function (p) { return '<option value="' + esc(p.sku) + '">' + esc(p.sku) + ' — ' + esc(p.name) + '</option>'; }).join('');
-    document.getElementById('inSku').innerHTML = '<option value="">-- Seleccione --</option>' + opts;
-    document.getElementById('outSku').innerHTML = '<option value="">-- Seleccione --</option>' + opts;
-    if (curIn) document.getElementById('inSku').value = curIn;
-    if (curOut) { document.getElementById('outSku').value = curOut; onOutSkuChange(); }
-}
-
-function renderAll() { renderDashboard(); renderProducts(); renderKardex(); fillProductSelects(); }
-
-// ============ ACCIONES ============
-function createProduct() {
-    var sku = document.getElementById('pSku').value.trim().toUpperCase();
-    var name = document.getElementById('pName').value.trim();
-    var unit = document.getElementById('pUnit').value.trim() || 'un';
-    var min = parseInt(document.getElementById('pMin').value) || 0;
-    var max = parseInt(document.getElementById('pMax').value) || 0;
-    var rep = parseInt(document.getElementById('pRep').value) || 0;
-    var fefo = document.getElementById('pFefo').checked;
-    if (!sku || !name) { feedback('prodFeedback', 'err', '⚠ El código SKU y la descripción son obligatorios. En un ERP real (SAP MM), no se puede crear un maestro de materiales sin estos datos.'); return; }
-    if (prod(sku)) { feedback('prodFeedback', 'err', '⚠ Ya existe un producto con el código ' + esc(sku) + '. El SKU debe ser único: es la identidad del producto en el sistema.'); return; }
-    data.products.push({ sku: sku, name: name, unit: unit, min: min, max: max, rep: rep, fefo: fefo });
-    save();
-    feedback('prodFeedback', 'ok', '✓ Producto <strong>' + esc(sku) + '</strong> creado en el maestro de materiales. Parámetros: mínimo ' + min + ', reposición ' + rep + ', máximo ' + max + ', rotación ' + (fefo ? 'FEFO' : 'FIFO') + '. Ahora ya puedes recibir stock de este producto.');
-    document.getElementById('pSku').value = ''; document.getElementById('pName').value = '';
-    renderAll();
-}
-
-function registerInbound() {
-    var sku = document.getElementById('inSku').value;
-    var lot = document.getElementById('inLot').value.trim() || 'S/L';
-    var exp = document.getElementById('inExp').value || '';
-    var qty = parseInt(document.getElementById('inQty').value);
-    var doc = document.getElementById('inDoc').value.trim() || 'S/DOC';
-    if (!sku) { feedback('inFeedback', 'err', '⚠ Seleccione un producto.'); return; }
-    if (!qty || qty <= 0) { feedback('inFeedback', 'err', '⚠ Ingrese una cantidad válida.'); return; }
-    var l = null;
-    for (var i = 0; i < data.lots.length; i++) if (data.lots[i].sku === sku && data.lots[i].lot === lot) l = data.lots[i];
-    if (l) { l.qty += qty; if (exp) l.exp = exp; } else { data.lots.push({ sku: sku, lot: lot, exp: exp, qty: qty }); }
-    data.movements.push({ id: Date.now(), date: nowStr(), type: 'IN', sku: sku, lot: lot, qty: qty, doc: doc });
-    save();
-    var p = prod(sku);
-    feedback('inFeedback', 'ok', '✓ Recepción registrada: <strong>+' + qty + ' ' + esc(p.unit) + '</strong> de ' + esc(p.name) + ' (lote ' + esc(lot) + '). Stock actual: <strong>' + stockOf(sku) + '</strong>. El movimiento quedó en el Kardex y el inventario se actualizó en tiempo real, como en un WMS.');
-    document.getElementById('inQty').value = ''; document.getElementById('inDoc').value = ''; document.getElementById('inLot').value = ''; document.getElementById('inExp').value = '';
-    renderAll();
-}
-
-function onOutSkuChange() {
-    var sku = document.getElementById('outSku').value;
-    var lotSel = document.getElementById('outLot');
-    lotSel.innerHTML = '';
-    if (!sku) { document.getElementById('fefoNote').innerHTML = ''; return; }
-    var lots = data.lots.filter(function (l) { return l.sku === sku && l.qty > 0; });
-    if (!lots.length) {
-        lotSel.innerHTML = '<option value="">-- Sin stock disponible --</option>';
-        document.getElementById('fefoNote').innerHTML = '<div class="edu warn">⚠ Este producto no tiene stock. En un WMS real el despacho quedaría bloqueado y aquí se generaría un quiebre de stock.</div>';
-        return;
+    function saveDB() {
+        localStorage.setItem('wms_pro_db', JSON.stringify(db));
     }
-    lots.forEach(function (l) {
-        var o = document.createElement('option');
-        o.value = l.lot;
-        o.textContent = l.lot + ' | stock: ' + l.qty + (l.exp ? ' | vence: ' + l.exp : '');
-        lotSel.appendChild(o);
-    });
-    var sug = fefoLot(sku);
-    if (sug) lotSel.value = sug.lot;
-    updateFefoNote();
-}
 
-function updateFefoNote() {
-    var sku = document.getElementById('outSku').value;
-    var box = document.getElementById('fefoNote');
-    var p = prod(sku);
-    if (!p) { box.innerHTML = ''; return; }
-    var sug = fefoLot(sku);
-    if (!sug) { box.innerHTML = ''; return; }
-    var sel = document.getElementById('outLot').value;
-    if (!p.fefo || !sug.exp) {
-        box.innerHTML = '<div class="edu ok">✓ Lotes disponibles listos. Este producto no se controla por vencimiento: aplica rotación FIFO por antigüedad de ingreso.</div>';
-        return;
+    // --- NAVIGATION ---
+    function openTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+        refreshAll();
     }
-    if (sel === sug.lot) {
-        box.innerHTML = '<div class="edu ok">✓ Aplicando FEFO: el sistema sugiere despachar el lote <strong>' + esc(sug.lot) + '</strong> porque vence primero (' + esc(sug.exp) + ').</div>';
-    } else {
-        box.innerHTML = '<div class="edu warn">⚠ No estás aplicando FEFO: el lote <strong>' + esc(sug.lot) + '</strong> vence antes (' + esc(sug.exp) + '). Si despachas otro lote, el más antiguo podría vencerse en bodega y convertirse en merma (Módulo 12).</div>';
+
+    // --- MASTERS ---
+    function createProduct() {
+        const code = document.getElementById('prod-code').value.trim().toUpperCase();
+        const desc = document.getElementById('prod-desc').value.trim();
+        const unit = document.getElementById('prod-unit').value;
+        const min = parseInt(document.getElementById('prod-min').value);
+
+        if (!code || !desc) return alert('Faltan datos');
+        if (db.products.find(p => p.code === code)) return alert('SKU ya existe');
+
+        db.products.push({ code, desc, unit, min });
+        saveDB();
+        alert('Producto creado');
+        document.getElementById('prod-code').value = '';
+        document.getElementById('prod-desc').value = '';
+        refreshAll();
     }
-}
 
-function registerOutbound() {
-    var sku = document.getElementById('outSku').value;
-    var lot = document.getElementById('outLot').value;
-    var qty = parseInt(document.getElementById('outQty').value);
-    var doc = document.getElementById('outDoc').value.trim() || 'S/DOC';
-    if (!sku || !lot) { feedback('outFeedback', 'err', '⚠ Seleccione producto y lote.'); return; }
-    if (!qty || qty <= 0) { feedback('outFeedback', 'err', '⚠ Ingrese una cantidad válida.'); return; }
-    var l = null;
-    for (var i = 0; i < data.lots.length; i++) if (data.lots[i].sku === sku && data.lots[i].lot === lot && data.lots[i].qty > 0) l = data.lots[i];
-    if (!l) { feedback('outFeedback', 'err', '⚠ El lote seleccionado no tiene stock disponible.'); return; }
-    if (qty > l.qty) { feedback('outFeedback', 'err', '🚫 <strong>Movimiento bloqueado por el sistema:</strong> intentas despachar ' + qty + ' ' + esc(prod(sku).unit) + ' pero el lote ' + esc(lot) + ' solo tiene ' + l.qty + '. Un WMS real bloquea salidas mayores al stock disponible.'); return; }
-    l.qty -= qty;
-    data.movements.push({ id: Date.now(), date: nowStr(), type: 'OUT', sku: sku, lot: lot, qty: qty, doc: doc });
-    save();
-    var p = prod(sku);
-    var st = stockOf(sku);
-    var msg = '✓ Despacho registrado: <strong>-' + qty + ' ' + esc(p.unit) + '</strong> de ' + esc(p.name) + ' (lote ' + esc(lot) + '). Stock actual: <strong>' + st + '</strong>.';
-    if (st < p.min) msg += ' 🔴 <strong>CRÍTICO:</strong> stock bajo el mínimo (' + p.min + '). Riesgo de quiebre: la operación puede detenerse.';
-    else if (st < p.rep) msg += ' 🟡 Stock bajo el <strong>punto de reposición</strong> (' + p.rep + '). En la vida real, aquí Compras evaluaría generar una orden de compra (Módulo 13).';
-    feedback('outFeedback', 'ok', msg);
-    document.getElementById('outQty').value = ''; document.getElementById('outDoc').value = '';
-    renderAll();
-    onOutSkuChange();
-}
+    function createPartner() {
+        const code = document.getElementById('partner-code').value.trim().toUpperCase();
+        const name = document.getElementById('partner-name').value.trim();
+        const type = document.getElementById('partner-type').value;
 
-function resetData() {
-    if (confirm('¿Reiniciar el simulador con los datos de ejemplo? Se perderán los cambios.')) {
-        localStorage.removeItem('wmsSim');
-        data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-        renderAll();
+        if (!code || !name) return alert('Faltan datos');
+        if (db.partners.find(p => p.code === code)) return alert('Partner ya existe');
+
+        db.partners.push({ code, name, type });
+        saveDB();
+        alert('Partner creado');
+        document.getElementById('partner-code').value = '';
+        document.getElementById('partner-name').value = '';
+        refreshAll();
     }
-}
 
-renderAll();
+    // --- PURCHASING (PO) ---
+    function createPO() {
+        const vendor = document.getElementById('po-vendor').value;
+        const prod = document.getElementById('po-prod').value;
+        const qty = parseInt(document.getElementById('po-qty').value);
+
+        if (!vendor || !prod || !qty) return alert('Complete la OC');
+
+        const poId = 'OC-' + (db.pos.length + 1001);
+        db.pos.push({ id: poId, vendor, prod, qty, received: 0, status: 'ABIERTA' });
+        saveDB();
+        alert(`Orden ${poId} creada`);
+        refreshAll();
+    }
+
+    // --- RECEPTION (GR) ---
+    function loadPODetails() {
+        const poId = document.getElementById('gr-po-select').value;
+        const po = db.pos.find(p => p.id === poId);
+        const div = document.getElementById('gr-details');
+        
+        if (po) {
+            div.style.display = 'block';
+            const pending = po.qty - po.received;
+            document.getElementById('gr-po-info').innerText = `${po.vendor} - ${po.prod}`;
+            document.getElementById('gr-pending-qty').innerText = pending;
+            document.getElementById('gr-qty').value = pending;
+            document.getElementById('gr-qty').max = pending;
+        } else {
+            div.style.display = 'none';
+        }
+    }
+
+    function postGR() {
+        const poId = document.getElementById('gr-po-select').value;
+        const qty = parseInt(document.getElementById('gr-qty').value);
+        const batch = document.getElementById('gr-batch').value.trim() || 'SIN-LOTE';
+        const loc = document.getElementById('gr-loc').value.trim() || 'SIN-UBIC';
+
+        const poIndex = db.pos.findIndex(p => p.id === poId);
+        if (poIndex === -1) return alert('Seleccione una OC');
+        
+        const po = db.pos[poIndex];
+        const pending = po.qty - po.received;
+
+        if (qty > pending) return alert(`Error: Solo faltan ${pending} por recibir`);
+        if (qty <= 0) return alert('Cantidad inválida');
+
+        // Update PO
+        db.pos[poIndex].received += qty;
+        if (db.pos[poIndex].received >= db.pos[poIndex].qty) {
+            db.pos[poIndex].status = 'CERRADA';
+        }
+
+        // Update Inventory
+        const existingInv = db.inventory.find(i => i.code === po.prod && i.batch === batch && i.loc === loc);
+        if (existingInv) {
+            existingInv.qty += qty;
+        } else {
+            // Simple exp logic for demo
+            const expDate = new Date(); expDate.setMonth(expDate.getMonth() + 6);
+            db.inventory.push({ 
+                code: po.prod, 
+                batch: batch, 
+                loc: loc, 
+                qty: qty, 
+                exp: expDate.toISOString().split('T')[0] 
+            });
+        }
+
+        // History
+        const currentBalance = db.inventory.filter(i => i.code === po.prod).reduce((s, i) => s + i.qty, 0);
+        db.history.unshift({
+            date: new Date().toLocaleString(),
+            type: 'ENTRADA',
+            doc: poId,
+            prod: po.prod,
+            batch: batch,
+            qty: qty,
+            balance: currentBalance
+        });
+
+        saveDB();
+        alert('Entrada registrada correctamente');
+        document.getElementById('gr-details').style.display = 'none';
+        refreshAll();
+    }
+
+    // --- SALES (SO) ---
+    function createSO() {
+        const cust = document.getElementById('so-customer').value;
+        const prod = document.getElementById('so-prod').value;
+        const qty = parseInt(document.getElementById('so-qty').value);
+
+        if (!cust || !prod || !qty) return alert('Complete el PV');
+
+        const soId = 'PV-' + (db.sos.length + 2001);
+        db.sos.push({ id: soId, customer: cust, prod, qty, delivered: 0, status: 'PENDIENTE' });
+        saveDB();
+        alert(`Pedido ${soId} creado`);
+        refreshAll();
+    }
+
+    // --- DISPATCH (GI) ---
+    function loadSODetails() {
+        const soId = document.getElementById('gi-so-select').value;
+        const so = db.sos.find(s => s.id === soId);
+        const div = document.getElementById('gi-details');
+        
+        if (so) {
+            div.style.display = 'block';
+            const pending = so.qty - so.delivered;
+            document.getElementById('gi-so-info').innerText = `${so.customer} - ${so.prod}`;
+            document.getElementById('gi-pending-qty').innerText = pending;
+            document.getElementById('gi-qty').value = pending;
+            
+            // Load batches for FEFO
+            const batches = db.inventory.filter(i => i.code === so.prod && i.qty > 0);
+            batches.sort((a, b) => new Date(a.exp) - new Date(b.exp)); // FEFO
+            
+            const sel = document.getElementById('gi-batch');
+            sel.innerHTML = '<option value="">-- Automático (FEFO) --</option>';
+            batches.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.batch;
+                opt.text = `${b.batch} (Exp: ${b.exp}, Qty: ${b.qty})`;
+                sel.appendChild(opt);
+            });
+        } else {
+            div.style.display = 'none';
+        }
+    }
+
+    function postGI() {
+        const soId = document.getElementById('gi-so-select').value;
+        let qty = parseInt(document.getElementById('gi-qty').value);
+        let batch = document.getElementById('gi-batch').value;
+        const warningDiv = document.getElementById('gi-warning');
+        warningDiv.style.display = 'none';
+
+        const soIndex = db.sos.findIndex(s => s.id === soId);
+        if (soIndex === -1) return alert('Seleccione un PV');
+        
+        const so = db.sos[soIndex];
+        const pending = so.qty - so.delivered;
+
+        if (qty > pending) return alert(`Error: Solo faltan ${pending} por entregar`);
+        if (qty <= 0) return alert('Cantidad inválida');
+
+        // Check Stock
+        const totalStock = db.inventory.filter(i => i.code === so.prod).reduce((s, i) => s + i.qty, 0);
+        if (totalStock < qty) return alert(`Error: Stock insuficiente. Disponible: ${totalStock}`);
+
+        // FEFO Logic if no batch selected
+        if (!batch) {
+            const available = db.inventory.filter(i => i.code === so.prod && i.qty > 0);
+            available.sort((a, b) => new Date(a.exp) - new Date(b.exp));
+            if (available.length > 0) {
+                batch = available[0].batch;
+                // Warning if user didn't pick but system did
+                warningDiv.innerText = `Sistema asignó lote FEFO: ${batch}`;
+                warningDiv.style.display = 'block';
+                warningDiv.className = 'alert alert-info';
+            }
+        }
+
+        // Deduct Stock
+        let remainingToDeduct = qty;
+        // Find the specific batch index or just deduct from the first available of that batch
+        const invIndex = db.inventory.findIndex(i => i.code === so.prod && i.batch === batch);
+        
+        if (invIndex > -1 && db.inventory[invIndex].qty >= remainingToDeduct) {
+            db.inventory[invIndex].qty -= remainingToDeduct;
+        } else {
+            // Fallback: deduct from any available if specific batch logic fails in this simple sim
+            // In real WMS, this would be stricter.
+            let deducted = 0;
+            for (let i of db.inventory) {
+                if (i.code === so.prod && i.qty > 0 && deducted < remainingToDeduct) {
+                    const take = Math.min(i.qty, remainingToDeduct - deducted);
+                    i.qty -= take;
+                    deducted += take;
+                    batch = i.batch; // Update batch to what was actually taken
+                }
+            }
+        }
+
+        // Update SO
+        db.sos[soIndex].delivered += qty;
+        if (db.sos[soIndex].delivered >= db.sos[soIndex].qty) {
+            db.sos[soIndex].status = 'ENTREGADO';
+        }
+
+        // History
+        const currentBalance = db.inventory.filter(i => i.code === so.prod).reduce((s, i) => s + i.qty, 0);
+        db.history.unshift({
+            date: new Date().toLocaleString(),
+            type: 'SALIDA',
+            doc: soId,
+            prod: so.prod,
+            batch: batch,
+            qty: -qty,
+            balance: currentBalance
+        });
+
+        saveDB();
+        alert('Salida registrada');
+        document.getElementById('gi-details').style.display = 'none';
+        refreshAll();
+    }
+
+    // --- VIEWS ---
+    function refreshAll() {
+        renderDashboard();
+        renderMasters();
+        renderPurchasing();
+        renderSales();
+        renderInventory();
+    }
+
+    function renderDashboard() {
+        document.getElementById('kpi-skus').innerText = db.products.length;
+        document.getElementById('kpi-stock').innerText = db.inventory.reduce((s, i) => s + i.qty, 0);
+        document.getElementById('kpi-po').innerText = db.pos.filter(p => p.status === 'ABIERTA').length;
+        
+        const alerts = db.products.filter(p => {
+            const stock = db.inventory.filter(i => i.code === p.code).reduce((s, i) => s + i.qty, 0);
+            return stock <= p.min;
+        }).length;
+        document.getElementById('kpi-alerts').innerText = alerts;
+
+        const alertsDiv = document.getElementById('alerts-container');
+        alertsDiv.innerHTML = '';
+        if (alerts > 0) {
+            alertsDiv.innerHTML += `<div class="alert alert-danger">⚠️ Hay ${alerts} productos bajo stock mínimo.</div>`;
+        }
+        
+        const recentBody = document.querySelector('#recent-moves-table tbody');
+        recentBody.innerHTML = '';
+        db.history.slice(0, 5).forEach(h => {
+            recentBody.innerHTML += `<tr><td>${h.date}</td><td>${h.type}</td><td>${h.doc}</td><td>${h.prod} (${h.qty})</td></tr>`;
+        });
+    }
+
+    function renderMasters() {
+        // Products
+        const pBody = document.querySelector('#products-table tbody');
+        pBody.innerHTML = '';
+        db.products.forEach(p => {
+            pBody.innerHTML += `<tr><td>${p.code}</td><td>${p.desc}</td><td>${p.min}</td></tr>`;
+        });
+
+        // Partners
+        const paBody = document.querySelector('#partners-table tbody');
+        paBody.innerHTML = '';
+        db.partners.forEach(p => {
+            paBody.innerHTML += `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.type}</td></tr>`;
+        });
+
+        // Selects
+        fillSelect('po-vendor', db.partners.filter(p => p.type.includes('PROVEEDOR')), p => p.name, p => p.code);
+        fillSelect('po-prod', db.products, p => p.desc, p => p.code);
+        fillSelect('so-customer', db.partners.filter(p => p.type.includes('CLIENTE')), p => p.name, p => p.code);
+        fillSelect('so-prod', db.products, p => p.desc, p => p.code);
+    }
+
+    function renderPurchasing() {
+        const body = document.querySelector('#po-table tbody');
+        body.innerHTML = '';
+        db.pos.forEach(po => {
+            const statusClass = po.status === 'ABIERTA' ? 'badge-pending' : 'badge-ok';
+            body.innerHTML += `
+                <tr>
+                    <td>${po.id}</td>
+                    <td>${po.vendor}</td>
+                    <td>${po.prod}</td>
+                    <td>${po.qty}</td>
+                    <td>${po.received}</td>
+                    <td><span class="badge ${statusClass}">${po.status}</span></td>
+                </tr>
+            `;
+        });
+
+        // Fill GR Select
+        const grSel = document.getElementById('gr-po-select');
+        grSel.innerHTML = '<option value="">-- Seleccione OC --</option>';
+        db.pos.filter(p => p.status === 'ABIERTA').forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.text = `${p.id} - ${p.vendor} (${p.prod})`;
+            grSel.appendChild(opt);
+        });
+    }
+
+    function renderSales() {
+        const body = document.querySelector('#so-table tbody');
+        body.innerHTML = '';
+        db.sos.forEach(so => {
+            const statusClass = so.status === 'PENDIENTE' ? 'badge-pending' : 'badge-ok';
+            body.innerHTML += `
+                <tr>
+                    <td>${so.id}</td>
+                    <td>${so.customer}</td>
+                    <td>${so.prod}</td>
+                    <td>${so.qty}</td>
+                    <td>${so.delivered}</td>
+                    <td><span class="badge ${statusClass}">${so.status}</span></td>
+                </tr>
+            `;
+        });
+
+        // Fill GI Select
+        const giSel = document.getElementById('gi-so-select');
+        giSel.innerHTML = '<option value="">-- Seleccione PV --</option>';
+        db.sos.filter(s => s.status === 'PENDIENTE').forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.text = `${s.id} - ${s.customer} (${s.prod})`;
+            giSel.appendChild(opt);
+        });
+    }
+
+    function renderInventory() {
+        const sBody = document.querySelector('#stock-table tbody');
+        sBody.innerHTML = '';
+        db.inventory.filter(i => i.qty > 0).forEach(i => {
+            sBody.innerHTML += `<tr><td>${i.code}</td><td>${i.batch}</td><td>${i.loc}</td><td>${i.qty}</td><td>${i.exp}</td></tr>`;
+        });
+
+        const hBody = document.querySelector('#history-table tbody');
+        hBody.innerHTML = '';
+        db.history.forEach(h => {
+            const color = h.qty > 0 ? 'green' : 'red';
+            hBody.innerHTML += `<tr><td>${h.date}</td><td>${h.type}</td><td>${h.doc}</td><td>${h.prod}</td><td>${h.batch}</td><td style="color:${color}">${h.qty}</td><td>${h.balance}</td></tr>`;
+        });
+    }
+
+    function fillSelect(id, data, labelFn, valFn) {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const curr = sel.value;
+        sel.innerHTML = '<option value="">-- Seleccionar --</option>';
+        data.forEach(d => {
+            const o = document.createElement('option');
+            o.value = valFn(d);
+            o.text = labelFn(d);
+            sel.appendChild(o);
+        });
+        if (curr) sel.value = curr;
+    }
+
+    function resetSystem() {
+        if (confirm('¿BORRAR TODO? Se perderán todos los datos.')) {
+            localStorage.removeItem('wms_pro_db');
+            location.reload();
+        }
+    }
+
 </script>
 
 </body>
