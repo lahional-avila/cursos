@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 10: Simulador Kaizen - Resolución de Problemas</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --dark: #1a252f;
+            --light: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #7f8c8d;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            
+            /* Colores Ishikawa */
+            --bone-color: #34495e;
+            --spine-color: #7f8c8d;
+            --head-color: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { background-color: #f4f7f6; color: var(--text-main); line-height: 1.6; padding-bottom: 50px; }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--secondary); }
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+        /* MAIN CONTAINER */
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--secondary), var(--success));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-top: -25px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            border: 3px solid #f4f7f6;
+            transition: var(--transition);
+        }
+        .step-dot.active { background: var(--secondary); transform: scale(1.2); }
+        .step-dot.completed { background: var(--success); }
+
+        /* CARDS & SECTIONS */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease;
+            display: none; /* Hidden by default */
+        }
+        .card.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { color: var(--primary); margin-bottom: 1rem; border-bottom: 2px solid var(--light); padding-bottom: 0.5rem; }
+        h3 { color: var(--secondary); margin: 1.5rem 0 1rem 0; }
+        p { margin-bottom: 1rem; color: var(--text-muted); }
+
+        /* SCENARIO BOX */
+        .scenario-box {
+            background: #fff3cd;
+            border-left: 5px solid var(--warning);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+        .scenario-title { font-weight: bold; color: #856404; display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
+
+        /* KPI DASHBOARD */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .kpi-card {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light);
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .kpi-value { font-size: 2rem; font-weight: bold; color: var(--accent); display: block; }
+        .kpi-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-good .kpi-value { color: var(--success); }
+
+        /* --- ISHIKAWA VISUAL STYLES --- */
+        .ishikawa-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 500px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        /* La espina central */
+        .spine {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            width: 70%;
+            height: 4px;
+            background: var(--bone-color);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        .spine::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -8px;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 20px solid var(--bone-color);
+        }
+
+        /* La cabeza del pez (Problema) */
+        .fish-head {
+            position: absolute;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            background: var(--head-color);
+            color: white;
+            padding: 15px;
+            border-radius: 50% 10% 50% 10%;
+            width: 180px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        /* Espinas (Categorías) */
+        .bone {
+            position: absolute;
+            width: 2px;
+            background: var(--spine-color);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Posiciones de las espinas */
+        .bone-1 { left: 15%; top: 10%; height: 40%; transform: rotate(25deg); transform-origin: bottom; }
+        .bone-2 { left: 35%; top: 10%; height: 40%; transform: rotate(25deg); transform-origin: bottom; }
+        .bone-3 { left: 55%; top: 10%; height: 40%; transform: rotate(25deg); transform-origin: bottom; }
+        
+        .bone-4 { left: 25%; bottom: 10%; height: 40%; transform: rotate(-25deg); transform-origin: top; }
+        .bone-5 { left: 45%; bottom: 10%; height: 40%; transform: rotate(-25deg); transform-origin: top; }
+
+        /* Etiquetas de categoría en las espinas */
+        .bone-label {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+            position: absolute;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .bone-1 .bone-label, .bone-2 .bone-label, .bone-3 .bone-label { top: -10px; }
+        .bone-4 .bone-label, .bone-5 .bone-label { bottom: -10px; }
+
+        /* Contenedores de selección en las espinas */
+        .bone-select-container {
+            position: absolute;
+            width: 220px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 3;
+        }
+        
+        /* Posicionamiento de los selects relativos a la espina */
+        .bone-1 .bone-select-container { top: 20%; left: 20px; }
+        .bone-2 .bone-select-container { top: 20%; left: 20px; }
+        .bone-3 .bone-select-container { top: 20%; left: 20px; }
+        .bone-4 .bone-select-container { bottom: 20%; left: 20px; }
+        .bone-5 .bone-select-container { bottom: 20%; left: 20px; }
+
+        .bone-select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+        .bone-select.correct { border-color: var(--success); background: #e8f5e9; }
+        .bone-select.wrong { border-color: var(--accent); background: #ffebee; }
+
+        /* Feedback Ishikawa */
+        .ishikawa-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* 5 WHYS */
+        .why-step {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--secondary);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .why-question { font-weight: bold; color: var(--primary); margin-bottom: 0.5rem; }
+        .why-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px; font-size: 1rem; }
+
+        /* SOAP PLAN */
+        .soap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .soap-item { background: #f1f3f5; padding: 1rem; border-radius: var(--border-radius); }
+        .soap-item h4 { color: var(--primary); margin-bottom: 0.5rem; border-bottom: 1px solid #ddd; padding-bottom: 5px;}
+        .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.95rem; }
+        .checkbox-label input { transform: scale(1.2); accent-color: var(--secondary); }
+
+        /* BUTTONS */
+        .btn-action {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+        .btn-action:hover { background: #2980b9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-action:disabled { background: #bdc3c7; cursor: not-allowed; transform: none; }
+        .btn-next { float: right; }
+
+        /* UTILS */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 2rem; }
+        
+        /* FLASH EFFECT */
+        .flash { animation: flashAnim 0.5s; }
+        @keyframes flashAnim { 0% { background-color: #fff; } 50% { background-color: #d4edda; } 100% { background-color: #fff; } }
+
+        @media (max-width: 768px) {
+            .ishikawa-wrapper { min-height: 800px; }
+            .spine { width: 90%; left: 5%; }
+            .fish-head { right: 2%; width: 120px; font-size: 0.8rem; }
+            .bone { transform: none !important; width: 100%; height: 2px; left: 0 !important; }
+            .bone-1 { top: 10%; } .bone-2 { top: 25%; } .bone-3 { top: 40%; }
+            .bone-4 { top: 55%; } .bone-5 { top: 70%; }
+            .bone-label { position: static; display: inline-block; margin-bottom: 5px; }
+            .bone-select-container { position: static; width: 100%; margin-top: 5px; }
+            .spine::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"> <span>Kaizen</span> Simulator</div>
+    <a href="index.html" class="nav-btn">🏠 Menú Principal</a>
+</header>
+
+<div class="container">
+    
+    <!-- PROGRESS -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="step-indicators">
+        <div class="step-dot active" id="dot-1">1</div>
+        <div class="step-dot" id="dot-2">2</div>
+        <div class="step-dot" id="dot-3">3</div>
+        <div class="step-dot" id="dot-4">4</div>
+        <div class="step-dot" id="dot-5">5</div>
+    </div>
+
+    <!-- STEP 1: DIAGNÓSTICO (KPI) -->
+    <div class="card active" id="step-1">
+        <h2>📊 Fase 1: Diagnóstico Inicial (KPIs)</h2>
+        <div class="scenario-box">
+            <span class="scenario-title">⚠️ ALERTA DE GERENCIA</span>
+            <p>"El equipo de Ventas ha escalado una queja formal. Los clientes están furiosos. En el último mes, los errores en los despachos se han disparado y estamos perdiendo dinero y reputación. Necesitamos saber qué está pasando exactamente antes de actuar."</p>
+        </div>
+
+        <p>Revisa el Dashboard de Operaciones del último trimestre. ¿Qué indican los KPIs?</p>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <span class="kpi-label">Exactitud de Inventario</span>
+                <span class="kpi-value">68%</span>
+                <small style="color:red">▼ Meta: 98%</small>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Tasa de Error Despacho</span>
+                <span class="kpi-value">15%</span>
+                <small style="color:red">▲ Meta: < 2%</small>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Reclamos Clientes</span>
+                <span class="kpi-value">42</span>
+                <small style="color:red">▲ Meta: < 5</small>
+            </div>
+            <div class="kpi-card kpi-good">
+                <span class="kpi-label">Productividad (Picks/Hr)</span>
+                <span class="kpi-value">120</span>
+                <small style="color:green">▲ Meta: 100</small>
+            </div>
+        </div>
+
+        <div class="alert alert-info" style="background:#e3f2fd; padding:1rem; border-radius:4px; margin-top:1rem;">
+            <strong>Análisis Rápido:</strong> La productividad es alta (la gente trabaja rápido), pero la calidad es pésima (muchos errores). Esto sugiere que se está priorizando la velocidad sobre la precisión, o que hay fallas sistémicas que obligan a improvisar.
+        </div>
+
+        <button class="btn-action btn-next" onclick="nextStep(2)">Analizar Causas →</button>
+    </div>
+
+    <!-- STEP 2: ANÁLISIS (ISHIKAWA VISUAL + 5 PORQUÉS) -->
+    <div class="card" id="step-2">
+        <h2>🐟 Fase 2: Análisis de Causas (Ishikawa + 5 Porqués)</h2>
+        <p>Los datos confirman el problema. Ahora debemos encontrar la <strong>Causa Raíz</strong>. Usa el Diagrama de Ishikawa interactivo para categorizar los problemas observados.</p>
+
+        <h3>1. Diagrama de Ishikawa (Espina de Pescado)</h3>
+        <p>Selecciona la causa correcta en cada "espina" del pez. Todas convergen en el problema central.</p>
+        
+        <div class="ishikawa-wrapper">
+            <!-- Espina Central -->
+            <div class="spine"></div>
+            
+            <!-- Cabeza del Pez (Problema) -->
+            <div class="fish-head">
+                Errores en Despacho<br>(15%)
+            </div>
+
+            <!-- Espina 1: Mano de Obra (Arriba Izq) -->
+            <div class="bone bone-1">
+                <div class="bone-label">👷 Mano de Obra</div>
+                <div class="bone-select-container">
+                    <select class="bone-select" id="ish-manpower" onchange="checkIshikawa()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="wrong">Falta de motivación</option>
+                        <option value="correct">Sin capacitación en SOPs</option>
+                        <option value="wrong">Exceso de horas extras</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Espina 2: Método (Arriba Centro) -->
+            <div class="bone bone-2">
+                <div class="bone-label">📋 Método</div>
+                <div class="bone-select-container">
+                    <select class="bone-select" id="ish-method" onchange="checkIshikawa()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="correct">Sin procedimientos escritos</option>
+                        <option value="wrong">Procedimientos complejos</option>
+                        <option value="wrong">Falta de supervisión</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Espina 3: Medio Ambiente (Arriba Der) -->
+            <div class="bone bone-3">
+                <div class="bone-label">🏭 Medio Ambiente</div>
+                <div class="bone-select-container">
+                    <select class="bone-select" id="ish-env" onchange="checkIshikawa()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="wrong">Iluminación deficiente</option>
+                        <option value="correct">Desorden (5S no aplicado)</option>
+                        <option value="wrong">Temperatura inadecuada</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Espina 4: Maquinaria (Abajo Izq) -->
+            <div class="bone bone-4">
+                <div class="bone-label">⚙️ Maquinaria</div>
+                <div class="bone-select-container">
+                    <select class="bone-select" id="ish-machine" onchange="checkIshikawa()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="wrong">Software lento</option>
+                        <option value="correct">Sin mantenimiento preventivo</option>
+                        <option value="wrong">Falta de equipos modernos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Espina 5: Materiales (Abajo Centro) - Extra para completar el pez -->
+            <div class="bone bone-5">
+                <div class="bone-label">📦 Materiales</div>
+                <div class="bone-select-container">
+                    <select class="bone-select" id="ish-material" onchange="checkIshikawa()">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="wrong">Mala calidad del producto</option>
+                        <option value="correct">Etiquetado incorrecto/ilegible</option>
+                        <option value="wrong">Falta de stock</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="ishikawa-feedback" class="ishikawa-feedback"></div>
+
+        <h3 style="margin-top:2rem;">2. Los 5 Porqués (Drill Down)</h3>
+        <p>Profundicemos en la causa más crítica: <strong>"Errores en el picking debido a desorden y falta de procedimientos"</strong>.</p>
+
+        <div class="why-step">
+            <div class="why-question">1. ¿Por qué hay errores en el despacho?</div>
+            <div style="font-size:0.9rem; color:#666;">Porque los operarios están tomando productos equivocados de los racks.</div>
+        </div>
+        <div class="why-step">
+            <div class="why-question">2. ¿Por qué toman productos equivocados?</div>
+            <div style="font-size:0.9rem; color:#666;">Porque las ubicaciones no están señalizadas y hay producto mezclado.</div>
+        </div>
+        <div class="why-step">
+            <div class="why-question">3. ¿Por qué no hay señalización y hay mezcla?</div>
+            <div style="font-size:0.9rem; color:#666;">Porque no se aplican las 5S y no hay un estándar de ubicación visual.</div>
+        </div>
+        <div class="why-step">
+            <div class="why-question">4. ¿Por qué no se aplican las 5S ni hay estándares?</div>
+            <div style="font-size:0.9rem; color:#666;">Porque no hay procedimientos escritos (SOPs) que lo exijan ni auditorías.</div>
+        </div>
+        <div class="why-step" style="border-left-color: var(--accent);">
+            <div class="why-question">5. ¿Por qué no hay procedimientos ni auditorías? (CAUSA RAÍZ)</div>
+            <input type="text" class="why-input" id="why5-input" placeholder="Escribe la causa raíz fundamental..." oninput="checkWhy5()">
+            <div id="why5-hint" style="font-size:0.8rem; color:#888; margin-top:5px;">Pista: Tiene que ver con la gestión y el sistema de trabajo.</div>
+        </div>
+
+        <div id="rca-result" class="hidden" style="margin-top:1rem; padding:1rem; background:#e8f5e9; border-radius:4px; border:1px solid #c3e6cb;">
+            <strong>✅ Causa Raíz Identificada (RCA):</strong> Falta de un Sistema de Gestión de Calidad operativo (ausencia de SOPs, mantenimiento preventivo y programa 5S).
+        </div>
+
+        <button class="btn-action btn-next" id="btn-step2-next" disabled onclick="nextStep(3)">Definir Solución (Kaizen) →</button>
+    </div>
+
+    <!-- STEP 3: SOLUCIÓN (KAIZEN / SOAP) -->
+    <div class="card" id="step-3">
+        <h2>🛠️ Fase 3: Plan de Acción (Kaizen / SOAP)</h2>
+        <p>Con la Causa Raíz identificada, debemos diseñar un plan <strong>Kaizen</strong> (Mejora Continua) utilizando el formato <strong>SOAP</strong> (Subjetivo, Objetivo, Análisis, Plan) o un Plan de Acción correctivo.</p>
+        
+        <div class="scenario-box" style="background:#e3f2fd; border-color:var(--secondary);">
+            <span class="scenario-title" style="color:var(--primary);">🎯 OBJETIVO DEL PLAN</span>
+            <p>Reducir la Tasa de Error de Despacho al 2% y aumentar la Exactitud de Inventario al 95% en 3 meses, mediante la estandarización y el orden.</p>
+        </div>
+
+        <h3>Selecciona las acciones correctas para el Plan Kaizen:</h3>
+        <p>Marca las casillas que corresponden a soluciones efectivas para las causas raíz encontradas (Capacitación, Orden, Procedimientos, Mantenimiento).</p>
+
+        <div class="soap-grid">
+            <div class="soap-item">
+                <h4>👷 Personas (Capacitación)</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="capacitacion" onchange="validatePlan()"> Implementar programa de inducción y re-entrenamiento en SOPs.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="despedir" onchange="validatePlan()"> Despedir a todo el personal y contratar nuevo.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="premios" onchange="validatePlan()"> Dar premios solo por velocidad (sin importar errores).</label>
+                </div>
+            </div>
+            <div class="soap-item">
+                <h4>📋 Procesos (Métodos)</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="sops" onchange="validatePlan()"> Redactar y publicar Procedimientos Operativos Estándar (SOPs) visuales.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="5s" onchange="validatePlan()"> Iniciar campaña 5S (Clasificar, Ordenar, Limpiar, Estandarizar, Disciplina).</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="ignorar" onchange="validatePlan()"> Ignorar el orden y enfocarse solo en despachar rápido.</label>
+                </div>
+            </div>
+            <div class="soap-item">
+                <h4>⚙️ Equipos (Mantenimiento)</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="mantenimiento" onchange="validatePlan()"> Establecer calendario de Mantenimiento Preventivo para grúas/apiladoras.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="reparar" onchange="validatePlan()"> Reparar equipos solo cuando se rompan completamente (Correctivo).</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="checklist" onchange="validatePlan()"> Crear checklist diario de inspección de equipos pre-uso.</label>
+                </div>
+            </div>
+            <div class="soap-item">
+                <h4>📊 Control (Verificación)</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="auditoria" onchange="validatePlan()"> Realizar auditorías semanales de cumplimiento de SOPs y 5S.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="kpi-diario" onchange="validatePlan()"> Revisar KPIs de calidad diariamente en reunión de inicio de turno.</label>
+                    <label class="checkbox-label"><input type="checkbox" class="kaizen-check" value="nada" onchange="validatePlan()"> Confiar en que la gente lo hará bien sin supervisar.</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="plan-feedback" class="ishikawa-feedback"></div>
+
+        <button class="btn-action btn-next" id="btn-step3-next" disabled onclick="nextStep(4)">Implementar y Verificar →</button>
+    </div>
+
+    <!-- STEP 4: VERIFICACIÓN (NUEVOS KPIs) -->
+    <div class="card" id="step-4">
+        <h2>📈 Fase 4: Verificación de Resultados (KPIs Post-Kaizen)</h2>
+        <p>Han pasado 3 meses desde la implementación del Plan Kaizen. Las acciones fueron:</p>
+        <ul style="margin-left:20px; margin-bottom:1rem; color:var(--text-muted);">
+            <li>✅ Capacitación completa del personal en nuevos SOPs.</li>
+            <li>✅ Implementación de 5S (Bodega ordenada y limpia).</li>
+            <li>✅ Mantenimiento preventivo activo (0 fallas de grúas).</li>
+            <li>✅ Auditorías semanales de calidad.</li>
+        </ul>
+
+        <p>Revisemos el Dashboard actual. ¿Logramos el objetivo?</p>
+
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-good">
+                <span class="kpi-label">Exactitud de Inventario</span>
+                <span class="kpi-value" id="kpi-inv-final">--</span>
+                <small style="color:green">Meta: 98%</small>
+            </div>
+            <div class="kpi-card kpi-good">
+                <span class="kpi-label">Tasa de Error Despacho</span>
+                <span class="kpi-value" id="kpi-err-final">--</span>
+                <small style="color:green">Meta: < 2%</small>
+            </div>
+            <div class="kpi-card kpi-good">
+                <span class="kpi-label">Reclamos Clientes</span>
+                <span class="kpi-value" id="kpi-rec-final">--</span>
+                <small style="color:green">Meta: < 5</small>
+            </div>
+            <div class="kpi-card kpi-good">
+                <span class="kpi-label">Disponibilidad Equipos</span>
+                <span class="kpi-value" id="kpi-eq-final">--</span>
+                <small style="color:green">Meta: > 95%</small>
+            </div>
+        </div>
+
+        <div id="final-analysis" class="hidden" style="margin-top:1rem; padding:1.5rem; background:#f8f9fa; border-radius:var(--border-radius); border-left:5px solid var(--success);">
+            <h3 style="margin-top:0; color:var(--success);">🎉 ¡Mejora Confirmada!</h3>
+            <p>Los datos demuestran que al atacar la <strong>Causa Raíz</strong> (falta de estándares y mantenimiento) con un plan <strong>Kaizen</strong> estructurado, los indicadores críticos mejoraron drásticamente.</p>
+            <p><strong>Conclusión:</strong> La calidad no es suerte, es el resultado de procesos estandarizados, personas capacitadas y equipos confiables. El ciclo PDCA (Plan-Do-Check-Act) debe continuar para mantener estos resultados.</p>
+        </div>
+
+        <button class="btn-action" id="btn-reveal" onclick="revealResults()"> Revelar Resultados Finales</button>
+        <button class="btn-action btn-next hidden" id="btn-step4-next" onclick="nextStep(5)">Finalizar Simulación →</button>
+    </div>
+
+    <!-- STEP 5: CIERRE -->
+    <div class="card text-center" id="step-5">
+        <h2>🏆 Simulación Completada</h2>
+        <p style="font-size:1.2rem; margin:2rem 0;">Has completado exitosamente el ciclo de mejora continua.</p>
+        
+        <div style="background:var(--light); padding:2rem; border-radius:var(--border-radius); margin:2rem 0; text-align:left;">
+            <h3 style="margin-top:0;">📝 Resumen de Aprendizaje:</h3>
+            <ol style="margin-left:20px; line-height:2;">
+                <li><strong>KPI Inicial:</strong> Detectamos que la alta productividad ocultaba una baja calidad (errores).</li>
+                <li><strong>Ishikawa + 5 Porqués:</strong> Identificamos que la raíz no era "gente mala", sino "sistemas ausentes" (sin SOPs, sin 5S, sin mantenimiento).</li>
+                <li><strong>Kaizen/SOAP:</strong> Diseñamos soluciones estructurales (capacitación, orden, preventivos).</li>
+                <li><strong>KPI Final:</strong> Verificamos que los cambios generaron el impacto deseado.</li>
+            </ol>
+        </div>
+
+        <p>Este enfoque es aplicable a cualquier problema en tu bodega diaria. ¡No aceptes los errores como norma!</p>
+        
+        <a href="index.html" class="btn-action" style="text-decoration:none; justify-content:center; margin-top:2rem;">🏠 Volver al Menú Principal</a>
+    </div>
+
+</div>
+
+<script>
+    // STATE
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    // DOM ELEMENTS
+    const progressBar = document.getElementById('progressBar');
+    const dots = [
+        document.getElementById('dot-1'),
+        document.getElementById('dot-2'),
+        document.getElementById('dot-3'),
+        document.getElementById('dot-4'),
+        document.getElementById('dot-5')
+    ];
+    const cards = [
+        document.getElementById('step-1'),
+        document.getElementById('step-2'),
+        document.getElementById('step-3'),
+        document.getElementById('step-4'),
+        document.getElementById('step-5')
+    ];
+
+    // NAVIGATION
+    function nextStep(step) {
+        // Hide current
+        cards[currentStep - 1].classList.remove('active');
+        dots[currentStep - 1].classList.remove('active');
+        dots[currentStep - 1].classList.add('completed');
+
+        // Show next
+        currentStep = step;
+        cards[currentStep - 1].classList.add('active');
+        dots[currentStep - 1].classList.add('active');
+
+        // Update Progress Bar
+        const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // STEP 2 LOGIC: ISHIKAWA VISUAL
+    function checkIshikawa() {
+        const selects = ['ish-manpower', 'ish-method', 'ish-env', 'ish-machine', 'ish-material'];
+        let allCorrect = true;
+        let allAnswered = true;
+
+        selects.forEach(id => {
+            const el = document.getElementById(id);
+            if (el.value === "") allAnswered = false;
+            
+            // Visual feedback per select
+            if(el.value === "correct") {
+                el.classList.add('correct');
+                el.classList.remove('wrong');
+            } else if (el.value === "wrong") {
+                el.classList.add('wrong');
+                el.classList.remove('correct');
+                allCorrect = false;
+            } else {
+                el.classList.remove('correct', 'wrong');
+            }
+        });
+
+        const feedback = document.getElementById('ishikawa-feedback');
+        
+        if (!allAnswered) {
+            feedback.style.display = 'none';
+            return;
+        }
+
+        feedback.style.display = 'block';
+        if (allCorrect) {
+            feedback.className = 'ishikawa-feedback feedback-success';
+            feedback.style.background = '#d4edda';
+            feedback.style.color = '#155724';
+            feedback.style.border = '1px solid #c3e6cb';
+            feedback.innerHTML = "<strong>¡Excelente!</strong> Has identificado correctamente las causas en cada espina del diagrama de Ishikawa.";
+            checkStep2Completion();
+        } else {
+            feedback.className = 'ishikawa-feedback feedback-error';
+            feedback.style.background = '#f8d7da';
+            feedback.style.color = '#721c24';
+            feedback.style.border = '1px solid #f5c6cb';
+            feedback.innerHTML = "<strong>Revisa tus selecciones.</strong> Algunas causas no corresponden a la situación descrita (ej. falta de capacitación, desorden, falta de mantenimiento, etiquetado).";
+        }
+    }
+
+    // STEP 2 LOGIC: 5 WHYS
+    function checkWhy5() {
+        const input = document.getElementById('why5-input').value.toLowerCase();
+        const keywords = ['procedimiento', 'sop', 'estandar', 'sistema', 'gestion', 'metodo', 'norma', 'regla', 'falta', 'ausencia'];
+        const rcaResult = document.getElementById('rca-result');
+        const btnNext = document.getElementById('btn-step2-next');
+        
+        // Simple keyword matching for the root cause
+        const isCorrect = keywords.some(k => input.includes(k));
+
+        if (input.length > 10 && isCorrect) {
+            rcaResult.classList.remove('hidden');
+            rcaResult.classList.add('flash');
+            checkStep2Completion();
+        }
+    }
+
+    function checkStep2Completion() {
+        // Check if Ishikawa is correct AND Why5 has valid input
+        const ishFeedback = document.getElementById('ishikawa-feedback');
+        const ishCorrect = ishFeedback.style.display === 'block' && ishFeedback.classList.contains('feedback-success');
+        
+        const whyInput = document.getElementById('why5-input').value.toLowerCase();
+        const keywords = ['procedimiento', 'sop', 'estandar', 'sistema', 'gestion', 'metodo', 'norma', 'regla', 'falta', 'ausencia'];
+        const whyCorrect = keywords.some(k => whyInput.includes(k)) && whyInput.length > 10;
+
+        if (ishCorrect && whyCorrect) {
+            document.getElementById('btn-step2-next').disabled = false;
+        }
+    }
+
+    // STEP 3 LOGIC: KAIZEN PLAN
+    function validatePlan() {
+        const checks = document.querySelectorAll('.kaizen-check');
+        const correctValues = ['capacitacion', 'sops', '5s', 'mantenimiento', 'checklist', 'auditoria', 'kpi-diario'];
+        const wrongValues = ['despedir', 'premios', 'ignorar', 'reparar', 'nada'];
+        
+        let selectedValues = Array.from(checks).filter(c => c.checked).map(c => c.value);
+        const feedback = document.getElementById('plan-feedback');
+        const btnNext = document.getElementById('btn-step3-next');
+
+        // Check for any wrong selection
+        const hasWrong = selectedValues.some(v => wrongValues.includes(v));
+        // Check if all correct are selected (optional strictness, here we just ensure no wrong ones and at least some correct ones)
+        const hasCorrect = selectedValues.some(v => correctValues.includes(v));
+        const allCorrectSelected = correctValues.every(v => selectedValues.includes(v));
+
+        feedback.style.display = 'block';
+
+        if (hasWrong) {
+            feedback.className = 'ishikawa-feedback feedback-error';
+            feedback.style.background = '#f8d7da';
+            feedback.style.color = '#721c24';
+            feedback.style.border = '1px solid #f5c6cb';
+            feedback.innerHTML = "<strong>⚠️ Cuidado:</strong> Has seleccionado acciones contraproducentes (como despedir a todos o ignorar el orden). El Kaizen busca mejorar el sistema, no castigar ciegamente o ignorar problemas. Desmarca las opciones incorrectas.";
+            btnNext.disabled = true;
+        } else if (!hasCorrect) {
+            feedback.style.display = 'none';
+            btnNext.disabled = true;
+        } else if (!allCorrectSelected) {
+            feedback.className = 'ishikawa-feedback feedback-info';
+            feedback.style.background = '#d1ecf1';
+            feedback.style.color = '#0c5460';
+            feedback.style.border = '1px solid #bee5eb';
+            feedback.innerHTML = "<strong>Buen comienzo.</strong> Pero faltan acciones clave para cubrir todas las causas raíz (Personas, Procesos, Equipos, Control). Sigue seleccionando las mejores prácticas.";
+            btnNext.disabled = true;
+        } else {
+            feedback.className = 'ishikawa-feedback feedback-success';
+            feedback.style.background = '#d4edda';
+            feedback.style.color = '#155724';
+            feedback.style.border = '1px solid #c3e6cb';
+            feedback.innerHTML = "<strong>¡Plan Kaizen Perfecto!</strong> Has seleccionado un conjunto equilibrado de acciones correctivas que atacan directamente las causas raíz identificadas (Capacitación, Estandarización, 5S, Mantenimiento Preventivo y Control).";
+            btnNext.disabled = false;
+        }
+    }
+
+    // STEP 4 LOGIC: RESULTS
+    function revealResults() {
+        // Animate numbers
+        animateValue("kpi-inv-final", 68, 99, 1500);
+        animateValue("kpi-err-final", 15, 1, 1500, true); // True for percentage with decimal or just low number
+        animateValue("kpi-rec-final", 42, 2, 1500);
+        animateValue("kpi-eq-final", 70, 98, 1500);
+
+        document.getElementById('final-analysis').classList.remove('hidden');
+        document.getElementById('btn-reveal').classList.add('hidden');
+        document.getElementById('btn-step4-next').classList.remove('hidden');
+        
+        // Flash effect on cards
+        document.querySelectorAll('.kpi-card').forEach(card => {
+            card.classList.add('flash');
+        });
+    }
+
+    function animateValue(id, start, end, duration, isPercent = false) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            let currentVal = Math.floor(progress * (end - start) + start);
+            
+            // Special handling for error rate to show decimals or specific format if needed
+            if (id === "kpi-err-final") {
+                // Interpolate between 15 and 1
+                let val = (15 - (progress * 14)).toFixed(1);
+                obj.innerHTML = val + "%";
+            } else {
+                obj.innerHTML = currentVal + (isPercent ? "%" : (id === "kpi-rec-final" ? "" : "%"));
+            }
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                // Ensure final value is exact
+                if (id === "kpi-err-final") obj.innerHTML = "1.2%";
+                else if (id === "kpi-rec-final") obj.innerHTML = "2";
+                else obj.innerHTML = end + "%";
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+</script>
+
+</body>
+</html>
